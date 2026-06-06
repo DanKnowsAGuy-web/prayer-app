@@ -387,6 +387,81 @@ DISCIPLINE_STEPS[18] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 20 ----
+DISCIPLINE_STEPS[19] = {
+  morningPsalms: [
+    "May Yahweh answer you in the day of trouble. May the name of the God of Jacob protect you.",
+    "May he send you help from the sanctuary, and strengthen you out of Zion.",
+  ],
+  eveningPsalms: [
+    "We will triumph in your salvation, and in the name of our God we will set up our banners. May Yahweh grant all your requests. Now I know that Yahweh saves his anointed.",
+  ],
+  morningShortReading:
+    "Some trust in chariots, and some in horses, but we will remember the name of Yahweh our God. They are bowed down and fallen, but we have risen and stand upright.",
+  eveningShortReading: "Save, Yahweh! Let the King answer us when we call.",
+  morningCollect:
+    "Almighty God, who has given us grace at this time with one accord to make our common supplications to you: Fulfill now, O Lord, the desires and petitions of your servants, as may be most expedient for them; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 21 ----
+DISCIPLINE_STEPS[20] = {
+  morningPsalms: [
+    "The king triumphs in your strength, Yahweh! How greatly he rejoices in your salvation!",
+    "You have given him his heart's desire, and have not withheld the request of his lips.",
+  ],
+  eveningPsalms: [
+    "For you meet him with the blessings of goodness. You set a crown of fine gold on his head. He asked life of you, and you gave it to him.",
+  ],
+  morningShortReading:
+    "For the king trusts in Yahweh. Through the loving kindness of the Most High, he shall not be moved. Your hand will find out all your enemies.",
+  eveningShortReading:
+    "Be exalted, Yahweh, in your strength. So we will sing and praise your power.",
+  morningCollect:
+    "O Lord, we beseech you mercifully to receive the prayers of your people who call upon you; and grant that they may both perceive and know what things they ought to do, and also may have grace and power faithfully to fulfill the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 22 ----
+DISCIPLINE_STEPS[21] = {
+  morningPsalms: [
+    "My God, my God, why have you forsaken me? Why are you so far from helping me, and from the words of my groaning?",
+    "O my God, I cry in the daytime, but you don't answer; and in the night season, and am not silent.",
+  ],
+  eveningPsalms: [
+    "But you are holy, you who inhabit the praises of Israel. Our fathers trusted in you. They trusted, and you delivered them. They cried to you, and were delivered.",
+  ],
+  morningShortReading:
+    "For he has not despised nor abhorred the affliction of the afflicted, neither has he hidden his face from him; but when he cried to him, he heard.",
+  eveningShortReading:
+    "All the ends of the earth shall remember and turn to Yahweh. All the relatives of the nations shall worship before you. For the kingdom is Yahweh's, and he is the ruler over the nations.",
+  morningCollect:
+    "Almighty and everlasting God, who of your tender love toward mankind has sent your Son our Savior Jesus Christ to take upon him our flesh and to suffer death upon the cross: Mercifully grant that we may follow the example of his patience; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 23 ----
+DISCIPLINE_STEPS[22] = {
+  morningPsalms: [
+    "Yahweh is my shepherd: I shall lack nothing.",
+    "He makes me lie down in green pastures. He leads me beside still waters. He restores my soul.",
+  ],
+  eveningPsalms: [
+    "He guides me in the paths of righteousness for his name's sake. Yes, though I walk through the valley of the shadow of death, I will fear no evil, for you are with me.",
+  ],
+  morningShortReading:
+    "Your rod and your staff, they comfort me. You prepare a table before me in the presence of my enemies. You anoint my head with oil. My cup runs over.",
+  eveningShortReading:
+    "Surely goodness and loving kindness shall follow me all the days of my life, and I will dwell in Yahweh's house forever.",
+  morningCollect:
+    "O God, whose Son Jesus Christ is the good shepherd of your people: Grant that when we hear his voice we may know him who calls us each by name, and faithfully follow where he leads; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
