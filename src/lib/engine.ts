@@ -88,6 +88,8 @@ export type RuleState = {
   petitionTime: "morning" | "evening";
   /** Local date the Psalter last advanced, so it moves once per day. */
   lastPsalmAdvanceDate?: string;
+  /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
+  previewDate?: string;
 };
 
 export type Cadence = "daily" | "weekly";

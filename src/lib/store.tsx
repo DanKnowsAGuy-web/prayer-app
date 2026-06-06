@@ -38,6 +38,7 @@ type Action =
   | { type: "setPetitionTime"; time: "morning" | "evening" }
   | { type: "setTradition"; tradition: Tradition }
   | { type: "setPref"; key: keyof Prefs; value: boolean }
+  | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "advancePsalm"; date: string }
   | { type: "reset" };
 
@@ -96,6 +97,8 @@ function reducer(state: RuleState, action: Action): RuleState {
       return { ...state, tradition: action.tradition };
     case "setPref":
       return { ...state, prefs: { ...state.prefs, [action.key]: action.value } };
+    case "devPatch":
+      return { ...state, ...action.patch };
     case "advancePsalm":
       return {
         ...state,
@@ -124,7 +127,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     saveState(state);
   }, [state]);
 
-  const today = localDate(new Date());
+  // Dev/preview override lets the app time-travel; otherwise the real date.
+  const today = state.previewDate ?? localDate(new Date());
   const value = useMemo<Store>(() => ({ state, today, dispatch }), [state, today]);
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

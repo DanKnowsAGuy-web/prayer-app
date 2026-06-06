@@ -632,6 +632,46 @@
   background: var(--olive);
 }
 
+/* ============ DEV / PREVIEW PANEL ============ */
+.dev {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.dev-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.dev-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-3);
+}
+.dev-h {
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.dev-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.dev-wrap {
+  flex-wrap: wrap;
+}
+.dev-note {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+.dev-num {
+  width: 6rem;
+}
+
 /* ============ READER ============ */
 .reader {
   min-height: 100dvh;
