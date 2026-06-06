@@ -39,6 +39,7 @@ type Action =
   | { type: "setTradition"; tradition: Tradition }
   | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "devPatch"; patch: Partial<RuleState> }
+  | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "advancePsalm"; date: string }
   | { type: "reset" };
 
@@ -99,6 +100,11 @@ function reducer(state: RuleState, action: Action): RuleState {
       return { ...state, prefs: { ...state.prefs, [action.key]: action.value } };
     case "devPatch":
       return { ...state, ...action.patch };
+    case "setReminder":
+      return {
+        ...state,
+        reminders: { ...state.reminders, [action.slot]: action.time },
+      };
     case "advancePsalm":
       return {
         ...state,

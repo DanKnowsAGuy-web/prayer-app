@@ -1,5 +1,6 @@
 import { useStore } from "../lib/store";
 import type { Prefs, Tradition } from "../lib/engine";
+import { buildReminderIcs, downloadIcs } from "../lib/ics";
 
 const TRADITIONS: { value: Tradition; label: string }[] = [
   { value: "anglican", label: "Anglican" },
@@ -63,6 +64,39 @@ export function Settings({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="settings-group">
+        <h2 className="settings-h">Reminders</h2>
+        <p className="settings-note">
+          Set a time and add it to your phone's calendar — it will remind you
+          every day, even when the app is closed.
+        </p>
+        <ReminderRow
+          label="Morning prayer"
+          value={state.reminders.morning}
+          fallback="07:00"
+          onChange={(time) =>
+            dispatch({ type: "setReminder", slot: "morning", time })
+          }
+        />
+        <ReminderRow
+          label="Evening prayer"
+          value={state.reminders.evening}
+          fallback="20:00"
+          onChange={(time) =>
+            dispatch({ type: "setReminder", slot: "evening", time })
+          }
+        />
+        <button
+          className="btn btn-ghost see-list"
+          disabled={!state.reminders.morning && !state.reminders.evening}
+          onClick={() =>
+            downloadIcs("prayer-reminders.ics", buildReminderIcs(state.reminders))
+          }
+        >
+          Add prayer reminders to my calendar
+        </button>
+      </section>
+
+      <section className="settings-group">
         <h2 className="settings-h">What your prayer includes</h2>
         <p className="settings-note">
           These are added on top of your current rule.
@@ -99,6 +133,45 @@ export function Settings({ onClose }: { onClose: () => void }) {
         </button>
       </div>
     </main>
+  );
+}
+
+function ReminderRow({
+  label,
+  value,
+  fallback,
+  onChange,
+}: {
+  label: string;
+  value: string | null;
+  fallback: string;
+  onChange: (time: string | null) => void;
+}) {
+  const on = value !== null;
+  return (
+    <div className="reminder-row">
+      <span className="toggle-label">{label}</span>
+      <div className="reminder-controls">
+        {on && (
+          <input
+            className="intention-input reminder-time"
+            type="time"
+            value={value ?? fallback}
+            onChange={(e) => onChange(e.target.value)}
+            aria-label={`${label} time`}
+          />
+        )}
+        <button
+          className={`switch ${on ? "is-on" : ""}`}
+          role="switch"
+          aria-checked={on}
+          aria-label={`${label} reminder ${on ? "on" : "off"}`}
+          onClick={() => onChange(on ? null : fallback)}
+        >
+          <span className="switch-knob" />
+        </button>
+      </div>
+    </div>
   );
 }
 

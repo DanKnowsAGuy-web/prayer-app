@@ -90,6 +90,8 @@ export type RuleState = {
   lastPsalmAdvanceDate?: string;
   /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
   previewDate?: string;
+  /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
+  reminders: { morning: string | null; evening: string | null };
 };
 
 export type Cadence = "daily" | "weekly";
@@ -150,6 +152,7 @@ export function initialState(): RuleState {
     psalmIndex: 0,
     psalmTime: "morning",
     petitionTime: "morning",
+    reminders: { morning: null, evening: null },
   };
 }
 

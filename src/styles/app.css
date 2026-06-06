@@ -572,6 +572,24 @@
   color: var(--on-clay);
   font-weight: 600;
 }
+.reminder-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--border);
+}
+.reminder-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.reminder-time {
+  width: 8rem;
+  min-height: 40px;
+}
+
 .toggle-list {
   list-style: none;
   margin: 0;
