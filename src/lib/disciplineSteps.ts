@@ -462,6 +462,82 @@ DISCIPLINE_STEPS[22] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 24 ----
+DISCIPLINE_STEPS[23] = {
+  morningPsalms: [
+    "The earth is Yahweh's, with its fullness; the world, and those who dwell therein.",
+    "For he has founded it on the seas, and established it on the floods.",
+  ],
+  eveningPsalms: [
+    "Who may ascend to Yahweh's hill? Who may stand in his holy place? He who has clean hands and a pure heart; who has not lifted up his soul to falsehood, and has not sworn deceitfully.",
+  ],
+  morningShortReading:
+    "He will receive a blessing from Yahweh, and righteousness from the God of his salvation. This is the generation of those who seek him, who seek your face, God of Jacob.",
+  eveningShortReading:
+    "Lift up your heads, you gates! Be lifted up, you everlasting doors, and the King of glory will come in. Who is this King of glory? Yahweh strong and mighty, Yahweh mighty in battle.",
+  morningCollect:
+    "O God, whose blessed Son manifested himself to his disciples in the breaking of bread: Open the eyes of our faith, that we may behold him in all his redeeming work; who lives and reigns with you and the Holy Spirit, one God, now and forever. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 25 ----
+DISCIPLINE_STEPS[24] = {
+  morningPsalms: [
+    "To you, Yahweh, I lift up my soul.",
+    "My God, I have trusted in you. Don't let me be shamed. Don't let my enemies triumph over me.",
+  ],
+  eveningPsalms: [
+    "Show me your ways, Yahweh. Teach me your paths. Guide me in your truth, and teach me, for you are the God of my salvation. I wait for you all day long.",
+  ],
+  morningShortReading:
+    "Remember, Yahweh, your tender mercies and your loving kindnesses, for they are from old times. Don't remember the sins of my youth, nor my transgressions.",
+  eveningShortReading:
+    "Good and upright is Yahweh, therefore he will instruct sinners in the way. He will guide the humble in justice. He will teach the humble his way.",
+  morningCollect:
+    "Almighty God, you show to those who are in error the light of your truth, to the intent that they may return into the way of righteousness: Grant to all those who are admitted into the fellowship of Christ's Religion, that they may avoid those things that are contrary to their profession; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 26 ----
+DISCIPLINE_STEPS[25] = {
+  morningPsalms: [
+    "Judge me, Yahweh, for I have walked in my integrity. I have trusted also in Yahweh without wavering.",
+    "Examine me, Yahweh, and prove me. Try my heart and my mind. For your loving kindness is before my eyes. I have walked in your truth.",
+  ],
+  eveningPsalms: [
+    "I don't sit with deceitful men, neither will I go in with hypocrites. I hate the assembly of evil-doers, and will not sit with the wicked.",
+  ],
+  morningShortReading:
+    "I will wash my hands in innocence, so I will go about your altar, Yahweh; that I may make the voice of thanksgiving to be heard, and tell of all your wondrous works.",
+  eveningShortReading:
+    "Yahweh, I love the habitation of your house, the place where your glory dwells. Don't gather my soul with sinners, nor my life with bloodthirsty men.",
+  morningCollect:
+    "O God, the king of glory, who has exalted your only Son Jesus Christ with great triumph unto your kingdom in heaven: We beseech you, leave us not comfortless; but send to us your Holy Spirit to comfort us; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 27 ----
+DISCIPLINE_STEPS[26] = {
+  morningPsalms: [
+    "Yahweh is my light and my salvation. Whom shall I fear? Yahweh is the strength of my life. Of whom shall I be afraid?",
+    "When evil-doers came upon me to eat up my flesh, even my adversaries and my foes, they stumbled and fell.",
+  ],
+  eveningPsalms: [
+    "Though an army should encamp against me, my heart shall not fear. Though war should rise against me, even then I will be confident.",
+  ],
+  morningShortReading:
+    "One thing I have asked of Yahweh, that I will seek after: that I may dwell in Yahweh's house all the days of my life, to see Yahweh's beauty, and to inquire in his temple.",
+  eveningShortReading:
+    "For in the day of trouble, he will hide me in his pavilion. In the secret place of his tabernacle, he will hide me. He will lift me up on a rock.",
+  morningCollect:
+    "O Lord, from whom all good things do come: Grant to us your humble servants, that by your holy inspiration we may think those things that are good, and by your merciful guiding may perform the same; through our Lord Jesus Christ. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
