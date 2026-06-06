@@ -17,6 +17,12 @@ import {
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
 import { TRADITION_META } from "./traditions";
+import {
+  canticleMovement,
+  devotionalMovement,
+  jesusPrayerMovement,
+  rosaryMovements,
+} from "./devotions";
 
 export type Movement = {
   label: string;
@@ -188,9 +194,16 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
 
   movements.push(...practice.steps.flatMap((s) => expandStep(s, ctx)));
 
+  // The rotating 60-day Psalter takes precedence: when it's on, drop the rung's
+  // fixed morning Psalm so we don't pray two.
+  if (ctx.prefs.psalter && ctx.part === ctx.psalmTime) {
+    for (let i = movements.length - 1; i >= 0; i--) {
+      if (movements[i].label === "Psalm") movements.splice(i, 1);
+    }
+  }
+
   // Additive preferences: include what an experienced person already practices,
-  // only when the rung doesn't already provide it. Slotted into the body, in a
-  // natural order (Psalms, then Scripture, then silence).
+  // only when the rung doesn't already provide it. Slotted into the body.
   const additions: Movement[] = [];
   const has = (test: (m: Movement) => boolean) => movements.some(test);
 
@@ -201,12 +214,24 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
   ) {
     additions.push(...ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const })));
   }
+  if (ctx.prefs.dailyOffice && !has((m) => /benedictus|magnificat/i.test(m.label))) {
+    additions.push(canticleMovement(ctx.part));
+  }
   if (
     ctx.prefs.scripture &&
     ctx.part === "morning" &&
     !has((m) => m.label === "The Holy Gospel" || m.label === "Today's Reading")
   ) {
     additions.push(gospelMovement(ctx.day, ctx.tradition));
+  }
+  if (ctx.prefs.jesusPrayer && !has((m) => m.label === "The Jesus Prayer")) {
+    additions.push(jesusPrayerMovement());
+  }
+  if (ctx.prefs.rosary && !has((m) => m.label === "The Holy Rosary")) {
+    additions.push(...rosaryMovements(ctx.date));
+  }
+  if (ctx.prefs.devotional && !has((m) => m.label === "Personal Devotion")) {
+    additions.push(devotionalMovement());
   }
   if (ctx.prefs.silence && !has((m) => /silence/i.test(m.label))) {
     additions.push(SILENCE_MOVEMENT);

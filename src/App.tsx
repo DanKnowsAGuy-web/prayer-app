@@ -5,15 +5,21 @@ import { dayPart, type DayPart } from "./lib/daypart";
 import { Onboarding } from "./components/Onboarding";
 import { Home } from "./components/Home";
 import { PrayerReader } from "./components/PrayerReader";
+import { Settings } from "./components/Settings";
 import "./styles/app.css";
 
 export function App() {
   const { state } = useStore();
   // When reading, we hold which practice is open.
   const [reading, setReading] = useState<DayPart | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   if (!state.onboarded) {
     return <Onboarding />;
+  }
+
+  if (settingsOpen) {
+    return <Settings onClose={() => setSettingsOpen(false)} />;
   }
 
   const rung = rungAt(state.rung);
@@ -40,6 +46,7 @@ export function App() {
   return (
     <Home
       onBeginPrayer={(part) => setReading(part)}
+      onOpenSettings={() => setSettingsOpen(true)}
       defaultPart={dayPart(new Date())}
     />
   );

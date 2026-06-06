@@ -36,6 +36,8 @@ type Action =
   | { type: "removeIntention"; id: string }
   | { type: "setPsalmTime"; time: "morning" | "evening" }
   | { type: "setPetitionTime"; time: "morning" | "evening" }
+  | { type: "setTradition"; tradition: Tradition }
+  | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "advancePsalm"; date: string }
   | { type: "reset" };
 
@@ -90,6 +92,10 @@ function reducer(state: RuleState, action: Action): RuleState {
       return { ...state, psalmTime: action.time };
     case "setPetitionTime":
       return { ...state, petitionTime: action.time };
+    case "setTradition":
+      return { ...state, tradition: action.tradition };
+    case "setPref":
+      return { ...state, prefs: { ...state.prefs, [action.key]: action.value } };
     case "advancePsalm":
       return {
         ...state,

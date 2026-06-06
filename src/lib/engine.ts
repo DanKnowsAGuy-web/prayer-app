@@ -45,12 +45,21 @@ export type Prefs = {
   scripture: boolean;
   psalter: boolean;
   silence: boolean;
+  jesusPrayer: boolean;
+  rosary: boolean;
+  dailyOffice: boolean;
+  /** Recorded but intentionally without fixed content for now. */
+  devotional: boolean;
 };
 
 export const NO_PREFS: Prefs = {
   scripture: false,
   psalter: false,
   silence: false,
+  jesusPrayer: false,
+  rosary: false,
+  dailyOffice: false,
+  devotional: false,
 };
 
 export type RuleState = {

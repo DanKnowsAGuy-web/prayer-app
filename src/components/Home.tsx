@@ -20,9 +20,11 @@ import { useState } from "react";
 
 export function Home({
   onBeginPrayer,
+  onOpenSettings,
   defaultPart,
 }: {
   onBeginPrayer: (part: DayPart) => void;
+  onOpenSettings: () => void;
   defaultPart: DayPart;
 }) {
   const { state, today, dispatch } = useStore();
@@ -108,6 +110,12 @@ export function Home({
       <p className="benediction">
         The Lord bless you and keep you, this day and always.
       </p>
+
+      <div className="home-footer">
+        <button className="btn btn-quiet" onClick={onOpenSettings}>
+          Settings
+        </button>
+      </div>
     </main>
   );
 }

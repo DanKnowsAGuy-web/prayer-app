@@ -425,12 +425,20 @@ export function Onboarding() {
     scripture: elements.includes("scripture"),
     psalter: elements.includes("psalm"),
     silence: elements.includes("silence"),
+    jesusPrayer: elements.includes("jesusprayer"),
+    rosary: elements.includes("rosary"),
+    dailyOffice: elements.includes("office"),
+    devotional: elements.includes("devotional"),
   };
   const anchorTime = anchor ?? "morning";
   const integrated = [
     elements.includes("psalm") && "your Psalms",
     elements.includes("scripture") && "Scripture reading",
+    elements.includes("jesusprayer") && "the Jesus Prayer",
+    elements.includes("rosary") && "the Rosary",
+    elements.includes("office") && "a Daily Office canticle",
     elements.includes("silence") && "a time of silence",
+    elements.includes("devotional") && "personal devotion time",
     elements.includes("others") && "your prayer list",
   ].filter(Boolean) as string[];
   return (
