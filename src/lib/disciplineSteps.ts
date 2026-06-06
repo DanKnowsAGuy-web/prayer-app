@@ -36,11 +36,11 @@ export const DISCIPLINE_STEPS: (DisciplineStep | null)[] = Array.from(
 // ---- STEP 1 ----
 DISCIPLINE_STEPS[0] = {
   morningPsalms: [
-    "Blessed is the man who doesn't walk in the counsel of the wicked, nor stand in the way of sinners, nor sit in the seat of scoffers; but his delight is in the LORD's law. On his law he meditates day and night...",
-    "Why do the nations rage, and the peoples plot a vain thing? The kings of the earth take a stand, and the rulers take counsel together, against the LORD, and against his Anointed...",
+    "Blessed is the man who doesn't walk in the counsel of the wicked, nor stand in the way of sinners, nor sit in the seat of scoffers; but his delight is in Yahweh's law. On his law he meditates day and night...",
+    "Why do the nations rage, and the peoples plot a vain thing? The kings of the earth take a stand, and the rulers take counsel together, against Yahweh, and against his Anointed...",
   ],
   eveningPsalms: [
-    "LORD, don't rebuke me in your anger, neither chasten me in your hot displeasure. Have mercy on me, LORD, for I am faint...",
+    "Yahweh, don't rebuke me in your anger, neither chasten me in your hot displeasure. Have mercy on me, Yahweh, for I am faint...",
   ],
   morningShortReading: "The night is far spent, and the day is at hand...",
   morningCollect:
@@ -155,18 +155,94 @@ DISCIPLINE_STEPS[6] = {
   eveningShortReading:
     "For the wages of sin is death, but the free gift of God is eternal life in Christ Jesus our Lord.",
   morningCollect:
-    "Almighty God, who explicitly knows us to be set in the midst of so many and great dangers: Grant to us such strength and protection as may support us in all dangers and carry us through all temptations; through Christ our Lord. Amen.",
+    "Almighty God, who mercifully knows us to be set in the midst of so many and great dangers: Grant to us such strength and protection as may support us in all dangers and carry us through all temptations; through Christ our Lord. Amen.",
   eveningCollect:
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
+// ---- STEP 8 ----
+DISCIPLINE_STEPS[7] = {
+  morningPsalms: [
+    "Yahweh, don't rebuke me in your anger, neither chasten me in your hot displeasure.",
+    "Have mercy on me, Yahweh, for I am faint. Yahweh, heal me, for my bones are troubled.",
+  ],
+  eveningPsalms: [
+    "My soul is also deeply troubled. But you, Yahweh—how long? Return, Yahweh. Deliver my soul. Save me for your loving kindness' sake.",
+  ],
+  morningShortReading:
+    "For if you live after the flesh, you must die; but if by the Spirit you put to death the deeds of the body, you will live.",
+  eveningShortReading:
+    "Behold, I stand at the door and knock. If anyone hears my voice and opens the door, I will come in to him, and will dine with him, and he with me.",
+  morningCollect:
+    "O God, who provides for your people by your power, and rules over them in love: Grant to us the spirit of wisdom and understanding, that we may walk in your fear all the days of our life; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 9 ----
+DISCIPLINE_STEPS[8] = {
+  morningPsalms: [
+    "I will give thanks to Yahweh with my whole heart. I will tell of all your marvelous works.",
+    "I will be glad and rejoice in you. I will sing praise to your name, O Most High.",
+  ],
+  eveningPsalms: [
+    "When my enemies turn back, they stumble and perish at your presence. For you have maintained my right and my cause.",
+  ],
+  morningShortReading:
+    "But you are a chosen race, a royal priesthood, a holy nation, a people for God's own possession, that you may proclaim the excellence of him who called you out of darkness into his marvelous light.",
+  eveningShortReading:
+    "Don't let your heart be troubled. Believe in God. Believe also in me.",
+  morningCollect:
+    "Almighty and everlasting God, who art always more ready to hear than we to pray, and art wont to give more than either we desire or deserve: Pour down upon us the abundance of your mercy; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Lighten our darkness, we beseech you, O Lord; and by your great mercy defend us from all perils and dangers of this night; for the love of your only Son, our Savior Jesus Christ. Amen.",
+};
+
+// ---- STEP 10 ----
+DISCIPLINE_STEPS[9] = {
+  morningPsalms: [
+    "Why do you stand far off, Yahweh? Why do you hide yourself in times of trouble?",
+    "In arrogance the wicked hotly pursue the poor. Let them be caught in the schemes that they have devised.",
+  ],
+  eveningPsalms: [
+    "The wicked boasts of his heart's desire. The covetous renounces Yahweh, and condemns him.",
+  ],
+  morningShortReading:
+    "Therefore, my beloved brothers, be steadfast, immovable, always abounding in the work of the Lord, because you know that your labor is not in vain in the Lord.",
+  eveningShortReading:
+    "Watch and pray, that you don't enter into temptation. The spirit indeed is willing, but the flesh is weak.",
+  morningCollect:
+    "O God, the strength of all those who put their trust in you, mercifully accept our prayers; and because through the weakness of our mortal nature we can do no good thing without you, grant us the help of your grace; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 11 ----
+DISCIPLINE_STEPS[10] = {
+  morningPsalms: [
+    "In Yahweh I take refuge. How can you say to my soul, 'Flee as a bird to your mountain!'",
+    "For, behold, the wicked bend their bows. They set their arrows on the strings, that they may shoot in darkness at the upright in heart.",
+  ],
+  eveningPsalms: [
+    "Yahweh is in his holy temple. Yahweh is on his throne in heaven. His eyes observe. His eyes examine the children of men.",
+  ],
+  morningShortReading:
+    "Put on the whole armor of God, that you may be able to stand against the wiles of the devil.",
+  eveningShortReading:
+    "Peace I leave with you. My peace I give to you; not as the world gives, give I to you. Don't let your heart be troubled, neither let it be fearful.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us, that you being our ruler and guide, we may so pass through things temporal, that we finally lose not the things eternal; through Jesus Christ our Lord. Amen.",
 };
 
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
-    "In you, LORD, I take refuge. Let me never be disappointed. Deliver me in your righteousness...",
+    "In you, Yahweh, I take refuge. Let me never be disappointed. Deliver me in your righteousness...",
   ],
   eveningPsalms: [
-    "I will bless the LORD at all times. His praise shall continually be in my mouth...",
+    "I will bless Yahweh at all times. His praise shall continually be in my mouth...",
   ],
   morningShortReading: "Light will shine out of darkness...",
   morningCollect:
