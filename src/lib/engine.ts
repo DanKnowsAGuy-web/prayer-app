@@ -44,6 +44,8 @@ export type RuleState = {
   psalmIndex: number;
   /** Which daily prayer carries the rotating Psalm portion. */
   psalmTime: "morning" | "evening";
+  /** Which daily prayer carries the intercessions (the prayer list). */
+  petitionTime: "morning" | "evening";
   /** Local date the Psalter last advanced, so it moves once per day. */
   lastPsalmAdvanceDate?: string;
 };
@@ -103,6 +105,7 @@ export function initialState(): RuleState {
     intentions: [],
     psalmIndex: 0,
     psalmTime: "morning",
+    petitionTime: "morning",
   };
 }
 

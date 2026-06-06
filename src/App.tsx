@@ -18,6 +18,11 @@ export function App() {
 
   const rung = rungAt(state.rung);
 
+  // Petitions go in the chosen prayer, but fall back to morning when the
+  // current rung has no evening prayer yet — so they're never orphaned.
+  const petitionPart: DayPart =
+    state.petitionTime === "evening" && rung.evening ? "evening" : "morning";
+
   if (reading) {
     const practice = reading === "evening" ? rung.evening : rung.morning;
     if (practice) {
@@ -25,6 +30,7 @@ export function App() {
         <PrayerReader
           practice={practice}
           part={reading}
+          petitionPart={petitionPart}
           onClose={() => setReading(null)}
         />
       );

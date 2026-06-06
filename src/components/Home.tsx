@@ -6,6 +6,7 @@ import {
   nextWeeklyBucket,
   weekdayOf,
   type Cadence,
+  type Intention,
 } from "../lib/engine";
 import {
   guidance,
@@ -305,16 +306,21 @@ function CheckInPanel({
 function Intentions() {
   const { state, today, dispatch } = useStore();
   const [text, setText] = useState("");
+  // "Just added" is per-visit only; it does not persist across logins.
+  const [sessionAdded, setSessionAdded] = useState<string[]>([]);
+  const [showAll, setShowAll] = useState(false);
 
   const wd = weekdayOf(today);
+  const when = state.petitionTime;
 
   function add(cadence: Cadence) {
     const trimmed = text.trim();
     if (!trimmed) return;
+    const id = makeId(Date.now() + state.intentions.length);
     dispatch({
       type: "addIntention",
       intention: {
-        id: makeId(Date.now() + state.intentions.length),
+        id,
         text: trimmed,
         added: today,
         answered: false,
@@ -323,8 +329,47 @@ function Intentions() {
           cadence === "weekly" ? nextWeeklyBucket(state.intentions) : undefined,
       },
     });
+    setSessionAdded((prev) => [id, ...prev]);
     setText("");
   }
+
+  function row(i: Intention) {
+    const cadence = cadenceOf(i);
+    const inToday = cadence === "weekly" && (i.bucket ?? 0) % 7 === wd;
+    return (
+      <li key={i.id} className={`intention ${i.answered ? "is-answered" : ""}`}>
+        <button
+          className="intention-toggle"
+          onClick={() => dispatch({ type: "toggleIntention", id: i.id })}
+          aria-pressed={i.answered}
+          aria-label={i.answered ? "Mark as still praying" : "Mark as answered"}
+        >
+          <span className="intention-mark" aria-hidden="true" />
+          <span className="intention-text">{i.text}</span>
+        </button>
+        <button
+          className={`cadence-tag cadence-${cadence} ${inToday ? "is-today" : ""}`}
+          onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
+          aria-label={`Praying ${cadence}. Tap to make ${
+            cadence === "daily" ? "weekly" : "daily"
+          }.`}
+        >
+          {cadence === "daily" ? "Daily" : inToday ? "Weekly · today" : "Weekly"}
+        </button>
+        <button
+          className="intention-remove"
+          onClick={() => dispatch({ type: "removeIntention", id: i.id })}
+          aria-label={`Remove "${i.text}"`}
+        >
+          ×
+        </button>
+      </li>
+    );
+  }
+
+  const recent = sessionAdded
+    .map((id) => state.intentions.find((i) => i.id === id))
+    .filter((i): i is Intention => Boolean(i));
 
   return (
     <section className="intentions" aria-labelledby="int-h">
@@ -333,58 +378,36 @@ function Intentions() {
         Your prayer list
       </h2>
 
-      {state.intentions.length === 0 ? (
-        <p className="intentions-empty">
-          The people and needs you carry can rest here. Daily names are prayed
-          every day; weekly names come up once a week, in turn.
+      <div
+        className="seg petition-when"
+        role="group"
+        aria-label="When to pray for your list"
+      >
+        <span className="seg-label">Prayed during your</span>
+        <div className="seg-track">
+          <button
+            className={`seg-btn ${when === "morning" ? "is-on" : ""}`}
+            aria-pressed={when === "morning"}
+            onClick={() => dispatch({ type: "setPetitionTime", time: "morning" })}
+          >
+            Morning
+          </button>
+          <button
+            className={`seg-btn ${when === "evening" ? "is-on" : ""}`}
+            aria-pressed={when === "evening"}
+            onClick={() => dispatch({ type: "setPetitionTime", time: "evening" })}
+          >
+            Evening
+          </button>
+        </div>
+        <span className="seg-suffix">prayer</span>
+      </div>
+
+      {when === "evening" && !rungAt(state.rung).evening && (
+        <p className="petition-note">
+          Your rule has no evening prayer yet, so these are prayed in the morning
+          for now.
         </p>
-      ) : (
-        <ul className="intention-list">
-          {state.intentions.map((i) => {
-            const cadence = cadenceOf(i);
-            const inToday = cadence === "weekly" && (i.bucket ?? 0) % 7 === wd;
-            return (
-              <li
-                key={i.id}
-                className={`intention ${i.answered ? "is-answered" : ""}`}
-              >
-                <button
-                  className="intention-toggle"
-                  onClick={() => dispatch({ type: "toggleIntention", id: i.id })}
-                  aria-pressed={i.answered}
-                  aria-label={
-                    i.answered ? "Mark as still praying" : "Mark as answered"
-                  }
-                >
-                  <span className="intention-mark" aria-hidden="true" />
-                  <span className="intention-text">{i.text}</span>
-                </button>
-                <button
-                  className={`cadence-tag cadence-${cadence} ${
-                    inToday ? "is-today" : ""
-                  }`}
-                  onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
-                  aria-label={`Praying ${cadence}. Tap to make ${
-                    cadence === "daily" ? "weekly" : "daily"
-                  }.`}
-                >
-                  {cadence === "daily"
-                    ? "Daily"
-                    : inToday
-                      ? "Weekly · today"
-                      : "Weekly"}
-                </button>
-                <button
-                  className="intention-remove"
-                  onClick={() => dispatch({ type: "removeIntention", id: i.id })}
-                  aria-label={`Remove "${i.text}"`}
-                >
-                  ×
-                </button>
-              </li>
-            );
-          })}
-        </ul>
       )}
 
       <form
@@ -416,6 +439,36 @@ function Intentions() {
           </button>
         </div>
       </form>
+
+      {recent.length > 0 && !showAll && (
+        <div className="recent-added">
+          <p className="recent-label">Just added</p>
+          <ul className="intention-list">{recent.map(row)}</ul>
+        </div>
+      )}
+
+      {state.intentions.length === 0 && recent.length === 0 ? (
+        <p className="intentions-empty">
+          The people and needs you carry can rest here. Daily names are prayed
+          every day; weekly names come up once a week, in turn.
+        </p>
+      ) : showAll ? (
+        <div className="full-list">
+          <ul className="intention-list">{state.intentions.map(row)}</ul>
+          <button className="btn btn-quiet" onClick={() => setShowAll(false)}>
+            Hide list
+          </button>
+        </div>
+      ) : (
+        state.intentions.length > 0 && (
+          <button
+            className="btn btn-ghost see-list"
+            onClick={() => setShowAll(true)}
+          >
+            See your prayer list ({state.intentions.length})
+          </button>
+        )
+      )}
     </section>
   );
 }

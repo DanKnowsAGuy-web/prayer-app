@@ -33,6 +33,8 @@ export type ResolveCtx = {
   psalmMovements: Movement[];
   /** Today's local date ("YYYY-MM-DD"), for the weekly intercession rotation. */
   date: string;
+  /** Which practice carries the intercessions (the prayer list). */
+  petitionTime: DayPart;
 };
 
 /** The standard prayers said around the names of those being interceded for. */
@@ -105,8 +107,6 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
       out.push(gospelMovement(ctx.day));
       return out;
     }
-    case "intercession":
-      return [intercessionMovement(ctx.intentions, ctx.date)];
     case "psalm":
       // The Psalm portion belongs only to the prayer the user chose for it.
       return ctx.part === ctx.psalmTime
@@ -119,6 +119,26 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
   }
 }
 
+/** Movements that conclude a practice; intercessions go just before these. */
+const CLOSING = /closing prayer|prayer for the night/i;
+
 export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[] {
-  return practice.steps.flatMap((s) => expandStep(s, ctx));
+  const movements = practice.steps.flatMap((s) => expandStep(s, ctx));
+
+  // The prayer list is prayed in whichever practice the person chose, and only
+  // when there are names for today — so prayers without a list stay simple.
+  if (ctx.part === ctx.petitionTime) {
+    const names = intentionsForDate(ctx.intentions, ctx.date);
+    if (names.length) {
+      const intercession = intercessionMovement(ctx.intentions, ctx.date);
+      const last = movements[movements.length - 1];
+      if (last && CLOSING.test(last.label)) {
+        movements.splice(movements.length - 1, 0, intercession);
+      } else {
+        movements.push(intercession);
+      }
+    }
+  }
+
+  return movements;
 }

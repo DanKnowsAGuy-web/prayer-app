@@ -17,10 +17,12 @@ import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
 export function PrayerReader({
   practice,
   part,
+  petitionPart,
   onClose,
 }: {
   practice: Practice;
   part: DayPart;
+  petitionPart: DayPart;
   onClose: () => void;
 }) {
   const { state, today, dispatch } = useStore();
@@ -70,8 +72,18 @@ export function PrayerReader({
         psalmTime: state.psalmTime,
         psalmMovements,
         date: today,
+        petitionTime: petitionPart,
       }),
-    [practice, day, state.intentions, part, state.psalmTime, psalmMovements, today],
+    [
+      practice,
+      day,
+      state.intentions,
+      part,
+      state.psalmTime,
+      psalmMovements,
+      today,
+      petitionPart,
+    ],
   );
 
   // Which segments are kept for today. Reset to "all" whenever the set changes.
@@ -106,7 +118,7 @@ export function PrayerReader({
   }, [handleClose]);
 
   const loading = (hasGospel || showsPsalm) && !ready;
-  const usePreview = movements.length > 2 && phase === "preview";
+  const usePreview = movements.length > 3 && phase === "preview";
 
   if (loading) {
     return (

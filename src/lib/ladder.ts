@@ -17,7 +17,7 @@
  *  - "gospelEpistle": the day's Epistle, then Gospel
  *  - "intercession": the standard prayers wrapping the user's named intentions
  */
-export type DynamicKind = "gospel" | "gospelEpistle" | "intercession" | "psalm";
+export type DynamicKind = "gospel" | "gospelEpistle" | "psalm";
 
 export type PrayerStep = {
   /** Short label shown in the order of service, e.g. "Opening" or "Psalm". */
@@ -138,11 +138,6 @@ export const LADDER: Rung[] = [
         },
         LORDS_PRAYER,
         {
-          label: "Intercession",
-          text: "",
-          dynamic: "intercession",
-        },
-        {
           label: "A Closing Prayer",
           text: "O Lord, our heavenly Father, by whose providence the duties of men are appointed: grant me grace to do this day the work set before me, that I may not weary nor faint, but offer it all to thee. Amen.",
         },
@@ -230,11 +225,6 @@ export const LADDER: Rung[] = [
         },
         LORDS_PRAYER,
         {
-          label: "Intercession",
-          text: "",
-          dynamic: "intercession",
-        },
-        {
           label: "A Closing Prayer",
           text: "O God, who art the author of peace and lover of concord: defend me in all assaults, that I may surely trust in thy defence, through Jesus Christ our Lord. Amen.",
         },
@@ -285,7 +275,6 @@ export const LADDER: Rung[] = [
           note: "Hold it in silence rather than analysing it.",
         },
         LORDS_PRAYER,
-        { label: "Intercession", text: "", dynamic: "intercession" },
         {
           label: "A Closing Prayer",
           text: "O God, who art the author of peace and lover of concord: defend me in all assaults, that I may surely trust in thy defence, through Jesus Christ our Lord. Amen.",

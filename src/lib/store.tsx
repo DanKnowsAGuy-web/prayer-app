@@ -26,6 +26,7 @@ type Action =
   | { type: "toggleCadence"; id: string }
   | { type: "removeIntention"; id: string }
   | { type: "setPsalmTime"; time: "morning" | "evening" }
+  | { type: "setPetitionTime"; time: "morning" | "evening" }
   | { type: "advancePsalm"; date: string }
   | { type: "reset" };
 
@@ -70,6 +71,8 @@ function reducer(state: RuleState, action: Action): RuleState {
       };
     case "setPsalmTime":
       return { ...state, psalmTime: action.time };
+    case "setPetitionTime":
+      return { ...state, petitionTime: action.time };
     case "advancePsalm":
       return {
         ...state,
