@@ -17,6 +17,8 @@ export type Movement = {
   text: string;
   source?: string;
   note?: string;
+  /** Marks a movement that came from the rotating Psalter portion. */
+  kind?: "psalm";
 };
 
 /** Everything a practice needs to resolve its dynamic steps for today. */
@@ -104,7 +106,9 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
       return [intercessionMovement(ctx.intentions)];
     case "psalm":
       // The Psalm portion belongs only to the prayer the user chose for it.
-      return ctx.part === ctx.psalmTime ? ctx.psalmMovements : [];
+      return ctx.part === ctx.psalmTime
+        ? ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const }))
+        : [];
     default:
       return [
         { label: step.label, text: step.text, source: step.source, note: step.note },

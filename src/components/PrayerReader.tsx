@@ -5,12 +5,14 @@ import { useStore } from "../lib/store";
 import { loadReadings, readingsForDay, type DayReadings } from "../lib/readings";
 import { loadPsalter, portionMovements } from "../lib/psalter";
 import { resolvePractice, type Movement } from "../lib/resolve";
+import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
 
 /**
- * The day's prayer, laid out in full as one quiet, scrollable page. Dynamic
- * movements (the daily Gospel, the rotating Psalm portion, the intercession
- * with your names) are resolved before the page is shown. When a Psalm-bearing
- * prayer is finished, the Psalter rotation advances one portion — once per day.
+ * Praying a longer office happens in two steps:
+ *   1. A build-out preview — every segment with its approximate time, where you
+ *      can drop the parts you don't have time for and watch the total shrink.
+ *   2. The prayer itself, laid out in full as one quiet, scrollable page.
+ * Short prayers skip the preview and open straight to praying.
  */
 export function PrayerReader({
   practice,
@@ -71,13 +73,28 @@ export function PrayerReader({
     [practice, day, state.intentions, part, state.psalmTime, psalmMovements],
   );
 
-  // Finishing a Psalm-bearing prayer moves the Psalter on, but only once a day.
+  // Which segments are kept for today. Reset to "all" whenever the set changes.
+  const [included, setIncluded] = useState<boolean[]>([]);
+  useEffect(() => {
+    setIncluded(Array(movements.length).fill(true));
+  }, [movements.length]);
+
+  const [phase, setPhase] = useState<"preview" | "pray">("preview");
+
+  const kept = useMemo(
+    () => movements.filter((_, i) => included[i]),
+    [movements, included],
+  );
+  const psalmKept = movements.some((m, i) => included[i] && m.kind === "psalm");
+
+  // Finishing a Psalm-bearing prayer moves the Psalter on — once a day, and only
+  // if the Psalm portion was actually kept in the build-out.
   const handleClose = useCallback(() => {
-    if (showsPsalm && state.lastPsalmAdvanceDate !== today) {
+    if (showsPsalm && psalmKept && state.lastPsalmAdvanceDate !== today) {
       dispatch({ type: "advancePsalm", date: today });
     }
     onClose();
-  }, [showsPsalm, state.lastPsalmAdvanceDate, today, dispatch, onClose]);
+  }, [showsPsalm, psalmKept, state.lastPsalmAdvanceDate, today, dispatch, onClose]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -88,6 +105,38 @@ export function PrayerReader({
   }, [handleClose]);
 
   const loading = (hasGospel || showsPsalm) && !ready;
+  const usePreview = movements.length > 2 && phase === "preview";
+
+  if (loading) {
+    return (
+      <main className="reader" data-part={part}>
+        <div className="reader-bar">
+          <button className="btn btn-quiet reader-close" onClick={handleClose}>
+            ← Close
+          </button>
+          <span className="reader-bar-title">{practice.title}</span>
+        </div>
+        <div className="reader-stage">
+          <p className="reader-loading">Preparing today's prayer…</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (usePreview) {
+    return (
+      <BuildOut
+        title={practice.title}
+        movements={movements}
+        included={included}
+        onToggle={(i) =>
+          setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)))
+        }
+        onBegin={() => setPhase("pray")}
+        onClose={handleClose}
+      />
+    );
+  }
 
   return (
     <main className="reader" data-part={part}>
@@ -98,28 +147,99 @@ export function PrayerReader({
         <span className="reader-bar-title">{practice.title}</span>
       </div>
 
-      {loading ? (
-        <div className="reader-stage">
-          <p className="reader-loading">Preparing today's prayer…</p>
-        </div>
-      ) : (
-        <div className="reader-scroll">
-          {movements.map((m, n) => (
-            <section className="movement" key={n}>
-              <p className="reader-label">{m.label}</p>
-              <p className="reader-text">{m.text}</p>
-              {m.source && <p className="reader-source">{m.source}</p>}
-              {m.note && <p className="reader-note">{m.note}</p>}
-            </section>
-          ))}
+      <div className="reader-scroll">
+        {kept.map((m, n) => (
+          <section className="movement" key={n}>
+            <p className="reader-label">{m.label}</p>
+            <p className="reader-text">{m.text}</p>
+            {m.source && <p className="reader-source">{m.source}</p>}
+            {m.note && <p className="reader-note">{m.note}</p>}
+          </section>
+        ))}
 
-          <div className="reader-end">
-            <button className="btn btn-primary" onClick={handleClose}>
-              Amen
-            </button>
-          </div>
+        <div className="reader-end">
+          <button className="btn btn-primary" onClick={handleClose}>
+            Amen
+          </button>
         </div>
-      )}
+      </div>
+    </main>
+  );
+}
+
+function BuildOut({
+  title,
+  movements,
+  included,
+  onToggle,
+  onBegin,
+  onClose,
+}: {
+  title: string;
+  movements: Movement[];
+  included: boolean[];
+  onToggle: (i: number) => void;
+  onBegin: () => void;
+  onClose: () => void;
+}) {
+  const totalSecs = movements.reduce(
+    (sum, m, i) => (included[i] ? sum + estimateSeconds(m) : sum),
+    0,
+  );
+  const anyKept = included.some(Boolean);
+
+  return (
+    <main className="reader buildout-screen">
+      <div className="reader-bar">
+        <button className="btn btn-quiet reader-close" onClick={onClose}>
+          ← Close
+        </button>
+        <span className="reader-bar-title">{title}</span>
+      </div>
+
+      <div className="buildout">
+        <header className="buildout-head">
+          <p className="eyebrow">Today's prayer · about {formatTotal(totalSecs)}</p>
+          <h1 className="buildout-title">How much time today?</h1>
+          <p className="buildout-sub">
+            Keep what you have time for. Tap a part to set it aside; you can
+            always pray it tomorrow.
+          </p>
+        </header>
+
+        <ul className="buildout-list">
+          {movements.map((m, i) => {
+            const on = included[i];
+            return (
+              <li key={i}>
+                <button
+                  className={`buildout-row ${on ? "" : "is-off"}`}
+                  onClick={() => onToggle(i)}
+                  aria-pressed={on}
+                >
+                  <span className="buildout-check" aria-hidden="true">
+                    {on ? "✓" : "+"}
+                  </span>
+                  <span className="buildout-label">{m.label}</span>
+                  <span className="buildout-time">
+                    {formatSegment(estimateSeconds(m))}
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+
+        <div className="buildout-actions">
+          <button
+            className="btn btn-primary"
+            onClick={onBegin}
+            disabled={!anyKept}
+          >
+            Begin · {formatTotal(totalSecs)}
+          </button>
+        </div>
+      </div>
     </main>
   );
 }
