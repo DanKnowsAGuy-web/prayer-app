@@ -684,6 +684,82 @@ DISCIPLINE_STEPS[34] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 36 ----
+DISCIPLINE_STEPS[35] = {
+  morningPsalms: [
+    "An oracle is in my heart concerning the disobedience of the wicked: There is no fear of God before his eyes.",
+    "For he flatters himself in his own eyes, that his iniquity won't be found out and hated.",
+  ],
+  eveningPsalms: [
+    "Your loving kindness, Yahweh, is in the heavens. Your faithfulness reaches to the skies. Your righteousness is like the mountains of God. Your judgments are like a great deep.",
+  ],
+  morningShortReading:
+    "How precious is your loving kindness, God! The children of men take refuge under the shadow of your wings.",
+  eveningShortReading:
+    "They shall be abundantly satisfied with the abundance of your house. You will make them drink of the river of your pleasures. For with you is the fountain of life. In your light we will see light.",
+  morningCollect:
+    "O God, whose days are without end, and whose mercies cannot be numbered: Make us deeply sensible of the shortness and uncertainty of human life; and let your Holy Spirit lead us through this vale of misery in holiness and righteousness all the days of our life; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 37 ----
+DISCIPLINE_STEPS[36] = {
+  morningPsalms: [
+    "Don't fret because of evil-doers, neither be envious against those who work unrighteousness.",
+    "For they shall soon be cut down like the grass, and wither like the green herb. Trust in Yahweh, and do good. Dwell in the land, and enjoy safe pasture.",
+  ],
+  eveningPsalms: [
+    "Delight yourself also in Yahweh, and he will give you the desires of your heart. Commit your way to Yahweh. Trust also in him, and he will do this:",
+  ],
+  morningShortReading:
+    "He will make your righteousness go forth as the light, and your justice as the noon day. Rest in Yahweh, and wait patiently for him.",
+  eveningShortReading:
+    "For evil-doers shall be cut off, but those who wait for Yahweh shall inherit the land. For yet a little while, and the wicked will be no more.",
+  morningCollect:
+    "Almighty God, who has given us your only Son to be unto us both a sacrifice for sin, and also an example of godly life: Give us grace that we may always most thankfully receive that his inestimable benefit; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 38 ----
+DISCIPLINE_STEPS[37] = {
+  morningPsalms: [
+    "Yahweh, don't rebuke me in your wrath, neither chasten me in your hot displeasure.",
+    "For your arrows have pierced me deeply. Your hand presses hard on me. There is no soundness in my flesh because of your indignation.",
+  ],
+  eveningPsalms: [
+    "My groin is filled with burning. There is no soundness in my flesh. I am faint and severely bruised. I have groaned by reason of the disquietness of my heart.",
+  ],
+  morningShortReading:
+    "Lord, all my desire is before you. My groaning is not hidden from you. My heart throbs. My strength fails me.",
+  eveningShortReading:
+    "Don't forsake me, Yahweh. My God, don't be far from me. Hurry to help me, Lord, my salvation.",
+  morningCollect:
+    "O Lord, from whom all good things do come: Grant to us your humble servants, that by your holy inspiration we may think those things that are good, and by your merciful guiding may perform the same; through our Lord Jesus Christ. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 39 ----
+DISCIPLINE_STEPS[38] = {
+  morningPsalms: [
+    "I said, 'I will watch my ways, that I don't sin with my tongue. I will keep my mouth with a bridle while the wicked is before me.'",
+    "I was dumb with silence. I held my peace, even from good. My sorrow was stirred.",
+  ],
+  eveningPsalms: [
+    "My heart was hot within me. While I was meditating, the fire burned. Then I spoke with my tongue: 'Yahweh, make me to know my end, and what the measure of my days is.'",
+  ],
+  morningShortReading:
+    "Show me how frail I am. Behold, you have made my days handbreadths. My lifetime is as nothing before you. Surely every man stands as a mere breath.",
+  eveningShortReading:
+    "Now, Lord, what do I wait for? My hope is in you. Deliver me from all my transgressions. Don't make me the reproach of the foolish.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 /** The discipline step (1–60), or null if not yet supplied. */
 export function disciplineStep(step: number): DisciplineStep | null {
   if (step < 1 || step > STEP_COUNT) return null;
