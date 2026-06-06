@@ -538,6 +538,63 @@ DISCIPLINE_STEPS[26] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 28 ----
+DISCIPLINE_STEPS[27] = {
+  morningPsalms: [
+    "To you, Yahweh, I call. My rock, don't be deaf to me; lest, if you are silent to me, I become like those who go down into the pit.",
+    "Hear the voice of my petitions, when I cry to you, when I lift up my hands toward your Most Holy Place.",
+  ],
+  eveningPsalms: [
+    "Yahweh is my strength and my shield. My heart has trusted in him, and I am helped. Therefore my heart greatly rejoices. With my song I will thank him.",
+  ],
+  morningShortReading:
+    "Yahweh is their strength. He is a stronghold of salvation to his anointed. Save your people, and bless your inheritance. Be their shepherd also, and bear them up forever.",
+  eveningShortReading:
+    "The Lord is faithful, who will establish you and guard you from the evil one.",
+  morningCollect:
+    "O God, the strength of all those who put their trust in you, mercifully accept our prayers; and because through the weakness of our mortal nature we can do no good thing without you, grant us the help of your grace; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 29 ----
+DISCIPLINE_STEPS[28] = {
+  morningPsalms: [
+    "Ascribe to Yahweh, you sons of the mighty, ascribe to Yahweh glory and strength.",
+    "Ascribe to Yahweh the glory due to his name. Worship Yahweh in holy array.",
+  ],
+  eveningPsalms: [
+    "The voice of Yahweh is on the waters. The God of glory thunders, even Yahweh on many waters. The voice of Yahweh is powerful. The voice of Yahweh is full of majesty.",
+  ],
+  morningShortReading:
+    "Yahweh sits as King over the Flood. Yes, Yahweh sits as King forever. Yahweh will give strength to his people. Yahweh will bless his people with peace.",
+  eveningShortReading:
+    "For the kingdom of God is not eating and drinking, but righteousness, peace, and joy in the Holy Spirit.",
+  morningCollect:
+    "Almighty and everlasting God, who art always more ready to hear than we to pray, and art wont to give more than either we desire or deserve: Pour down upon us the abundance of your mercy; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 30 ----
+DISCIPLINE_STEPS[29] = {
+  morningPsalms: [
+    "I will extol you, Yahweh, for you have raised me up, and have not made my foes to rejoice over me.",
+    "Yahweh my God, I cried to you, and you have healed me.",
+  ],
+  eveningPsalms: [
+    "Yahweh, you have brought up my soul from Sheol. You have kept me alive, that I should not go down to the pit. Sing praise to Yahweh, you saints of his, and give thanks to his holy name.",
+  ],
+  morningShortReading:
+    "For his anger is but for a moment. His favor is for a lifetime. Weeping may stay for the night, but joy comes in the morning.",
+  eveningShortReading:
+    "You have turned my mourning into dancing for me. You have removed my sackcloth, and clothed me with gladness, to the end that my heart may sing praise to you, and not be silent. Yahweh my God, I will give thanks to you forever.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
