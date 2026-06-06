@@ -760,6 +760,82 @@ DISCIPLINE_STEPS[38] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 40 ----
+DISCIPLINE_STEPS[39] = {
+  morningPsalms: [
+    "I waited patiently for Yahweh. He turned to me, and heard my cry.",
+    "He brought me up also out of a horrible pit, out of the miry clay. He set my feet on a rock, and gave me a firm place to stand.",
+  ],
+  eveningPsalms: [
+    "He has put a new song in my mouth, even praise to our God. Many shall see it, and fear, and shall trust in Yahweh. Blessed is the man who makes Yahweh his trust.",
+  ],
+  morningShortReading:
+    "I haven't hidden your righteousness within my heart. I have declared your faithfulness and your salvation. I haven't concealed your loving kindness and your truth from the great assembly.",
+  eveningShortReading:
+    "Don't withhold your tender mercies from me, Yahweh. Let your loving kindness and your truth continually preserve me.",
+  morningCollect:
+    "O Almighty God, who alone canst order the unruly wills and affections of sinful men: Grant unto thy people, that they may love the thing which thou commandest, and desire that which thou dost promise; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 41 ----
+DISCIPLINE_STEPS[40] = {
+  morningPsalms: [
+    "Blessed is he who considers the poor. Yahweh will deliver him in the day of evil.",
+    "Yahweh will preserve him, and keep him alive. He shall be blessed on the earth, and you will not deliver him to the will of his enemies.",
+  ],
+  eveningPsalms: [
+    "Yahweh will sustain him on his sickbed. You will restore him from his bed of illness. I said, 'Yahweh, have mercy on me. Heal me, for I have sinned against you.'",
+  ],
+  morningShortReading:
+    "But as for me, you uphold me in my integrity, and set me in your presence forever. Blessed be Yahweh, the God of Israel, from everlasting and to everlasting! Amen and Amen.",
+  eveningShortReading:
+    "Cast your burden on Yahweh, and he will sustain you. He will never allow the righteous to be moved.",
+  morningCollect:
+    "Almighty and everlasting God, give unto us the increase of faith, hope, and charity; and, that we may obtain that which you do promise, make us to love that which you do command; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 42 ----
+DISCIPLINE_STEPS[41] = {
+  morningPsalms: [
+    "As the deer pants for the water brooks, so my soul pants after you, God.",
+    "My soul thirsts for God, for the living God. When shall I come and appear before God?",
+  ],
+  eveningPsalms: [
+    "Why are you cast down, my soul? Why are you disquieted within me? Hope in God! For I shall still praise him for the help of his countenance.",
+  ],
+  morningShortReading:
+    "Deep calls to deep at the noise of your waterfalls. All your waves and your billows have gone over me. Yahweh will command his loving kindness in the daytime. In the night his song shall be with me—a prayer to the God of my life.",
+  eveningShortReading:
+    "Why are you cast down, my soul? Why are you disquieted within me? Hope in God! For I shall still praise him, who is the health of my countenance, and my God.",
+  morningCollect:
+    "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 43 ----
+DISCIPLINE_STEPS[42] = {
+  morningPsalms: [
+    "Vindicate me, God, and plead my cause against an ungodly nation. Oh, deliver me from the deceitful and wicked man.",
+    "For you are the God of my strength. Why have you rejected me? Why do I go mourning because of the oppression of the enemy?",
+  ],
+  eveningPsalms: [
+    "Oh, send out your light and your truth. Let them lead me. Let them bring me to your holy hill, to your tents. Then I will go to the altar of God, to God my exceeding joy.",
+  ],
+  morningShortReading:
+    "I will praise you on the harp, God, my God. Why are you cast down, my soul? Why are you disquieted within me?",
+  eveningShortReading:
+    "Hope in God! For I shall still praise him, who is the health of my countenance, and my God.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 /** The discipline step (1–60), or null if not yet supplied. */
 export function disciplineStep(step: number): DisciplineStep | null {
   if (step < 1 || step > STEP_COUNT) return null;
