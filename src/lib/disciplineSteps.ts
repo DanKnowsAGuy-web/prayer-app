@@ -774,7 +774,7 @@ DISCIPLINE_STEPS[39] = {
   eveningShortReading:
     "Don't withhold your tender mercies from me, Yahweh. Let your loving kindness and your truth continually preserve me.",
   morningCollect:
-    "O Almighty God, who alone canst order the unruly wills and affections of sinful men: Grant unto thy people, that they may love the thing which thou commandest, and desire that which thou dost promise; through Jesus Christ our Lord. Amen.",
+    "Almighty God, who alone can order the unruly wills and affections of sinful people: Grant to your people that they may love the thing which you command, and desire that which you promise; through Jesus Christ our Lord. Amen.",
   eveningCollect:
     "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
 };
@@ -830,6 +830,82 @@ DISCIPLINE_STEPS[42] = {
     "I will praise you on the harp, God, my God. Why are you cast down, my soul? Why are you disquieted within me?",
   eveningShortReading:
     "Hope in God! For I shall still praise him, who is the health of my countenance, and my God.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
+// ---- STEP 44 ----
+DISCIPLINE_STEPS[43] = {
+  morningPsalms: [
+    "We have heard with our ears, God; our fathers have told us what work you did in their days, in the days of old.",
+    "You drove out the nations with your hand, but you planted them. You afflicted the peoples, but you spread them abroad.",
+  ],
+  eveningPsalms: [
+    "For they didn't get the land in possession by their own sword, neither did their own arm save them; but your right hand, and your arm, and the light of your face, because you were favorable to them.",
+  ],
+  morningShortReading:
+    "You are my King, God. Command victories for Jacob! Through you we will push down our adversaries. Through your name we will tread them under who rise up against us.",
+  eveningShortReading:
+    "For I will not trust in my bow, neither shall my sword save me. But you have saved us from our adversaries, and have shamed those who hate us.",
+  morningCollect:
+    "Almighty God, who has built your Church upon the foundation of the Apostles and Prophets, Jesus Christ himself being the chief corner-stone: Grant us so to be joined together in unity of spirit by their doctrine, that we may be made a holy temple acceptable unto you; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 45 ----
+DISCIPLINE_STEPS[44] = {
+  morningPsalms: [
+    "My heart overflows with a noble theme. I recite my verses for the king. My tongue is like the pen of a skillful writer.",
+    "You are the most excellent of the sons of men. Grace has poured into your lips. Therefore God has blessed you forever.",
+  ],
+  eveningPsalms: [
+    "Gird your sword on your thigh, mighty one, in your splendor and your majesty. In your majesty ride on victoriously on behalf of truth, humility, and righteousness.",
+  ],
+  morningShortReading:
+    "Your throne, God, is forever and ever. A scepter of equity is the scepter of your kingdom. You have loved righteousness, and hated wickedness.",
+  eveningShortReading:
+    "Therefore God, your God, has anointed you with the oil of gladness above your fellows. All your garments smell of myrrh, aloes, and cassia.",
+  morningCollect:
+    "O Lord, we beseech you mercifully to receive the prayers of your people who call upon you; and grant that they may both perceive and know what things they ought to do, and also may have grace and power faithfully to fulfill the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 46 ----
+DISCIPLINE_STEPS[45] = {
+  morningPsalms: [
+    "God is our refuge and strength, a very present help in trouble.",
+    "Therefore we won't fear, though the earth changes, and though the mountains are shaken into the heart of the seas;",
+  ],
+  eveningPsalms: [
+    "Though its waters roar and are troubled, though the mountains tremble with their swelling. There is a river, the streams of which make glad the city of God, the holy place of the tents of the Most High.",
+  ],
+  morningShortReading:
+    "God is in her midst. She shall not be moved. God will help her at dawn. The nations raged. The kingdoms were moved. He lifted his voice, and the earth melted.",
+  eveningShortReading:
+    "Yahweh of Armies is with us. The God of Jacob is our refuge. Come, see Yahweh's works, what desolations he has made on the earth. He makes wars to cease to the end of the earth.",
+  morningCollect:
+    "Almighty and everlasting God, who art always more ready to hear than we to pray, and art wont to give more than either we desire or deserve: Pour down upon us the abundance of your mercy; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 47 ----
+DISCIPLINE_STEPS[46] = {
+  morningPsalms: [
+    "Oh clap your hands, all you nations! Shout to God with the voice of triumph!",
+    "For Yahweh Most High is awesome. He is a great King over all the earth.",
+  ],
+  eveningPsalms: [
+    "He subdues peoples under us, and nations under our feet. He chooses our inheritance for us, the glory of Jacob whom he loved.",
+  ],
+  morningShortReading:
+    "God has gone up with a shout, Yahweh with the sound of a trumpet. Sing praises to God! Sing praises! Sing praises to our King! Sing praises!",
+  eveningShortReading:
+    "For God is the King of all the earth. Sing praises with understanding. God reigns over the nations. God sits on his holy throne.",
   morningCollect:
     "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
   eveningCollect:
