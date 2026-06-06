@@ -912,6 +912,82 @@ DISCIPLINE_STEPS[46] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 48 ----
+DISCIPLINE_STEPS[47] = {
+  morningPsalms: [
+    "Great is Yahweh, and greatly to be praised, in the city of our God, in his holy mountain.",
+    "Beautiful in elevation, the joy of the whole earth, is Mount Zion, on the sides of the north, the city of the great King.",
+  ],
+  eveningPsalms: [
+    "God has shown himself in her citadels as a refuge. For, behold, the kings assembled themselves, they passed by together.",
+  ],
+  morningShortReading:
+    "As we have heard, so we have seen in the city of Yahweh of Armies, in the city of our God. God will establish it forever.",
+  eveningShortReading:
+    "We have thought of your loving kindness, God, in the midst of your temple. As is your name, God, so is your praise to the ends of the earth. Your right hand is full of righteousness.",
+  morningCollect:
+    "O Lord, from whom all good things do come: Grant to us your humble servants, that by your holy inspiration we may think those things that are good, and by your merciful guiding may perform the same; through our Lord Jesus Christ. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 49 ----
+DISCIPLINE_STEPS[48] = {
+  morningPsalms: [
+    "Hear this, all you peoples! Listen, all you inhabitants of the world, both low and high, rich and poor together.",
+    "My mouth will speak words of wisdom. The meditation of my heart will be of understanding. I will incline my ear to a proverb. I will open my riddle on the harp.",
+  ],
+  eveningPsalms: [
+    "Why should I fear in the days of evil, when iniquity at my heels surrounds me? Those who trust in their wealth, and boast themselves in the multitude of their riches—none of them can by any means redeem his brother.",
+  ],
+  morningShortReading:
+    "For he sees that wise men die; likewise the fool and the senseless perish, and leave their wealth to others.",
+  eveningShortReading:
+    "But God will redeem my soul from the power of Sheol, for he will receive me. Don't be afraid when a man is made rich, when the glory of his house is increased.",
+  morningCollect:
+    "Almighty God, you show to those who are in error the light of your truth, to the intent that they may return into the way of righteousness: Grant to all those who are admitted into the fellowship of Christ's Religion, that they may avoid those things that are contrary to their profession; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 50 ----
+DISCIPLINE_STEPS[49] = {
+  morningPsalms: [
+    "The Mighty One, God, Yahweh, speaks, and calls the earth from the rising of the sun to its going down.",
+    "Out of Zion, the perfection of beauty, God shines forth. Our God comes, and does not keep silent.",
+  ],
+  eveningPsalms: [
+    "A fire devours before him. It is very tempestuous around him. He calls to the heavens above, and to the earth, that he may judge his people.",
+  ],
+  morningShortReading:
+    "Gather my saints together to me, those who have made a covenant with me by sacrifice. The heavens shall declare his righteousness, for God himself is judge.",
+  eveningShortReading:
+    "Call on me in the day of trouble. I will deliver you, and you will honor me.",
+  morningCollect:
+    "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 51 ----
+DISCIPLINE_STEPS[50] = {
+  morningPsalms: [
+    "Have mercy on me, God, according to your loving kindness. According to the multitude of your tender mercies, blot out my transgressions.",
+    "Wash me thoroughly from my iniquity, and cleanse me from my sin. For I know my transgressions, and my sin is ever before me.",
+  ],
+  eveningPsalms: [
+    "Against you, you only, have I sinned, and done that which is evil in your sight; that you may be justified when you speak, and blameless when you judge.",
+  ],
+  morningShortReading:
+    "Purge me with hyssop, and I shall be clean. Wash me, and I shall be whiter than snow. Make me to hear joy and gladness, that the bones which you have broken may rejoice.",
+  eveningShortReading:
+    "Create in me a clean heart, God. Renew a right spirit within me. Don't cast me away from your presence, and don't take your Holy Spirit from me. Restore to me the joy of your salvation.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 /** The discipline step (1–60), or null if not yet supplied. */
 export function disciplineStep(step: number): DisciplineStep | null {
   if (step < 1 || step > STEP_COUNT) return null;
