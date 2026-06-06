@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useStore } from "../lib/store";
 import { rungAt } from "../lib/ladder";
+import type { Tradition } from "../lib/engine";
 
 /**
  * The assessment. It finds the lowest rung the person can keep, so the rule
@@ -13,6 +14,15 @@ type Answer = {
   meaning: string;
   rung: number;
 };
+
+/** Alphabetical, as requested. */
+const TRADITIONS: { value: Tradition; label: string }[] = [
+  { value: "anglican", label: "Anglican" },
+  { value: "eastern-orthodox", label: "Eastern Orthodox" },
+  { value: "evangelical", label: "Evangelical" },
+  { value: "protestant", label: "Protestant" },
+  { value: "roman-catholic", label: "Roman Catholic" },
+];
 
 const PRACTICE_ANSWERS: Answer[] = [
   {
@@ -39,8 +49,11 @@ const PRACTICE_ANSWERS: Answer[] = [
 
 export function Onboarding() {
   const { dispatch } = useStore();
-  const [step, setStep] = useState<"welcome" | "practice" | "placed">("welcome");
+  const [step, setStep] = useState<
+    "welcome" | "tradition" | "practice" | "placed"
+  >("welcome");
   const [choice, setChoice] = useState<Answer | null>(null);
+  const [tradition, setTradition] = useState<Tradition | null>(null);
 
   if (step === "welcome") {
     return (
@@ -55,8 +68,46 @@ export function Onboarding() {
           the prayer — never the other way around.
         </p>
         <div className="onboard-actions">
-          <button className="btn btn-primary" onClick={() => setStep("practice")}>
+          <button className="btn btn-primary" onClick={() => setStep("tradition")}>
             Begin
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "tradition") {
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">Where you pray from</p>
+        <h2 className="onboard-q">Which tradition is your home?</h2>
+        <p className="lede">
+          This shapes a few touches along the way. You're always welcome,
+          whatever you choose.
+        </p>
+        <ul className="choices">
+          {TRADITIONS.map((t) => (
+            <li key={t.value}>
+              <button
+                className={`choice ${tradition === t.value ? "is-selected" : ""}`}
+                onClick={() => setTradition(t.value)}
+                aria-pressed={tradition === t.value}
+              >
+                <span className="choice-label">{t.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="onboard-actions">
+          <button
+            className="btn btn-primary"
+            disabled={!tradition}
+            onClick={() => setStep("practice")}
+          >
+            Continue
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("welcome")}>
+            Go back
           </button>
         </div>
       </main>
@@ -122,7 +173,9 @@ export function Onboarding() {
       <div className="onboard-actions">
         <button
           className="btn btn-primary"
-          onClick={() => dispatch({ type: "onboard", rung: choice!.rung })}
+          onClick={() =>
+            dispatch({ type: "onboard", rung: choice!.rung, tradition })
+          }
         >
           Start my rule
         </button>

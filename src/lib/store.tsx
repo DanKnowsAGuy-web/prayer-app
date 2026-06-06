@@ -13,11 +13,12 @@ import {
   nextWeeklyBucket,
   type Intention,
   type RuleState,
+  type Tradition,
 } from "./engine";
 import { loadState, saveState } from "./storage";
 
 type Action =
-  | { type: "onboard"; rung: number }
+  | { type: "onboard"; rung: number; tradition: Tradition | null }
   | { type: "checkIn"; date: string; kept: boolean }
   | { type: "setRung"; rung: number; dismissed?: string }
   | { type: "dismissAdvance"; date: string }
@@ -33,7 +34,12 @@ type Action =
 function reducer(state: RuleState, action: Action): RuleState {
   switch (action.type) {
     case "onboard":
-      return { ...state, onboarded: true, rung: action.rung };
+      return {
+        ...state,
+        onboarded: true,
+        rung: action.rung,
+        tradition: action.tradition,
+      };
     case "checkIn": {
       const log = state.log.filter((c) => c.date !== action.date);
       log.push({ date: action.date, kept: action.kept });

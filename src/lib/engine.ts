@@ -29,9 +29,19 @@ export const ENGINE_CONFIG = {
   minCheckInsBeforeAdvance: 5,
 };
 
+/** The Christian tradition a person prays within (alphabetical). */
+export type Tradition =
+  | "anglican"
+  | "eastern-orthodox"
+  | "evangelical"
+  | "protestant"
+  | "roman-catholic";
+
 export type RuleState = {
   /** Whether onboarding is complete. */
   onboarded: boolean;
+  /** The tradition chosen at first launch; null if not yet chosen. */
+  tradition: Tradition | null;
   /** Current rung index into the LADDER. */
   rung: number;
   /** Chronological check-in log (oldest first). */
@@ -100,6 +110,7 @@ export function nextWeeklyBucket(intentions: Intention[]): number {
 export function initialState(): RuleState {
   return {
     onboarded: false,
+    tradition: null,
     rung: FIRST_RUNG,
     log: [],
     intentions: [],
