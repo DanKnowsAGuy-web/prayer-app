@@ -1,0 +1,523 @@
+/* ---- Shared reveal (restrained: a single soft settle) ---- */
+@keyframes settle {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.app > *,
+.reader-stage {
+  animation: settle var(--dur) var(--ease-out) both;
+}
+.app > *:nth-child(2) { animation-delay: 60ms; }
+.app > *:nth-child(3) { animation-delay: 120ms; }
+.app > *:nth-child(4) { animation-delay: 180ms; }
+.app > *:nth-child(5) { animation-delay: 240ms; }
+
+/* ============ ONBOARDING ============ */
+.onboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-height: 100dvh;
+  justify-content: center;
+}
+.onboard-title {
+  font-size: clamp(2.4rem, 7vw, 3.6rem);
+  font-weight: 500;
+}
+.onboard-q {
+  font-size: clamp(1.7rem, 4.5vw, 2.3rem);
+  font-weight: 500;
+}
+.lede {
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+  max-width: 34rem;
+}
+.onboard-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.choices {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.choice {
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1.05rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  transition: border-color var(--dur) var(--ease-out),
+    background var(--dur) var(--ease-out);
+}
+.choice:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-2);
+}
+.choice.is-selected {
+  border-color: var(--clay);
+  background: var(--clay-soft);
+}
+.choice-label {
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+.choice-meaning {
+  font-size: 1rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+.placed-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.placed-goal-label {
+  font-size: 0.72rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+.placed-goal {
+  font-size: 1.3rem;
+  color: var(--ink);
+}
+.placed-goal-evening {
+  font-size: 1.1rem;
+  color: var(--ink-muted);
+}
+.placed-minutes {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+/* ============ HOME ============ */
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+.home-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.home-greeting {
+  font-size: clamp(2.6rem, 8vw, 4rem);
+  font-weight: 500;
+}
+.faithful {
+  color: var(--ink-muted);
+  font-size: 1.1rem;
+  font-style: italic;
+  margin-top: 0.25rem;
+}
+.faithful-quiet {
+  color: var(--ink-faint);
+}
+
+/* Today's prayer — the centerpiece */
+.today {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+}
+.today-title {
+  font-size: clamp(2rem, 5vw, 2.6rem);
+  font-weight: 500;
+}
+.today-goal {
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  max-width: 32rem;
+}
+.practice-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+.minutes {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.evening-block {
+  margin-top: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.evening-title {
+  font-size: 1.6rem;
+  font-weight: 500;
+}
+
+/* Guidance offers */
+.offer {
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.offer-advance {
+  background: var(--olive-soft);
+  border-color: oklch(0.66 0.07 122 / 0.4);
+}
+.offer-simplify {
+  background: var(--surface);
+}
+.offer-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  font-weight: 600;
+}
+.offer-body {
+  font-size: 1.15rem;
+  color: var(--ink);
+}
+.offer-actions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+/* Psalter rotation */
+.psalter {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.psalter-h {
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-weight: 500;
+}
+.psalter-sub {
+  color: var(--ink-muted);
+  font-style: italic;
+  max-width: 32rem;
+}
+.seg {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-top: var(--space-2);
+}
+.seg-label {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+.seg-track {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.seg-btn {
+  background: transparent;
+  border: none;
+  color: var(--ink-muted);
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  min-height: 40px;
+  transition: background var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out);
+}
+.seg-btn:hover {
+  color: var(--ink);
+}
+.seg-btn.is-on {
+  background: var(--clay);
+  color: var(--on-clay);
+  font-weight: 600;
+}
+
+/* Check-in */
+.checkin {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.checkin-q {
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-weight: 500;
+}
+.checkin-actions {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  flex-wrap: wrap;
+}
+.checkin-answered {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  align-items: flex-start;
+  margin-top: var(--space-2);
+}
+.checkin-result {
+  font-size: 1.15rem;
+  color: var(--ink);
+  font-style: italic;
+}
+
+/* Intentions */
+.intentions {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.intentions-h {
+  font-size: clamp(1.5rem, 4vw, 1.9rem);
+  font-weight: 500;
+}
+.intentions-empty {
+  color: var(--ink-muted);
+  font-style: italic;
+  max-width: 30rem;
+}
+.intention-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.intention {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border);
+}
+.intention-toggle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.25rem 0;
+}
+.intention-mark {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink-faint);
+  transition: background var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out);
+}
+.intention-text {
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+.intention.is-answered .intention-mark {
+  background: var(--olive);
+  border-color: var(--olive);
+}
+.intention.is-answered .intention-text {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-faint);
+}
+.intention-remove {
+  flex: none;
+  background: none;
+  border: none;
+  color: var(--ink-faint);
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  transition: color var(--dur) var(--ease-out);
+}
+.intention-remove:hover {
+  color: var(--clay);
+}
+.intention-add {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+.intention-input {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 0.85rem 1rem;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 1.0625rem;
+  min-height: 48px;
+  transition: border-color var(--dur) var(--ease-out);
+}
+.intention-input::placeholder {
+  color: var(--ink-faint);
+}
+.intention-input:focus {
+  outline: none;
+  border-color: var(--clay);
+}
+
+.benediction {
+  text-align: center;
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 1.15rem;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+/* ============ READER ============ */
+.reader {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  width: min(100% - 2.5rem, 34rem);
+  margin-inline: auto;
+  padding-block: var(--space-4) var(--space-6);
+}
+.reader-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-sticky);
+  background: var(--bg);
+  padding-block: var(--space-3);
+}
+.reader-close {
+  margin-left: -0.5rem;
+}
+.reader-bar-title {
+  font-size: 0.72rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  font-weight: 600;
+}
+.reader-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: var(--space-5);
+}
+.reader-loading {
+  font-size: 1.2rem;
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
+/* The whole order of service, read top to bottom. */
+.reader-scroll {
+  display: flex;
+  flex-direction: column;
+  padding-block: var(--space-5) var(--space-6);
+}
+.movement {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-block: var(--space-4);
+}
+.movement + .movement {
+  border-top: 1px solid var(--border);
+}
+.reader-end {
+  display: flex;
+  justify-content: center;
+  padding-top: var(--space-5);
+}
+.reader-end .btn-primary {
+  min-width: 9rem;
+}
+.reader-label {
+  font-size: 0.72rem;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--clay);
+  font-weight: 600;
+}
+.reader-text {
+  font-size: clamp(1.5rem, 4.2vw, 1.95rem);
+  line-height: 1.5;
+  color: var(--ink);
+  white-space: pre-line;
+  text-wrap: pretty;
+}
+.reader-source {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 1.05rem;
+}
+.reader-note {
+  color: var(--ink-muted);
+  font-size: 1.1rem;
+  border-left: none;
+  padding-top: var(--space-2);
+}
+.reader-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+.reader-actions .btn-primary {
+  margin-left: auto;
+  min-width: 9rem;
+}
+
+/* Larger screens: let the prayer breathe a little more. */
+@media (min-width: 720px) {
+  .reader-text {
+    line-height: 1.55;
+  }
+}

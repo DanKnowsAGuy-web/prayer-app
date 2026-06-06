@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/home.tsx","./src/components/onboarding.tsx","./src/components/prayerreader.tsx","./src/lib/daypart.ts","./src/lib/engine.ts","./src/lib/ladder.ts","./src/lib/psalter.ts","./src/lib/readings.ts","./src/lib/resolve.ts","./src/lib/storage.ts","./src/lib/store.tsx"],"version":"5.9.3"}
