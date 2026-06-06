@@ -8,7 +8,7 @@
  */
 
 import type { Practice, PrayerStep } from "./ladder";
-import type { Intention } from "./engine";
+import { intentionsForDate, type Intention } from "./engine";
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
 
@@ -31,13 +31,15 @@ export type ResolveCtx = {
   psalmTime: DayPart;
   /** The current Psalter portion, already built from the bundle. */
   psalmMovements: Movement[];
+  /** Today's local date ("YYYY-MM-DD"), for the weekly intercession rotation. */
+  date: string;
 };
 
 /** The standard prayers said around the names of those being interceded for. */
 export const INTERCESSION_BEFORE =
-  "O Lord Jesus Christ, who bade us pray for one another, receive those I now bring before You by name:";
+  "Lord, listen to the petition of our prayers, unworthy as we may be, and grant all good things profitable for our souls and salvation. For the servants of God we pray, Lord, have mercy:";
 export const INTERCESSION_AFTER =
-  "Remember them, O Lord, in Your mercy. Grant them health and salvation, guard them from all evil, and visit them with Your grace. For You are good and love mankind, and to You we give glory. Amen.";
+  "Lord, as You will and as You know, have mercy on us and save us, for You are good and love mankind.\n\nThrough the prayers of the holy fathers and holy mothers and all the saints who have gone before us, have mercy on us and save us.\n\nIn the name of the Father, and the Son, and the Holy Spirit. Amen.";
 
 /** A quiet fallback when no scripture is appointed and none is bundled. */
 const PSALM_FALLBACK: Movement = {
@@ -75,10 +77,11 @@ function gospelMovement(day?: DayReadings): Movement {
   return PSALM_FALLBACK;
 }
 
-function intercessionMovement(intentions: Intention[]): Movement {
-  const active = intentions.filter((i) => !i.answered).map((i) => i.text);
-  const names = active.length
-    ? active.join("\n")
+function intercessionMovement(intentions: Intention[], date: string): Movement {
+  // Daily names every day, plus the weekly names whose rotation lands today.
+  const today = intentionsForDate(intentions, date).map((i) => i.text);
+  const names = today.length
+    ? today.join("\n")
     : "(bring to mind those you carry, and name them before God)";
   return {
     label: "Intercession",
@@ -103,7 +106,7 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
       return out;
     }
     case "intercession":
-      return [intercessionMovement(ctx.intentions)];
+      return [intercessionMovement(ctx.intentions, ctx.date)];
     case "psalm":
       // The Psalm portion belongs only to the prayer the user chose for it.
       return ctx.part === ctx.psalmTime

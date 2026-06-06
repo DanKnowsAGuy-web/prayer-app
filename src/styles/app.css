@@ -379,10 +379,44 @@
 .intention-remove:hover {
   color: var(--clay);
 }
+.cadence-tag {
+  flex: none;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  color: var(--ink-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.7rem;
+  min-height: 32px;
+  white-space: nowrap;
+  transition: border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out), background var(--dur) var(--ease-out);
+}
+.cadence-tag:hover {
+  color: var(--ink);
+  border-color: var(--ink-faint);
+}
+.cadence-tag.cadence-weekly {
+  color: var(--olive);
+  border-color: oklch(0.66 0.07 122 / 0.5);
+}
+.cadence-tag.cadence-weekly.is-today {
+  background: var(--olive-soft);
+}
+.intention.is-answered .cadence-tag {
+  opacity: 0.5;
+}
+
 .intention-add {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+.intention-add-btns {
+  display: flex;
+  gap: var(--space-2);
 }
 .intention-input {
   flex: 1;

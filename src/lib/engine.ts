@@ -48,13 +48,52 @@ export type RuleState = {
   lastPsalmAdvanceDate?: string;
 };
 
+export type Cadence = "daily" | "weekly";
+
 export type Intention = {
   id: string;
   text: string;
   /** Local date added. */
   added: string;
   answered: boolean;
+  /** Daily names are prayed every day; weekly names rotate, once a week. */
+  cadence: Cadence;
+  /** For weekly names: the weekday (0=Sun…6=Sat) they come up on. */
+  bucket?: number;
 };
+
+/** Treat a saved intention with no cadence (older data) as daily. */
+export function cadenceOf(i: Intention): Cadence {
+  return i.cadence ?? "daily";
+}
+
+/** The weekday (0=Sun…6=Sat) for a local "YYYY-MM-DD" date. */
+export function weekdayOf(date: string): number {
+  const [y, m, d] = date.split("-").map(Number);
+  return new Date(y, m - 1, d).getDay();
+}
+
+/**
+ * The intentions to pray on a given day: every daily name, plus the weekly
+ * names whose rotation slot lands on today's weekday. Answered names drop out.
+ */
+export function intentionsForDate(
+  intentions: Intention[],
+  date: string,
+): Intention[] {
+  const wd = weekdayOf(date);
+  return intentions.filter((i) => {
+    if (i.answered) return false;
+    if (cadenceOf(i) === "daily") return true;
+    return (i.bucket ?? 0) % 7 === wd;
+  });
+}
+
+/** The weekday slot to give the next weekly name, spreading them evenly. */
+export function nextWeeklyBucket(intentions: Intention[]): number {
+  const weeklyCount = intentions.filter((i) => cadenceOf(i) === "weekly").length;
+  return weeklyCount % 7;
+}
 
 export function initialState(): RuleState {
   return {

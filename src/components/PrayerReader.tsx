@@ -69,8 +69,9 @@ export function PrayerReader({
         part,
         psalmTime: state.psalmTime,
         psalmMovements,
+        date: today,
       }),
-    [practice, day, state.intentions, part, state.psalmTime, psalmMovements],
+    [practice, day, state.intentions, part, state.psalmTime, psalmMovements, today],
   );
 
   // Which segments are kept for today. Reset to "all" whenever the set changes.

@@ -7,8 +7,10 @@ import {
   type ReactNode,
 } from "react";
 import {
+  cadenceOf,
   initialState,
   localDate,
+  nextWeeklyBucket,
   type Intention,
   type RuleState,
 } from "./engine";
@@ -21,6 +23,7 @@ type Action =
   | { type: "dismissAdvance"; date: string }
   | { type: "addIntention"; intention: Intention }
   | { type: "toggleIntention"; id: string }
+  | { type: "toggleCadence"; id: string }
   | { type: "removeIntention"; id: string }
   | { type: "setPsalmTime"; time: "morning" | "evening" }
   | { type: "advancePsalm"; date: string }
@@ -48,6 +51,17 @@ function reducer(state: RuleState, action: Action): RuleState {
         intentions: state.intentions.map((i) =>
           i.id === action.id ? { ...i, answered: !i.answered } : i,
         ),
+      };
+    case "toggleCadence":
+      return {
+        ...state,
+        intentions: state.intentions.map((i) => {
+          if (i.id !== action.id) return i;
+          if (cadenceOf(i) === "weekly") {
+            return { ...i, cadence: "daily", bucket: undefined };
+          }
+          return { ...i, cadence: "weekly", bucket: nextWeeklyBucket(state.intentions) };
+        }),
       };
     case "removeIntention":
       return {

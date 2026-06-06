@@ -2,6 +2,12 @@ import { useStore, makeId } from "../lib/store";
 import { rungAt } from "../lib/ladder";
 import { portionLabel } from "../lib/psalter";
 import {
+  cadenceOf,
+  nextWeeklyBucket,
+  weekdayOf,
+  type Cadence,
+} from "../lib/engine";
+import {
   guidance,
   keptInWindow,
   keptStreak,
@@ -300,8 +306,9 @@ function Intentions() {
   const { state, today, dispatch } = useStore();
   const [text, setText] = useState("");
 
-  function add(e: React.FormEvent) {
-    e.preventDefault();
+  const wd = weekdayOf(today);
+
+  function add(cadence: Cadence) {
     const trimmed = text.trim();
     if (!trimmed) return;
     dispatch({
@@ -311,6 +318,9 @@ function Intentions() {
         text: trimmed,
         added: today,
         answered: false,
+        cadence,
+        bucket:
+          cadence === "weekly" ? nextWeeklyBucket(state.intentions) : undefined,
       },
     });
     setText("");
@@ -325,40 +335,65 @@ function Intentions() {
 
       {state.intentions.length === 0 ? (
         <p className="intentions-empty">
-          The people and needs you carry can rest here. Add the first when you're
-          ready.
+          The people and needs you carry can rest here. Daily names are prayed
+          every day; weekly names come up once a week, in turn.
         </p>
       ) : (
         <ul className="intention-list">
-          {state.intentions.map((i) => (
-            <li
-              key={i.id}
-              className={`intention ${i.answered ? "is-answered" : ""}`}
-            >
-              <button
-                className="intention-toggle"
-                onClick={() => dispatch({ type: "toggleIntention", id: i.id })}
-                aria-pressed={i.answered}
-                aria-label={
-                  i.answered ? "Mark as still praying" : "Mark as answered"
-                }
+          {state.intentions.map((i) => {
+            const cadence = cadenceOf(i);
+            const inToday = cadence === "weekly" && (i.bucket ?? 0) % 7 === wd;
+            return (
+              <li
+                key={i.id}
+                className={`intention ${i.answered ? "is-answered" : ""}`}
               >
-                <span className="intention-mark" aria-hidden="true" />
-                <span className="intention-text">{i.text}</span>
-              </button>
-              <button
-                className="intention-remove"
-                onClick={() => dispatch({ type: "removeIntention", id: i.id })}
-                aria-label={`Remove "${i.text}"`}
-              >
-                ×
-              </button>
-            </li>
-          ))}
+                <button
+                  className="intention-toggle"
+                  onClick={() => dispatch({ type: "toggleIntention", id: i.id })}
+                  aria-pressed={i.answered}
+                  aria-label={
+                    i.answered ? "Mark as still praying" : "Mark as answered"
+                  }
+                >
+                  <span className="intention-mark" aria-hidden="true" />
+                  <span className="intention-text">{i.text}</span>
+                </button>
+                <button
+                  className={`cadence-tag cadence-${cadence} ${
+                    inToday ? "is-today" : ""
+                  }`}
+                  onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
+                  aria-label={`Praying ${cadence}. Tap to make ${
+                    cadence === "daily" ? "weekly" : "daily"
+                  }.`}
+                >
+                  {cadence === "daily"
+                    ? "Daily"
+                    : inToday
+                      ? "Weekly · today"
+                      : "Weekly"}
+                </button>
+                <button
+                  className="intention-remove"
+                  onClick={() => dispatch({ type: "removeIntention", id: i.id })}
+                  aria-label={`Remove "${i.text}"`}
+                >
+                  ×
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
 
-      <form className="intention-add" onSubmit={add}>
+      <form
+        className="intention-add"
+        onSubmit={(e) => {
+          e.preventDefault();
+          add("daily");
+        }}
+      >
         <input
           className="intention-input"
           value={text}
@@ -367,9 +402,19 @@ function Intentions() {
           aria-label="Add a prayer intention"
           maxLength={120}
         />
-        <button className="btn btn-ghost" type="submit" disabled={!text.trim()}>
-          Add
-        </button>
+        <div className="intention-add-btns">
+          <button className="btn btn-primary" type="submit" disabled={!text.trim()}>
+            Add daily
+          </button>
+          <button
+            className="btn btn-ghost"
+            type="button"
+            onClick={() => add("weekly")}
+            disabled={!text.trim()}
+          >
+            Add weekly
+          </button>
+        </div>
       </form>
     </section>
   );
