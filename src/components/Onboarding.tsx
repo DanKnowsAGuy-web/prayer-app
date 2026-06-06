@@ -47,13 +47,41 @@ const PRACTICE_ANSWERS: Answer[] = [
   },
 ];
 
+/** A beginner's chosen starting time; each maps to a small starting rung. */
+type Commitment = { minutes: number; rung: number; label: string; meaning: string };
+
+const COMMITMENTS: Commitment[] = [
+  {
+    minutes: 2,
+    rung: 0,
+    label: "2 minutes",
+    meaning: "The smallest beginning — a short prayer to anchor each morning.",
+  },
+  {
+    minutes: 4,
+    rung: 1,
+    label: "4 minutes",
+    meaning: "A little more — a brief prayer with a word of scripture.",
+  },
+  {
+    minutes: 6,
+    rung: 2,
+    label: "6 minutes",
+    meaning: "A fuller morning — prayer, the day's Gospel, and those you hold.",
+  },
+];
+
 export function Onboarding() {
   const { dispatch } = useStore();
   const [step, setStep] = useState<
-    "welcome" | "tradition" | "practice" | "placed"
+    "welcome" | "tradition" | "practice" | "framing" | "commitment" | "placed"
   >("welcome");
   const [choice, setChoice] = useState<Answer | null>(null);
   const [tradition, setTradition] = useState<Tradition | null>(null);
+  const [commitment, setCommitment] = useState<Commitment | null>(null);
+
+  // Those without a settled routine get the framing + time-commitment path.
+  const isBeginner = !!choice && choice.rung <= 1;
 
   if (step === "welcome") {
     return (
@@ -140,9 +168,82 @@ export function Onboarding() {
           <button
             className="btn btn-primary"
             disabled={!choice}
+            onClick={() => setStep(isBeginner ? "framing" : "placed")}
+          >
+            Continue
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("tradition")}>
+            Go back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "framing") {
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">How this works</p>
+        <h2 className="onboard-q">Consistency before intensity</h2>
+        <p className="lede">
+          Over time, this companion slowly grows your prayer and scripture
+          reading, working you up to about fifteen minutes in the morning and ten
+          in the evening.
+        </p>
+        <p className="lede">
+          We begin small, on purpose. It is better to pray a little every day
+          than to force a long habit you'll set down after a week. We build
+          consistency first, and grow from there.
+        </p>
+        <p className="lede">
+          If you start missing days, we'll quietly pull back to make it easier.
+          As you stay faithful, we'll invite you to pray a little longer.
+          Adjusting as you go is completely normal.
+        </p>
+        <div className="onboard-actions">
+          <button className="btn btn-primary" onClick={() => setStep("commitment")}>
+            Continue
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("practice")}>
+            Go back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "commitment") {
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">Your starting point</p>
+        <h2 className="onboard-q">How long would you like to begin with?</h2>
+        <p className="lede">Just a starting point. We'll adjust together as you go.</p>
+        <ul className="choices">
+          {COMMITMENTS.map((c) => (
+            <li key={c.minutes}>
+              <button
+                className={`choice ${
+                  commitment?.minutes === c.minutes ? "is-selected" : ""
+                }`}
+                onClick={() => setCommitment(c)}
+                aria-pressed={commitment?.minutes === c.minutes}
+              >
+                <span className="choice-label">{c.label}</span>
+                <span className="choice-meaning">{c.meaning}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="onboard-actions">
+          <button
+            className="btn btn-primary"
+            disabled={!commitment}
             onClick={() => setStep("placed")}
           >
             Continue
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("framing")}>
+            Go back
           </button>
         </div>
       </main>
@@ -150,7 +251,10 @@ export function Onboarding() {
   }
 
   // placed
-  const rung = rungAt(choice!.rung);
+  const finalRung = isBeginner && commitment ? commitment.rung : choice!.rung;
+  const rung = rungAt(finalRung);
+  const startMinutes =
+    isBeginner && commitment ? commitment.minutes : rung.morning.minutes;
   return (
     <main className="app onboard">
       <p className="eyebrow">Your starting place</p>
@@ -166,7 +270,8 @@ export function Onboarding() {
           </p>
         )}
         <p className="placed-minutes">
-          About {rung.morning.minutes} minute{rung.morning.minutes === 1 ? "" : "s"} to begin.
+          About {startMinutes} minute{startMinutes === 1 ? "" : "s"} to begin.
+          We'll adjust as you go.
         </p>
       </div>
 
@@ -174,12 +279,15 @@ export function Onboarding() {
         <button
           className="btn btn-primary"
           onClick={() =>
-            dispatch({ type: "onboard", rung: choice!.rung, tradition })
+            dispatch({ type: "onboard", rung: finalRung, tradition })
           }
         >
           Start my rule
         </button>
-        <button className="btn btn-quiet" onClick={() => setStep("practice")}>
+        <button
+          className="btn btn-quiet"
+          onClick={() => setStep(isBeginner ? "commitment" : "practice")}
+        >
           Go back
         </button>
       </div>

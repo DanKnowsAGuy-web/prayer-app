@@ -77,7 +77,7 @@ export const LADDER: Rung[] = [
     morning: {
       title: "Morning Prayer",
       goal: "Pray the Lord's Prayer each morning.",
-      minutes: 1,
+      minutes: 2,
       steps: [
         {
           label: "Begin",
@@ -95,7 +95,7 @@ export const LADDER: Rung[] = [
     morning: {
       title: "Morning Prayer",
       goal: "A brief opening, a psalm verse, the Lord's Prayer, and silence.",
-      minutes: 3,
+      minutes: 4,
       steps: [
         {
           label: "Opening",
@@ -122,8 +122,8 @@ export const LADDER: Rung[] = [
     summary: "A full, settled morning prayer — your morning rule is taking root.",
     morning: {
       title: "Morning Prayer",
-      goal: "Opening, the day's Gospel, the Lord's Prayer, intercession, and a collect.",
-      minutes: 7,
+      goal: "Opening, the day's Gospel, the Lord's Prayer, intercession, and a closing prayer.",
+      minutes: 6,
       steps: [
         {
           label: "Opening",
