@@ -311,6 +311,82 @@ DISCIPLINE_STEPS[14] = {
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 16 ----
+DISCIPLINE_STEPS[15] = {
+  morningPsalms: [
+    "Preserve me, God, for I take refuge in you. I have said to Yahweh, 'You are my Lord. I have no good beyond you.'",
+    "As for the saints who are in the earth, they are the excellent ones in whom is all my delight.",
+  ],
+  eveningPsalms: [
+    "Yahweh is the assigned portion of my inheritance and of my cup. You maintain my lot. The lines have fallen to me in pleasant places. Yes, I have a goodly heritage.",
+  ],
+  morningShortReading:
+    "Therefore my heart is glad, and my tongue rejoices. My body shall also dwell in safety. For you will not leave my soul in Sheol, neither will you allow your holy one to see corruption.",
+  eveningShortReading:
+    "You will show me the path of life. In your presence is fullness of joy. In your right hand there are pleasures forevermore.",
+  morningCollect:
+    "O God, whose blessed Son was manifested that he might destroy the works of the devil and make us children of God and heirs of eternal life: Grant us, we beseech you, that, having this hope, we may purify ourselves even as he is pure; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 17 ----
+DISCIPLINE_STEPS[16] = {
+  morningPsalms: [
+    "Hear a just cause, Yahweh. Attend to my cry. Give ear to my prayer, which doesn't go out of deceitful lips.",
+    "Let my judgment come forth from your presence. Let your eyes look on equity.",
+  ],
+  eveningPsalms: [
+    "You have proved my heart. You have visited me in the night. You have tried me, and you find nothing. I have purposed that my mouth shall not disobey.",
+  ],
+  morningShortReading:
+    "As for the works of men, by the word of your lips I have kept myself from the ways of the violent. My steps have held fast to your paths. My feet have not slipped.",
+  eveningShortReading:
+    "I have called on you, for you will answer me, God. Turn your ear to me. Hear my speech.",
+  morningCollect:
+    "Almighty and everlasting God, give to us an increase of faith, hope, and love; and, that we may obtain what you promise, make us love what you command; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 18 ----
+DISCIPLINE_STEPS[17] = {
+  morningPsalms: [
+    "I love you, Yahweh, my strength. Yahweh is my rock, my fortress, and my deliverer;",
+    "My God, my rock, in whom I take refuge; my shield, and the horn of my salvation, my high tower.",
+  ],
+  eveningPsalms: [
+    "I will call on Yahweh, who is worthy to be praised; so shall I be saved from my enemies. The cords of death surrounded me. The floods of ungodliness made me afraid.",
+  ],
+  morningShortReading:
+    "In my distress I called on Yahweh, and cried to my God. He heard my voice out of his temple. My cry before him came into his ears.",
+  eveningShortReading:
+    "He delivered me from my strong enemy, and from those who hated me; for they were too mighty for me. They came on me in the day of my calamity, but Yahweh was my support.",
+  morningCollect:
+    "Grant, we beseech you, merciful Lord, to your faithful people pardon and peace, that they may be cleansed from all their sins, and serve you with a quiet mind; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 19 ----
+DISCIPLINE_STEPS[18] = {
+  morningPsalms: [
+    "The heavens declare the glory of God. The expanse shows his handiwork.",
+    "Day unto day utters speech, and night unto night shows knowledge. There is no speech nor language where their voice is not heard.",
+  ],
+  eveningPsalms: [
+    "The law of Yahweh is perfect, restoring the soul. The testimony of Yahweh is sure, making wise the simple. The precepts of Yahweh are right, rejoicing the heart.",
+  ],
+  morningShortReading:
+    "The commandment of Yahweh is pure, enlightening the eyes. The fear of Yahweh is clean, enduring forever. The judgments of Yahweh are true, and righteous altogether.",
+  eveningShortReading:
+    "More to be desired are they than gold, yes, than much fine gold; sweeter also than honey and the droppings of the honeycomb. Moreover by them is your servant warned. In keeping them there is great reward.",
+  morningCollect:
+    "Almighty God, who has built your Church upon the foundation of the Apostles and Prophets, Jesus Christ himself being the chief corner-stone: Grant us so to be joined together in unity of spirit by their doctrine, that we may be made a holy temple acceptable unto you; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
