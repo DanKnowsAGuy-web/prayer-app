@@ -180,7 +180,7 @@ export const LADDER: Rung[] = [
           note: "Give thanks for the good; ask forgiveness for the rest.",
         },
         {
-          label: "Psalm",
+          label: "A Psalm",
           text: "I will both lay me down in peace, and sleep:\nfor thou, Lord, only makest me dwell in safety.",
           source: "Psalm 4:8",
         },
@@ -238,7 +238,7 @@ export const LADDER: Rung[] = [
           text: "Look back over the day. Give thanks for grace; ask forgiveness for the rest.",
         },
         {
-          label: "Psalm",
+          label: "A Psalm",
           text: "I will both lay me down in peace, and sleep:\nfor thou, Lord, only makest me dwell in safety.",
           source: "Psalm 4:8",
         },

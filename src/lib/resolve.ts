@@ -186,9 +186,8 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
     }
     case "psalm":
       // The Psalm portion belongs only to the prayer the user chose for it.
-      return ctx.part === ctx.psalmTime
-        ? ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const }))
-        : [];
+      // Movements are already tagged (psalms carry kind: "psalm") by the reader.
+      return ctx.part === ctx.psalmTime ? ctx.psalmMovements : [];
     case "doxology": {
       const dox = ctx.tradition
         ? TRADITION_META[ctx.tradition].doxology
@@ -230,7 +229,10 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
   // fixed morning Psalm so we don't pray two.
   if (ctx.prefs.psalter && ctx.part === ctx.psalmTime) {
     for (let i = movements.length - 1; i >= 0; i--) {
-      if (movements[i].label === "Psalm") movements.splice(i, 1);
+      // Drop the rung's own fixed Psalm, but never a tagged rotating/discipline one.
+      if (movements[i].label === "Psalm" && movements[i].kind !== "psalm") {
+        movements.splice(i, 1);
+      }
     }
   }
 
@@ -244,7 +246,7 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
     ctx.part === ctx.psalmTime &&
     !has((m) => m.kind === "psalm")
   ) {
-    additions.push(...ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const })));
+    additions.push(...ctx.psalmMovements);
   }
   if (ctx.prefs.dailyOffice && !has((m) => /benedictus|magnificat/i.test(m.label))) {
     additions.push(canticleMovement(ctx.part));

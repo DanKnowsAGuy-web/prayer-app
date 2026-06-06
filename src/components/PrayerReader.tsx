@@ -53,18 +53,33 @@ export function PrayerReader({
       );
     }
     if (showsPsalm) {
-      // Track A: the discipline step's psalms take precedence (by part);
-      // otherwise fall back to the bundled BCP Psalter portion.
+      // Track A: the discipline step (psalms + reading + collect for this part)
+      // takes precedence; otherwise fall back to the bundled BCP Psalter portion.
       const ds = disciplineStep(state.psalmIndex + 1);
       const volume = part === "evening" ? ds?.eveningPsalms : ds?.morningPsalms;
       if (ds && volume && volume.length) {
-        setPsalmMovements(
-          volume.map((p) => ({ label: `Psalm ${p.n}`, text: p.text })),
-        );
+        const block: Movement[] = volume.map((text) => ({
+          label: "Psalm",
+          text,
+          kind: "psalm" as const,
+        }));
+        const reading =
+          part === "evening" ? ds.eveningShortReading : ds.morningShortReading;
+        const collect = part === "evening" ? ds.eveningCollect : ds.morningCollect;
+        if (reading) block.push({ label: "A Reading", text: reading });
+        if (collect) block.push({ label: "A Collect", text: collect });
+        setPsalmMovements(block);
       } else {
         jobs.push(
           loadPsalter().then((b) => {
-            if (active) setPsalmMovements(portionMovements(b, state.psalmIndex));
+            if (active) {
+              setPsalmMovements(
+                portionMovements(b, state.psalmIndex).map((m) => ({
+                  ...m,
+                  kind: "psalm" as const,
+                })),
+              );
+            }
           }),
         );
       }
