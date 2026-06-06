@@ -608,6 +608,82 @@ DISCIPLINE_STEPS[30] = {
     "Almighty God, whose watchfulness never slumbers, clear our minds as we begin the labors of this day...",
 };
 
+// ---- STEP 32 ----
+DISCIPLINE_STEPS[31] = {
+  morningPsalms: [
+    "Blessed is he whose disobedience is forgiven, whose sin is covered.",
+    "Blessed is the man to whom Yahweh doesn't impute iniquity, and in whose spirit there is no deceit.",
+  ],
+  eveningPsalms: [
+    "When I kept silence, my bones wasted away through my groaning all day long. For day and night your hand was heavy on me. My moisture was changed as with the drought of summer.",
+  ],
+  morningShortReading:
+    "I acknowledged my sin to you. I didn't hide my iniquity. I said, 'I will confess my transgressions to Yahweh,' and you forgave the iniquity of my sin.",
+  eveningShortReading:
+    "For this, let every godly one pray to you in a time when you may be found. Surely when the great waters overflow, they shall not reach him.",
+  morningCollect:
+    "Almighty and everlasting God, who art always more ready to hear than we to pray, and art wont to give more than either we desire or deserve: Pour down upon us the abundance of your mercy; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 33 ----
+DISCIPLINE_STEPS[32] = {
+  morningPsalms: [
+    "Rejoice in Yahweh, you righteous! Praise is fitting for the upright.",
+    "Give thanks to Yahweh with the lyre. Sing praises to him with the harp of ten strings.",
+  ],
+  eveningPsalms: [
+    "Sing to him a new song. Play skillfully with a loud noise. For the word of Yahweh is right. All his work is done in faithfulness.",
+  ],
+  morningShortReading:
+    "He loves righteousness and justice. The earth is full of the loving kindness of Yahweh. By the word of Yahweh the heavens were made, and all their army by the breath of his mouth.",
+  eveningShortReading:
+    "Our soul has waited for Yahweh. He is our help and our shield. For our heart shall rejoice in him, because we have trusted in his holy name.",
+  morningCollect:
+    "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 34 ----
+DISCIPLINE_STEPS[33] = {
+  morningPsalms: [
+    "I will bless Yahweh at all times. His praise shall continually be in my mouth.",
+    "My soul shall boast in Yahweh. The humble shall hear of it, and be glad.",
+  ],
+  eveningPsalms: [
+    "Oh magnify Yahweh with me! Let us exalt his name together. I sought Yahweh, and he answered me, and delivered me from all my fears.",
+  ],
+  morningShortReading:
+    "They looked to him, and were radiant. Their faces shall never be confounded. This poor man cried, and Yahweh heard him, and saved him out of all his troubles.",
+  eveningShortReading:
+    "The angel of Yahweh encamps around those who fear him, and delivers them. Oh taste and see that Yahweh is good! Blessed is the man who takes refuge in him.",
+  morningCollect:
+    "O Lord, from whom all good things do come: Grant to us your humble servants, that by your holy inspiration we may think those things that are good, and by your merciful guiding may perform the same; through our Lord Jesus Christ. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 35 ----
+DISCIPLINE_STEPS[34] = {
+  morningPsalms: [
+    "Contend, Yahweh, with those who contend with me. Fight against those who fight against me.",
+    "Take hold of shield and buckler, and stand up for my help.",
+  ],
+  eveningPsalms: [
+    "Brandish the spear and block those who pursue me. Tell my soul, 'I am your salvation.' Let those who seek after my soul be disappointed and brought to dishonor.",
+  ],
+  morningShortReading:
+    "All my bones shall say, 'Yahweh, who is like you, who delivers the poor from him who is too strong for him, yes, the poor and the needy from him who robs him?'",
+  eveningShortReading:
+    "My tongue shall talk of your righteousness and of your praise all day long.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 /** The discipline step (1–60), or null if not yet supplied. */
 export function disciplineStep(step: number): DisciplineStep | null {
   if (step < 1 || step > STEP_COUNT) return null;
