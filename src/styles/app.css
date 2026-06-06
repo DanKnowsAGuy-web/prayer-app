@@ -594,6 +594,12 @@
   font-style: italic;
   font-size: 1.05rem;
 }
+.reader-ref {
+  color: var(--ink-muted);
+  font-style: italic;
+  font-size: 1.1rem;
+  margin-top: -0.25rem;
+}
 .reader-note {
   color: var(--ink-muted);
   font-size: 1.1rem;

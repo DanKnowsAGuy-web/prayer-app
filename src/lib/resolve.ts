@@ -16,7 +16,10 @@ import { TRADITION_META } from "./traditions";
 export type Movement = {
   label: string;
   text: string;
+  /** Citation shown beneath the text (e.g. an Epistle reference). */
   source?: string;
+  /** Citation shown above the text, so you know what you're about to read. */
+  ref?: string;
   note?: string;
   /** Marks a movement that came from the rotating Psalter portion. */
   kind?: "psalm";
@@ -59,23 +62,45 @@ function evangelist(ref: string): string {
   return m ? m[0].trim() : "";
 }
 
-function gospelMovement(day?: DayReadings): Movement {
+/** "Matthew 5.42-48" -> "Matthew 5:42–48", shown before the reading. */
+function formatRef(ref: string): string {
+  return ref.replace(".", ":").replace(/-/g, "–");
+}
+
+/** The announcement said before the Gospel, in each tradition's voice. */
+function gospelAnnounce(name: string, tradition: Tradition | null): string {
+  const saint = name ? `Saint ${name}` : "the Evangelist";
+  switch (tradition) {
+    case "eastern-orthodox":
+      return `The reading is from the Holy Gospel according to ${saint}.\n\nGlory to Thee, O Lord, glory to Thee.\n\nLet us attend.`;
+    case "roman-catholic":
+    case "anglican":
+      return `The Holy Gospel according to ${saint}.`;
+    case "evangelical":
+    case "protestant":
+      return name ? `The Gospel according to ${name}.` : "The Gospel.";
+    default:
+      return `The Holy Gospel according to ${saint}.`;
+  }
+}
+
+function gospelMovement(
+  day: DayReadings | undefined,
+  tradition: Tradition | null,
+): Movement {
   if (day?.gospel) {
     const name = evangelist(day.gospel.ref);
-    const intro = name
-      ? `The reading of the Holy Gospel according to Saint ${name}.`
-      : "The reading of the Holy Gospel.";
     return {
       label: "The Holy Gospel",
-      text: `${intro}\n\nGlory to Thee, O God. Glory to Thee, O God. Glory to Thee.\n\nLet us attend.\n\n${day.gospel.text}`,
-      source: day.gospel.ref,
+      ref: formatRef(day.gospel.ref),
+      text: `${gospelAnnounce(name, tradition)}\n\n${day.gospel.text}`,
     };
   }
   if (day?.appointed) {
     return {
       label: "Today's Reading",
+      ref: formatRef(day.appointed.ref),
       text: day.appointed.text,
-      source: day.appointed.ref,
       note: "No Gospel is appointed today; this is the reading set for the day.",
     };
   }
@@ -101,17 +126,17 @@ function intercessionMovement(
 function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
   switch (step.dynamic) {
     case "gospel":
-      return [gospelMovement(ctx.day)];
+      return [gospelMovement(ctx.day, ctx.tradition)];
     case "gospelEpistle": {
       const out: Movement[] = [];
       if (ctx.day?.epistle) {
         out.push({
           label: "The Epistle",
+          ref: formatRef(ctx.day.epistle.ref),
           text: ctx.day.epistle.text,
-          source: ctx.day.epistle.ref,
         });
       }
-      out.push(gospelMovement(ctx.day));
+      out.push(gospelMovement(ctx.day, ctx.tradition));
       return out;
     }
     case "psalm":
