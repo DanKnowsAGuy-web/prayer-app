@@ -11,7 +11,8 @@
 export type GospelReading = { ref: string; text: string };
 export type CalendarEntry = { morning?: GospelReading; evening?: GospelReading };
 
-export const CALENDAR_GOSPELS: Record<string, CalendarEntry> = {
+/** Jan 1–11 — hand-entered verbatim; kept inline and authoritative. */
+const SEED: Record<string, CalendarEntry> = {
   "01-01": {
     morning: {
       ref: "John 1:1-14",
@@ -121,6 +122,28 @@ export const CALENDAR_GOSPELS: Record<string, CalendarEntry> = {
   },
 };
 
+/**
+ * The full year is generated into src/data/calendarGospels.json (see
+ * scripts/build-calendar.mjs) and lazy-loaded so it doesn't weigh down first
+ * paint. The inline SEED (Jan 1–11) stays authoritative and is available
+ * synchronously even before the bundle loads.
+ */
+let cache: Record<string, CalendarEntry> = { ...SEED };
+let loaded = false;
+
+export async function loadCalendar(): Promise<void> {
+  if (loaded) return;
+  try {
+    const mod = await import("../data/calendarGospels.json");
+    const days = ((mod.default ?? mod) as { days?: Record<string, CalendarEntry> })
+      .days;
+    if (days) cache = { ...days, ...SEED }; // SEED wins for Jan 1–11
+  } catch {
+    /* generated file absent — fall back to SEED + lectionary */
+  }
+  loaded = true;
+}
+
 /** 'YYYY-MM-DD' → 'MM-DD'. */
 export function mmddOf(date: string): string {
   return date.slice(5);
@@ -131,5 +154,5 @@ export function calendarGospel(
   date: string,
   part: "morning" | "evening",
 ): GospelReading | undefined {
-  return CALENDAR_GOSPELS[mmddOf(date)]?.[part];
+  return cache[mmddOf(date)]?.[part];
 }

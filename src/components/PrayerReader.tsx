@@ -3,6 +3,7 @@ import type { Practice } from "../lib/ladder";
 import type { DayPart } from "../lib/daypart";
 import { useStore } from "../lib/store";
 import { loadReadings, readingsForDay, type DayReadings } from "../lib/readings";
+import { loadCalendar } from "../lib/calendarGospels";
 import { loadPsalter, portionMovements } from "../lib/psalter";
 import { disciplineStep } from "../lib/disciplineSteps";
 import { resolvePractice, type Movement } from "../lib/resolve";
@@ -60,6 +61,8 @@ export function PrayerReader({
           if (active) setDay(readingsForDay(b, today));
         }),
       );
+      // The date-anchored Gospel calendar (Track B) is consulted first.
+      jobs.push(loadCalendar());
     }
     if (showsPsalm) {
       // Track A: the discipline step (psalms + reading + collect for this part)
@@ -127,6 +130,7 @@ export function PrayerReader({
       state.tradition,
       state.prefs,
       disciplineCollect,
+      ready,
     ],
   );
 
