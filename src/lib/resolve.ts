@@ -8,9 +8,10 @@
  */
 
 import type { Practice, PrayerStep } from "./ladder";
-import { intentionsForDate, type Intention } from "./engine";
+import { intentionsForDate, type Intention, type Tradition } from "./engine";
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
+import { TRADITION_META } from "./traditions";
 
 export type Movement = {
   label: string;
@@ -35,6 +36,8 @@ export type ResolveCtx = {
   date: string;
   /** Which practice carries the intercessions (the prayer list). */
   petitionTime: DayPart;
+  /** The person's tradition, for opening prayer and intercession closing. */
+  tradition: Tradition | null;
 };
 
 /** The standard prayers said around the names of those being interceded for. */
@@ -79,7 +82,11 @@ function gospelMovement(day?: DayReadings): Movement {
   return PSALM_FALLBACK;
 }
 
-function intercessionMovement(intentions: Intention[], date: string): Movement {
+function intercessionMovement(
+  intentions: Intention[],
+  date: string,
+  close: string,
+): Movement {
   // Daily names every day, plus the weekly names whose rotation lands today.
   const today = intentionsForDate(intentions, date).map((i) => i.text);
   const names = today.length
@@ -87,7 +94,7 @@ function intercessionMovement(intentions: Intention[], date: string): Movement {
     : "(bring to mind those you carry, and name them before God)";
   return {
     label: "Intercession",
-    text: `${INTERCESSION_BEFORE}\n\n${names}\n\n${INTERCESSION_AFTER}`,
+    text: `${INTERCESSION_BEFORE}\n\n${names}\n\n${close}`,
   };
 }
 
@@ -123,14 +130,25 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
 const CLOSING = /closing prayer|prayer for the night/i;
 
 export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[] {
-  const movements = practice.steps.flatMap((s) => expandStep(s, ctx));
+  const movements: Movement[] = [];
+
+  // A tradition-specific opening prayer begins the office.
+  if (ctx.tradition) {
+    const opening = TRADITION_META[ctx.tradition].opening;
+    movements.push({ label: opening.label, text: opening.text });
+  }
+
+  movements.push(...practice.steps.flatMap((s) => expandStep(s, ctx)));
 
   // The prayer list is prayed in whichever practice the person chose, and only
   // when there are names for today — so prayers without a list stay simple.
   if (ctx.part === ctx.petitionTime) {
     const names = intentionsForDate(ctx.intentions, ctx.date);
     if (names.length) {
-      const intercession = intercessionMovement(ctx.intentions, ctx.date);
+      const close = ctx.tradition
+        ? TRADITION_META[ctx.tradition].intercessionClose
+        : INTERCESSION_AFTER;
+      const intercession = intercessionMovement(ctx.intentions, ctx.date, close);
       const last = movements[movements.length - 1];
       if (last && CLOSING.test(last.label)) {
         movements.splice(movements.length - 1, 0, intercession);

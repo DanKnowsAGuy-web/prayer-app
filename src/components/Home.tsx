@@ -1,6 +1,7 @@
 import { useStore, makeId } from "../lib/store";
 import { rungAt } from "../lib/ladder";
 import { portionLabel } from "../lib/psalter";
+import { TraditionEmblem } from "./TraditionEmblem";
 import {
   cadenceOf,
   nextWeeklyBucket,
@@ -39,6 +40,10 @@ export function Home({
   return (
     <main className="app home">
       <header className="home-head">
+        <TraditionEmblem
+          tradition={state.tradition}
+          className="emblem emblem-home"
+        />
         <p className="eyebrow">{longDate(now)}</p>
         <h1 className="home-greeting">{greeting(now)}.</h1>
         <Faithfulness streak={streak} kept={kept} logged={state.log.length} />

@@ -115,6 +115,28 @@
   font-style: italic;
 }
 
+/* Tradition emblem — a quiet watermark */
+.emblem {
+  color: var(--ink-faint);
+  flex: none;
+}
+.emblem-home {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  color: var(--olive);
+  opacity: 0.6;
+}
+.emblem-bar {
+  width: 16px;
+  height: 16px;
+  vertical-align: -2px;
+  margin-right: 0.45rem;
+  opacity: 0.85;
+}
+
 /* ============ HOME ============ */
 .home {
   display: flex;
@@ -122,6 +144,7 @@
   gap: var(--space-5);
 }
 .home-head {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;

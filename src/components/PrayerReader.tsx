@@ -6,6 +6,7 @@ import { loadReadings, readingsForDay, type DayReadings } from "../lib/readings"
 import { loadPsalter, portionMovements } from "../lib/psalter";
 import { resolvePractice, type Movement } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
+import { TraditionEmblem } from "./TraditionEmblem";
 
 /**
  * Praying a longer office happens in two steps:
@@ -73,6 +74,7 @@ export function PrayerReader({
         psalmMovements,
         date: today,
         petitionTime: petitionPart,
+        tradition: state.tradition,
       }),
     [
       practice,
@@ -83,6 +85,7 @@ export function PrayerReader({
       psalmMovements,
       today,
       petitionPart,
+      state.tradition,
     ],
   );
 
@@ -127,7 +130,13 @@ export function PrayerReader({
           <button className="btn btn-quiet reader-close" onClick={handleClose}>
             ← Close
           </button>
-          <span className="reader-bar-title">{practice.title}</span>
+          <span className="reader-bar-title">
+          <TraditionEmblem
+            tradition={state.tradition}
+            className="emblem emblem-bar"
+          />
+          {practice.title}
+        </span>
         </div>
         <div className="reader-stage">
           <p className="reader-loading">Preparing today's prayer…</p>
@@ -157,7 +166,13 @@ export function PrayerReader({
         <button className="btn btn-quiet reader-close" onClick={handleClose}>
           ← Close
         </button>
-        <span className="reader-bar-title">{practice.title}</span>
+        <span className="reader-bar-title">
+          <TraditionEmblem
+            tradition={state.tradition}
+            className="emblem emblem-bar"
+          />
+          {practice.title}
+        </span>
       </div>
 
       <div className="reader-scroll">
