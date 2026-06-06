@@ -236,6 +236,81 @@ DISCIPLINE_STEPS[10] = {
     "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us, that you being our ruler and guide, we may so pass through things temporal, that we finally lose not the things eternal; through Jesus Christ our Lord. Amen.",
 };
 
+// ---- STEP 12 ----
+DISCIPLINE_STEPS[11] = {
+  morningPsalms: [
+    "Help, Yahweh, for the godly man ceases; for the faithful fail from among the children of men.",
+    "Everyone speaks falsehood with his neighbor. They speak with flattering lips and with a double heart.",
+  ],
+  eveningPsalms: [
+    "The words of Yahweh are pure words, as silver tried in a furnace on the earth, purified seven times. You will keep them, Yahweh. You will preserve them from this generation forever.",
+  ],
+  morningShortReading:
+    "Let no corrupt speech proceed out of your mouth, but such as is good for building up as the need may be, that it may give grace to those who hear.",
+  eveningShortReading: "A gentle answer turns away wrath, but a harsh word stirs up anger.",
+  morningCollect:
+    "Almighty God, who has given us your only Son to be unto us both a sacrifice for sin, and also an example of godly life: Give us grace that we may always most thankfully receive that his inestimable benefit; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O Lord, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 13 ----
+DISCIPLINE_STEPS[12] = {
+  morningPsalms: [
+    "How long, Yahweh? Will you forget me forever? How long will you hide your face from me?",
+    "How long shall I take counsel in my soul, having sorrow in my heart every day? How long shall my enemy be exalted over me?",
+  ],
+  eveningPsalms: [
+    "Consider and answer me, Yahweh my God. Give light to my eyes, lest I sleep the sleep of death; lest my enemy say, 'I have prevailed against him.'",
+  ],
+  morningShortReading:
+    "Count it all joy, my brothers, when you fall into various temptations, knowing that the testing of your faith produces endurance.",
+  eveningShortReading:
+    "In the world you have oppression; but cheer up! I have overcome the world.",
+  morningCollect:
+    "Almighty and everlasting God, increase in us the gifts of faith, hope, and charity; and, that we may obtain that which you do promise, make us to love that which you do command; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 14 ----
+DISCIPLINE_STEPS[13] = {
+  morningPsalms: [
+    "The fool has said in his heart, 'There is no God.' They are corrupt. They have done abominable works.",
+    "Yahweh looked down from heaven on the children of men, to see if there were any who did understand, who did seek after God.",
+  ],
+  eveningPsalms: [
+    "There they were in great fear, for God is in the generation of the righteous. You frustrate the plan of the poor, because Yahweh is his refuge.",
+  ],
+  morningShortReading:
+    "For the word of the cross is foolishness to those who are perishing, but to us who are being saved, it is the power of God.",
+  eveningShortReading:
+    "The rowdy person says in his heart there is no restraint, but the wise man looks to his steps and delivers his soul from the pit.",
+  morningCollect:
+    "Grant to us, Lord, we beseech you, the spirit to think and do always such things as are right; that we, who cannot do anything that is good without you, may by you be enabled to live according to your will; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 15 ----
+DISCIPLINE_STEPS[14] = {
+  morningPsalms: [
+    "Yahweh, who shall dwell in your sanctuary? Who shall live on your holy hill?",
+    "He who walks blamelessly, does righteousness, and speaks truth in his heart.",
+  ],
+  eveningPsalms: [
+    "He who doesn't slander with his tongue, nor does evil to his friend, nor takes up a reproach against his neighbor.",
+  ],
+  morningShortReading:
+    "Therefore, receiving a kingdom that can't be shaken, let us have grace, through which we may offer service well-pleasing to God with reverence and awe.",
+  eveningShortReading:
+    "He who does these things shall never be shaken. The righteous shall inherit the land.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
 // ---- STEP 31 ----
 DISCIPLINE_STEPS[30] = {
   morningPsalms: [
