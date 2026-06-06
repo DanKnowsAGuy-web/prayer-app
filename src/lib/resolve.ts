@@ -8,7 +8,12 @@
  */
 
 import type { Practice, PrayerStep } from "./ladder";
-import { intentionsForDate, type Intention, type Tradition } from "./engine";
+import {
+  intentionsForDate,
+  type Intention,
+  type Prefs,
+  type Tradition,
+} from "./engine";
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
 import { TRADITION_META } from "./traditions";
@@ -41,6 +46,14 @@ export type ResolveCtx = {
   petitionTime: DayPart;
   /** The person's tradition, for opening prayer and intercession closing. */
   tradition: Tradition | null;
+  /** Elements the person already practices, added on top of the rung. */
+  prefs: Prefs;
+};
+
+const SILENCE_MOVEMENT: Movement = {
+  label: "Silence",
+  text: "Rest quietly before God for a moment.",
+  note: "Sit in silence, unhurried, for as long as feels natural.",
 };
 
 /** The standard prayers said around the names of those being interceded for. */
@@ -153,6 +166,16 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
 
 /** Movements that conclude a practice; intercessions go just before these. */
 const CLOSING = /closing prayer|prayer for the night/i;
+const LORDS = /lord's prayer/i;
+
+/** Where added elements slot in: before the Lord's Prayer, else the closing. */
+function bodyEnd(movements: Movement[]): number {
+  const lords = movements.findIndex((m) => LORDS.test(m.label));
+  if (lords >= 0) return lords;
+  const closing = movements.findIndex((m) => CLOSING.test(m.label));
+  if (closing >= 0) return closing;
+  return movements.length;
+}
 
 export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[] {
   const movements: Movement[] = [];
@@ -164,6 +187,33 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
   }
 
   movements.push(...practice.steps.flatMap((s) => expandStep(s, ctx)));
+
+  // Additive preferences: include what an experienced person already practices,
+  // only when the rung doesn't already provide it. Slotted into the body, in a
+  // natural order (Psalms, then Scripture, then silence).
+  const additions: Movement[] = [];
+  const has = (test: (m: Movement) => boolean) => movements.some(test);
+
+  if (
+    ctx.prefs.psalter &&
+    ctx.part === ctx.psalmTime &&
+    !has((m) => m.kind === "psalm")
+  ) {
+    additions.push(...ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const })));
+  }
+  if (
+    ctx.prefs.scripture &&
+    ctx.part === "morning" &&
+    !has((m) => m.label === "The Holy Gospel" || m.label === "Today's Reading")
+  ) {
+    additions.push(gospelMovement(ctx.day, ctx.tradition));
+  }
+  if (ctx.prefs.silence && !has((m) => /silence/i.test(m.label))) {
+    additions.push(SILENCE_MOVEMENT);
+  }
+  if (additions.length) {
+    movements.splice(bodyEnd(movements), 0, ...additions);
+  }
 
   // The prayer list is prayed in whichever practice the person chose, and only
   // when there are names for today — so prayers without a list stay simple.

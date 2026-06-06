@@ -114,6 +114,13 @@
   color: var(--ink-faint);
   font-style: italic;
 }
+.placed-integrated {
+  color: var(--olive);
+  font-style: italic;
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-2);
+  margin-top: var(--space-1);
+}
 
 /* Tradition emblem — a quiet watermark */
 .emblem {

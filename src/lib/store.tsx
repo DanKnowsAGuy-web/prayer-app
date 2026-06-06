@@ -12,13 +12,21 @@ import {
   localDate,
   nextWeeklyBucket,
   type Intention,
+  type Prefs,
   type RuleState,
   type Tradition,
 } from "./engine";
 import { loadState, saveState } from "./storage";
 
 type Action =
-  | { type: "onboard"; rung: number; tradition: Tradition | null }
+  | {
+      type: "onboard";
+      rung: number;
+      tradition: Tradition | null;
+      prefs?: Prefs;
+      psalmTime?: "morning" | "evening";
+      petitionTime?: "morning" | "evening";
+    }
   | { type: "checkIn"; date: string; kept: boolean }
   | { type: "setRung"; rung: number; dismissed?: string }
   | { type: "dismissAdvance"; date: string }
@@ -39,6 +47,9 @@ function reducer(state: RuleState, action: Action): RuleState {
         onboarded: true,
         rung: action.rung,
         tradition: action.tradition,
+        ...(action.prefs ? { prefs: action.prefs } : {}),
+        ...(action.psalmTime ? { psalmTime: action.psalmTime } : {}),
+        ...(action.petitionTime ? { petitionTime: action.petitionTime } : {}),
       };
     case "checkIn": {
       const log = state.log.filter((c) => c.date !== action.date);

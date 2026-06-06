@@ -37,11 +37,29 @@ export type Tradition =
   | "protestant"
   | "roman-catholic";
 
+/**
+ * Elements an experienced person already practices, switched on so the app
+ * integrates their routine. Additive only: these add to a rung, never remove.
+ */
+export type Prefs = {
+  scripture: boolean;
+  psalter: boolean;
+  silence: boolean;
+};
+
+export const NO_PREFS: Prefs = {
+  scripture: false,
+  psalter: false,
+  silence: false,
+};
+
 export type RuleState = {
   /** Whether onboarding is complete. */
   onboarded: boolean;
   /** The tradition chosen at first launch; null if not yet chosen. */
   tradition: Tradition | null;
+  /** Elements the person already practices, added on top of their rung. */
+  prefs: Prefs;
   /** Current rung index into the LADDER. */
   rung: number;
   /** Chronological check-in log (oldest first). */
@@ -111,6 +129,7 @@ export function initialState(): RuleState {
   return {
     onboarded: false,
     tradition: null,
+    prefs: { ...NO_PREFS },
     rung: FIRST_RUNG,
     log: [],
     intentions: [],

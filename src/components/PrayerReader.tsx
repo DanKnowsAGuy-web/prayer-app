@@ -28,11 +28,13 @@ export function PrayerReader({
 }) {
   const { state, today, dispatch } = useStore();
 
-  const hasGospel = practice.steps.some(
-    (s) => s.dynamic === "gospel" || s.dynamic === "gospelEpistle",
-  );
+  const hasGospel =
+    practice.steps.some(
+      (s) => s.dynamic === "gospel" || s.dynamic === "gospelEpistle",
+    ) ||
+    (state.prefs.scripture && part === "morning");
   const showsPsalm =
-    practice.steps.some((s) => s.dynamic === "psalm") &&
+    (practice.steps.some((s) => s.dynamic === "psalm") || state.prefs.psalter) &&
     part === state.psalmTime;
 
   const [day, setDay] = useState<DayReadings | undefined>(undefined);
@@ -75,6 +77,7 @@ export function PrayerReader({
         date: today,
         petitionTime: petitionPart,
         tradition: state.tradition,
+        prefs: state.prefs,
       }),
     [
       practice,
@@ -86,6 +89,7 @@ export function PrayerReader({
       today,
       petitionPart,
       state.tradition,
+      state.prefs,
     ],
   );
 
