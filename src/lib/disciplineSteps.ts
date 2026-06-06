@@ -5,10 +5,9 @@
  *
  * Each step is a small mini-office: morning and evening psalm volumes, a short
  * reading, and a concluding collect for each. Psalm texts are stored verbatim
- * as supplied. Where a step is null, the app falls back to the bundled BCP
- * Psalter portion for that step.
+ * as supplied. Modern WEB phrasing throughout; divine name "Yahweh".
  *
- * Provided so far: steps 1, 2, 3, 31. The rest remain null pending real data.
+ * COMPLETE: all 60 steps are populated.
  */
 
 export type DisciplineStep = {
@@ -986,6 +985,178 @@ DISCIPLINE_STEPS[50] = {
     "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
   eveningCollect:
     "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
+// ---- STEP 52 ----
+DISCIPLINE_STEPS[51] = {
+  morningPsalms: [
+    "Why do you boast in mischief, mighty man? God's loving kindness endures continually.",
+    "Your tongue plots destruction, like a sharp razor, working deceitfully.",
+  ],
+  eveningPsalms: [
+    "But I am like a green olive tree in God's house. I trust in God's loving kindness forever and ever. I will give you thanks forever, because you have done it.",
+  ],
+  morningShortReading:
+    "I will wait for your name, for it is good, in the presence of your saints.",
+  eveningShortReading:
+    "For the mind of the flesh is death, but the mind of the Spirit is life and peace.",
+  morningCollect:
+    "Almighty God, look onto the hearty desires of your humble servants, and stretch forth the right hand of your Majesty to be our defense against all our enemies; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 53 ----
+DISCIPLINE_STEPS[52] = {
+  morningPsalms: [
+    "The fool has said in his heart, 'There is no God.' They are corrupt, and have done abominable iniquity. There is no one who does good.",
+    "God looks down from heaven on the children of men, to see if there are any who understood, who seek after God.",
+  ],
+  eveningPsalms: [
+    "Every one of them has gone back. They have become filthy together. There is no one who does good, no, not one.",
+  ],
+  morningShortReading:
+    "Oh that the salvation of Israel would come out of Zion! When God brings back the captivity of his people, then Jacob shall rejoice, and Israel shall be glad.",
+  eveningShortReading:
+    "So then, let us not sleep, as the rest do, but let us watch and be sober.",
+  morningCollect:
+    "O Lord, we beseech you mercifully to receive the prayers of your people who call upon you; and grant that they may both perceive and know what things they ought to do, and also may have grace and power faithfully to fulfill the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 54 ----
+DISCIPLINE_STEPS[53] = {
+  morningPsalms: [
+    "Save me, God, by your name, and vindicate me by your might.",
+    "Hear my prayer, God. Listen to the words of my mouth.",
+  ],
+  eveningPsalms: [
+    "For strangers have risen up against me, and violent men have sought after my soul. They haven't set God before them. Behold, God is my helper. The Lord is the one who sustains my soul.",
+  ],
+  morningShortReading:
+    "With a free will offering I will sacrifice to you. I will give thanks to your name, Yahweh, for it is good.",
+  eveningShortReading:
+    "For he has delivered me out of all trouble. My eye has seen triumph over my enemies.",
+  morningCollect:
+    "Almighty and everlasting God, who art always more ready to hear than we to pray, and art wont to give more than either we desire or deserve: Pour down upon us the abundance of your mercy; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 55 ----
+DISCIPLINE_STEPS[54] = {
+  morningPsalms: [
+    "Listen to my prayer, God. Don't hide yourself from my supplication.",
+    "Attend to me, and answer me. I am restless in my complaint, and moan.",
+  ],
+  eveningPsalms: [
+    "My heart is severely pained within me. The terrors of death have fallen on me. Fearfulness and trembling have come on me. Horror has overwhelmed me.",
+  ],
+  morningShortReading:
+    "I said, 'Oh that I had wings like a dove! Then I would fly away, and be at rest. Behold, then I would wander far off. I would lodge in the wilderness.'",
+  eveningShortReading:
+    "As for me, I will call on God. Yahweh will save me. Evening, morning, and at noon, I will cry out aloud, and he will hear my voice.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
+// ---- STEP 56 ----
+DISCIPLINE_STEPS[55] = {
+  morningPsalms: [
+    "Be merciful to me, God, for man wants to swallow me up. All day long he fighting oppresses me.",
+    "My enemies want to swallow me up all day long, for they are many who fight proudly against me.",
+  ],
+  eveningPsalms: [
+    "What time I am afraid, I will trust in you. In God, I will praise his word. In God I have put my trust. I will not be afraid. What can flesh do to me?",
+  ],
+  morningShortReading:
+    "You count my wanderings. Put my tears into your bottle. Aren't they in your book? Then my enemies shall turn back in the day that I call. This I know, that God is for me.",
+  eveningShortReading:
+    "Your vows are on me, God. I will give thank offerings to you. For you have delivered my soul from death.",
+  morningCollect:
+    "O Lord, from whom all good things do come: Grant to us your humble servants, that by your holy inspiration we may think those things that are good, and by your merciful guiding may perform the same; through our Lord Jesus Christ. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
+};
+
+// ---- STEP 57 ----
+DISCIPLINE_STEPS[56] = {
+  morningPsalms: [
+    "Be merciful to me, God, be merciful to me, for my soul takes refuge in you. Yes, in the shadow of your wings I will take refuge, until disaster passes by.",
+    "I will cry to God Most High, to God who accomplishes my requests for me.",
+  ],
+  eveningPsalms: [
+    "He will send from heaven, and save me from the rebuke of him who desires to swallow me up. God will send out his loving kindness and his truth.",
+  ],
+  morningShortReading:
+    "Be exalted, God, above the heavens. Let your glory be over all the earth.",
+  eveningShortReading:
+    "My heart is steadfast, God, my heart is steadfast. I will sing, yes, I will sing praises.",
+  morningCollect:
+    "Almighty God, you show to those who are in error the light of your truth, to the intent that they may return into the way of righteousness: Grant to all those who are admitted into the fellowship of Christ's Religion, that they may avoid those things that are contrary to their profession; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Be our companion, O Lord, in our paths, and let your light scatter the darkness of our hearts, that we may walk safely in the light of your countenance; through Christ our Lord. Amen.",
+};
+
+// ---- STEP 58 ----
+DISCIPLINE_STEPS[57] = {
+  morningPsalms: [
+    "Do you indeed speak righteousness, silent ones? Do you judge uprightly, you sons of men?",
+    "No, in your heart you plot wickedness. You weigh out the violence of your hands in the earth.",
+  ],
+  eveningPsalms: [
+    "The wicked go astray from the womb. They go astray as soon as they are born, speaking lies.",
+  ],
+  morningShortReading:
+    "The righteous shall rejoice when he sees the vengeance. He shall wash his feet in the blood of the wicked.",
+  eveningShortReading:
+    "So that men shall say, 'Most certainly there is a reward for the righteous. Most certainly there is a God who judges the earth.'",
+  morningCollect:
+    "O God, the protector of all who trust in you, without whom nothing is strong, nothing is holy: Increase and multiply your mercy upon us; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "Keep watch, dear Lord, with those who work, or watch, or weep this night, and give your angels charge over those who sleep. Tend the sick, give rest to the weary, and soothe the suffering; all for your love's sake. Amen.",
+};
+
+// ---- STEP 59 ----
+DISCIPLINE_STEPS[58] = {
+  morningPsalms: [
+    "Deliver me from my enemies, my God. Set me on high away from those who rise up against me.",
+    "Deliver me from the workers of iniquity, and save me from the bloodthirsty men.",
+  ],
+  eveningPsalms: [
+    "For, behold, they lie in wait for my soul. The mighty gather themselves against me, not for my disobedience, nor for my sin, Yahweh.",
+  ],
+  morningShortReading:
+    "But I will sing of your strength. Yes, I will sing aloud of your loving kindness in the morning. For you have been my high tower, a refuge in the day of my distress.",
+  eveningShortReading:
+    "To you, my strength, I will sing praises. For God is my high tower, the God of my loving kindness.",
+  morningCollect:
+    "Almighty God, who alone can order the unruly wills and affections of sinful people: Grant to your people that they may love the thing which you command, and desire that which you promise; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, the source of all enduring peace, visit our homes this night and drive far from them all the snares of the enemy. Let your holy angels dwell herein to preserve us in safety; through Jesus Christ our Lord. Amen.",
+};
+
+// ---- STEP 60 ----
+DISCIPLINE_STEPS[59] = {
+  morningPsalms: [
+    "God, you have rejected us. You have broken us down. You have been angry. Restore us again.",
+    "You have made the land tremble. You have torn it. Heal its breaches, for it shakes.",
+  ],
+  eveningPsalms: [
+    "You have shown your people hard things. You have made us drink the wine of astonishment.",
+    "Give us help against the adversary, for the help of man is vain. Through God we will do valiantly, for it is he who will tread down our adversaries.",
+  ],
+  morningShortReading:
+    "You have given a banner to those who fear you, that it may be displayed because of the truth. That your beloved may be delivered, save with your right hand, and answer us.",
+  eveningShortReading:
+    "I will dwell in your tent forever. I will take refuge in the secret place of your wings. For you, God, have heard my vows. You have given me the heritage of those who fear your name.",
+  morningCollect:
+    "Lord of all power and might, who art the author and giver of all good things: Graft in our hearts the love of your name, increase in us true religion, and of your great mercy keep us in the same; through Jesus Christ our Lord. Amen.",
+  eveningCollect:
+    "O God, from whom all holy desires, all good counsels, and all just works do proceed: Give to your servants that peace which the world cannot give; through the merits of Jesus Christ our Savior. Amen.",
 };
 
 /** The discipline step (1–60), or null if not yet supplied. */
