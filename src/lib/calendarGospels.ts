@@ -119,38 +119,6 @@ export const CALENDAR_GOSPELS: Record<string, CalendarEntry> = {
       text: "Jesus said to her, 'Go, call your husband, and come here.' The woman answered, 'I have no husband.' Jesus said to her, 'You said well, \"I have no husband,\" for you have had five husbands; and he whom you now have is not your husband. This you have said truly.' The woman said to him, 'Sir, I perceive that you are a prophet. Our fathers worshiped in this mountain, and you say that in Jerusalem is the place where people ought to worship.'",
     },
   },
-
-  // --- Earlier sample dates (truncated placeholders, pending real data) ---
-  "06-06": {
-    morning: {
-      ref: "John 5:24–27",
-      text: "He who hears my word, and believes him who sent me, has eternal life...",
-    },
-    evening: {
-      ref: "John 5:28–30",
-      text: "Don't marvel at this, for the hour comes in which all that are in the tombs will hear his voice...",
-    },
-  },
-  "07-01": {
-    morning: {
-      ref: "Matthew 5:1–12",
-      text: "Seeing the multitudes, he went up onto the mountain. When he had sat down, his disciples came to him...",
-    },
-    evening: {
-      ref: "Matthew 5:13–16",
-      text: "You are the salt of the earth, but if the salt has lost its flavor, with what will it be salted?...",
-    },
-  },
-  "12-25": {
-    morning: {
-      ref: "Luke 2:1–14",
-      text: "Now it happened in those days, that a decree went out from Caesar Augustus...",
-    },
-    evening: {
-      ref: "John 1:14–18",
-      text: "The Word became flesh, and lived among us...",
-    },
-  },
 };
 
 /** 'YYYY-MM-DD' → 'MM-DD'. */
