@@ -58,6 +58,8 @@ export type ResolveCtx = {
   tradition: Tradition | null;
   /** Elements the person already practices, added on top of the rung. */
   prefs: Prefs;
+  /** The active discipline step's collect — replaces the rung's closing prayer. */
+  disciplineCollect?: string;
 };
 
 const SILENCE_MOVEMENT: Movement = {
@@ -225,17 +227,6 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
 
   movements.push(...practice.steps.flatMap((s) => expandStep(s, ctx)));
 
-  // The rotating 60-day Psalter takes precedence: when it's on, drop the rung's
-  // fixed morning Psalm so we don't pray two.
-  if (ctx.prefs.psalter && ctx.part === ctx.psalmTime) {
-    for (let i = movements.length - 1; i >= 0; i--) {
-      // Drop the rung's own fixed Psalm, but never a tagged rotating/discipline one.
-      if (movements[i].label === "Psalm" && movements[i].kind !== "psalm") {
-        movements.splice(i, 1);
-      }
-    }
-  }
-
   // Additive preferences: include what an experienced person already practices,
   // only when the rung doesn't already provide it. Slotted into the body.
   const additions: Movement[] = [];
@@ -277,6 +268,18 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
     movements.splice(bodyEnd(movements), 0, ...additions);
   }
 
+  // When the Psalter is active (rotating or discipline), it replaces the rung's
+  // own fixed Psalms — both the morning Psalm and the evening night Psalm — so
+  // nothing doubles up on screen.
+  if (movements.some((m) => m.kind === "psalm")) {
+    for (let i = movements.length - 1; i >= 0; i--) {
+      const m = movements[i];
+      if ((m.label === "Psalm" || m.label === "A Psalm") && m.kind !== "psalm") {
+        movements.splice(i, 1);
+      }
+    }
+  }
+
   // The prayer list is prayed in whichever practice the person chose, and only
   // when there are names for today — so prayers without a list stay simple.
   if (ctx.part === ctx.petitionTime) {
@@ -293,6 +296,14 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
         movements.push(intercession);
       }
     }
+  }
+
+  // When the discipline step is active, its collect replaces the rung's closing.
+  if (ctx.disciplineCollect) {
+    const collect: Movement = { label: "A Collect", text: ctx.disciplineCollect };
+    const idx = movements.findIndex((m) => CLOSING.test(m.label));
+    if (idx >= 0) movements[idx] = collect;
+    else movements.push(collect);
   }
 
   // In traditions that cross themselves, mark the moments where they would:

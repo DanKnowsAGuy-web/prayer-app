@@ -38,6 +38,15 @@ export function PrayerReader({
     (practice.steps.some((s) => s.dynamic === "psalm") || state.prefs.psalter) &&
     part === state.psalmTime;
 
+  // The discipline step's collect for this part (if a step is active), passed
+  // through to replace the rung's closing prayer.
+  const activeStep = showsPsalm ? disciplineStep(state.psalmIndex + 1) : null;
+  const disciplineCollect = activeStep
+    ? part === "evening"
+      ? activeStep.eveningCollect
+      : activeStep.morningCollect
+    : undefined;
+
   const [day, setDay] = useState<DayReadings | undefined>(undefined);
   const [psalmMovements, setPsalmMovements] = useState<Movement[]>([]);
   const [ready, setReady] = useState(false);
@@ -65,9 +74,9 @@ export function PrayerReader({
         }));
         const reading =
           part === "evening" ? ds.eveningShortReading : ds.morningShortReading;
-        const collect = part === "evening" ? ds.eveningCollect : ds.morningCollect;
         if (reading) block.push({ label: "A Reading", text: reading });
-        if (collect) block.push({ label: "A Collect", text: collect });
+        // The collect is delivered via ctx.disciplineCollect so it can replace
+        // the rung's closing prayer rather than sit mid-body.
         setPsalmMovements(block);
       } else {
         jobs.push(
@@ -104,6 +113,7 @@ export function PrayerReader({
         petitionTime: petitionPart,
         tradition: state.tradition,
         prefs: state.prefs,
+        disciplineCollect,
       }),
     [
       practice,
@@ -116,6 +126,7 @@ export function PrayerReader({
       petitionPart,
       state.tradition,
       state.prefs,
+      disciplineCollect,
     ],
   );
 
