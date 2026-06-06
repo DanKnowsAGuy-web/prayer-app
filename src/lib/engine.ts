@@ -48,6 +48,8 @@ export type Prefs = {
   jesusPrayer: boolean;
   rosary: boolean;
   dailyOffice: boolean;
+  /** Layer 3 — the litany below the readings. */
+  litany: boolean;
   /** Recorded but intentionally without fixed content for now. */
   devotional: boolean;
 };
@@ -59,6 +61,7 @@ export const NO_PREFS: Prefs = {
   jesusPrayer: false,
   rosary: false,
   dailyOffice: false,
+  litany: false,
   devotional: false,
 };
 

@@ -4,6 +4,7 @@ import type { DayPart } from "../lib/daypart";
 import { useStore } from "../lib/store";
 import { loadReadings, readingsForDay, type DayReadings } from "../lib/readings";
 import { loadPsalter, portionMovements } from "../lib/psalter";
+import { disciplineStep } from "../lib/disciplineSteps";
 import { resolvePractice, type Movement } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
 import { TraditionEmblem } from "./TraditionEmblem";
@@ -52,11 +53,21 @@ export function PrayerReader({
       );
     }
     if (showsPsalm) {
-      jobs.push(
-        loadPsalter().then((b) => {
-          if (active) setPsalmMovements(portionMovements(b, state.psalmIndex));
-        }),
-      );
+      // Track A: the discipline step's psalms take precedence (by part);
+      // otherwise fall back to the bundled BCP Psalter portion.
+      const ds = disciplineStep(state.psalmIndex + 1);
+      const volume = part === "evening" ? ds?.eveningPsalms : ds?.morningPsalms;
+      if (ds && volume && volume.length) {
+        setPsalmMovements(
+          volume.map((p) => ({ label: `Psalm ${p.n}`, text: p.text })),
+        );
+      } else {
+        jobs.push(
+          loadPsalter().then((b) => {
+            if (active) setPsalmMovements(portionMovements(b, state.psalmIndex));
+          }),
+        );
+      }
     }
     Promise.allSettled(jobs).finally(() => {
       if (active) setReady(true);

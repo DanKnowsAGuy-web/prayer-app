@@ -428,6 +428,7 @@ export function Onboarding() {
     jesusPrayer: elements.includes("jesusprayer"),
     rosary: elements.includes("rosary"),
     dailyOffice: elements.includes("office"),
+    litany: false,
     devotional: elements.includes("devotional"),
   };
   const anchorTime = anchor ?? "morning";

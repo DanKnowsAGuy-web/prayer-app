@@ -25,6 +25,17 @@ export const DEFAULT_DOXOLOGY = {
   text: "Glory be to the Father, and to the Son, and to the Holy Spirit; as it was in the beginning, is now, and ever shall be, world without end. Amen.",
 };
 
+/** Protestant and Evangelical users omit Marian / saints petitions. */
+export function filterMarian<T extends { isMarianOrSaints?: boolean }>(
+  items: T[],
+  tradition: Tradition | null,
+): T[] {
+  if (tradition === "protestant" || tradition === "evangelical") {
+    return items.filter((i) => !i.isMarianOrSaints);
+  }
+  return items;
+}
+
 const DOXOLOGY_ORTHODOX = {
   label: "Glory to the Father",
   // OCA-typical.

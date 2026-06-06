@@ -15,6 +15,7 @@ const ELEMENT_TOGGLES: { key: keyof Prefs; label: string; hint: string }[] = [
   { key: "dailyOffice", label: "A Daily Office canticle", hint: "The Benedictus or Magnificat." },
   { key: "jesusPrayer", label: "The Jesus Prayer", hint: "Lord Jesus Christ, have mercy on me." },
   { key: "rosary", label: "The Rosary", hint: "Today's mysteries and prayers." },
+  { key: "litany", label: "A Litany", hint: "A litany below the readings (Gelasian form)." },
   { key: "silence", label: "A time of silence", hint: "A short stillness before God." },
   { key: "devotional", label: "Personal devotion", hint: "A prompt for prayer in your own words." },
 ];

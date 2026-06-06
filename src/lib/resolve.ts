@@ -16,7 +16,9 @@ import {
 } from "./engine";
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
-import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
+import { TRADITION_META, DEFAULT_DOXOLOGY, filterMarian } from "./traditions";
+import { calendarGospel } from "./calendarGospels";
+import { GELASIAN_LITANY, LITANY_RESPONSE } from "./litany";
 import {
   canticleMovement,
   devotionalMovement,
@@ -64,6 +66,15 @@ const SILENCE_MOVEMENT: Movement = {
   note: "Sit in silence, unhurried, for as long as feels natural.",
 };
 
+/** Layer 3: the litany, with Marian/saints petitions filtered by tradition. */
+function litanyMovement(tradition: Tradition | null): Movement {
+  const petitions = filterMarian(GELASIAN_LITANY, tradition);
+  const text = petitions
+    .map((p) => `${p.text}\n${LITANY_RESPONSE}`)
+    .join("\n\n");
+  return { label: "A Litany", text };
+}
+
 /** The standard prayers said around the names of those being interceded for. */
 export const INTERCESSION_BEFORE =
   "Lord, listen to the petition of our prayers, unworthy as we may be, and grant all good things profitable for our souls and salvation. For the servants of God we pray, Lord, have mercy:";
@@ -108,7 +119,20 @@ function gospelAnnounce(name: string, tradition: Tradition | null): string {
 function gospelMovement(
   day: DayReadings | undefined,
   tradition: Tradition | null,
+  date: string,
+  part: DayPart,
 ): Movement {
+  // Track B: the date-anchored Gospel calendar takes precedence when the date
+  // is present; otherwise fall back to the bundled daily lectionary.
+  const cal = calendarGospel(date, part);
+  if (cal) {
+    const name = evangelist(cal.ref);
+    return {
+      label: "The Holy Gospel",
+      ref: cal.ref,
+      text: `${gospelAnnounce(name, tradition)}\n\n${cal.text}`,
+    };
+  }
   if (day?.gospel) {
     const name = evangelist(day.gospel.ref);
     return {
@@ -147,7 +171,7 @@ function intercessionMovement(
 function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
   switch (step.dynamic) {
     case "gospel":
-      return [gospelMovement(ctx.day, ctx.tradition)];
+      return [gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part)];
     case "gospelEpistle": {
       const out: Movement[] = [];
       if (ctx.day?.epistle) {
@@ -157,7 +181,7 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
           text: ctx.day.epistle.text,
         });
       }
-      out.push(gospelMovement(ctx.day, ctx.tradition));
+      out.push(gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part));
       return out;
     }
     case "psalm":
@@ -230,7 +254,7 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
     ctx.part === "morning" &&
     !has((m) => m.label === "The Holy Gospel" || m.label === "Today's Reading")
   ) {
-    additions.push(gospelMovement(ctx.day, ctx.tradition));
+    additions.push(gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part));
   }
   if (ctx.prefs.jesusPrayer && !has((m) => m.label === "The Jesus Prayer")) {
     additions.push(jesusPrayerMovement());
@@ -240,6 +264,9 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
   }
   if (ctx.prefs.devotional && !has((m) => m.label === "Personal Devotion")) {
     additions.push(devotionalMovement());
+  }
+  if (ctx.prefs.litany && !has((m) => m.label === "A Litany")) {
+    additions.push(litanyMovement(ctx.tradition));
   }
   if (ctx.prefs.silence && !has((m) => /silence/i.test(m.label))) {
     additions.push(SILENCE_MOVEMENT);
