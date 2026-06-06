@@ -16,7 +16,7 @@ import {
 } from "./engine";
 import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
-import { TRADITION_META } from "./traditions";
+import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 import {
   canticleMovement,
   devotionalMovement,
@@ -34,6 +34,8 @@ export type Movement = {
   note?: string;
   /** Marks a movement that came from the rotating Psalter portion. */
   kind?: "psalm";
+  /** Show a sign-of-the-cross mark (traditions that cross themselves). */
+  cross?: boolean;
 };
 
 /** Everything a practice needs to resolve its dynamic steps for today. */
@@ -163,6 +165,12 @@ function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
       return ctx.part === ctx.psalmTime
         ? ctx.psalmMovements.map((m) => ({ ...m, kind: "psalm" as const }))
         : [];
+    case "doxology": {
+      const dox = ctx.tradition
+        ? TRADITION_META[ctx.tradition].doxology
+        : DEFAULT_DOXOLOGY;
+      return [{ label: dox.label, text: dox.text }];
+    }
     default:
       return [
         { label: step.label, text: step.text, source: step.source, note: step.note },
@@ -254,6 +262,20 @@ export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[]
         movements.splice(movements.length - 1, 0, intercession);
       } else {
         movements.push(intercession);
+      }
+    }
+  }
+
+  // In traditions that cross themselves, mark the moments where they would:
+  // the sign-of-the-cross invocation, the opening versicle, and the doxology.
+  if (ctx.tradition && TRADITION_META[ctx.tradition].crosses) {
+    for (const m of movements) {
+      if (
+        /^In the name of the Father/.test(m.text) ||
+        /^O Lord, open thou my lips/.test(m.text) ||
+        /^Glory (be )?to the Father/.test(m.text)
+      ) {
+        m.cross = true;
       }
     }
   }

@@ -184,6 +184,11 @@ export function PrayerReader({
           <section className="movement" key={n}>
             <p className="reader-label">{m.label}</p>
             {m.ref && <p className="reader-ref">{m.ref}</p>}
+            {m.cross && (
+              <p className="cross-mark" aria-label="Make the sign of the cross">
+                ✛
+              </p>
+            )}
             <p className="reader-text">{m.text}</p>
             {m.source && <p className="reader-source">{m.source}</p>}
             {m.note && <p className="reader-note">{m.note}</p>}

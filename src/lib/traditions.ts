@@ -13,6 +13,22 @@ type TraditionMeta = {
   name: string;
   opening: { label: string; text: string };
   intercessionClose: string;
+  /** The doxology (Gloria Patri) in this tradition's form. */
+  doxology: { label: string; text: string };
+  /** Whether the faithful make the sign of the cross. */
+  crosses: boolean;
+};
+
+/** The Western doxology, used when no tradition is set. */
+export const DEFAULT_DOXOLOGY = {
+  label: "Glory be",
+  text: "Glory be to the Father, and to the Son, and to the Holy Spirit; as it was in the beginning, is now, and ever shall be, world without end. Amen.",
+};
+
+const DOXOLOGY_ORTHODOX = {
+  label: "Glory to the Father",
+  // OCA-typical.
+  text: "Glory to the Father, and to the Son, and to the Holy Spirit, now and ever, and unto the ages of ages. Amen.",
 };
 
 // Closings shared by more than one tradition.
@@ -28,6 +44,8 @@ const CLOSE_REFORMED =
 export const TRADITION_META: Record<Tradition, TraditionMeta> = {
   anglican: {
     name: "Anglican",
+    doxology: DEFAULT_DOXOLOGY,
+    crosses: true,
     opening: {
       label: "A Collect for Purity",
       text: "Almighty God, unto whom all hearts are open, all desires known, and from whom no secrets are hid: cleanse the thoughts of our hearts by the inspiration of thy Holy Spirit, that we may perfectly love thee, and worthily magnify thy holy Name; through Christ our Lord. Amen.",
@@ -36,6 +54,8 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
   },
   "eastern-orthodox": {
     name: "Eastern Orthodox",
+    doxology: DOXOLOGY_ORTHODOX,
+    crosses: true,
     opening: {
       label: "O Heavenly King",
       // OCA-typical English.
@@ -45,6 +65,8 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
   },
   evangelical: {
     name: "Evangelical",
+    doxology: DEFAULT_DOXOLOGY,
+    crosses: false,
     opening: {
       label: "Coming to God",
       text: "Be still, and know that I am God. (Psalm 46:10)\n\nLord, I come to You now. Quiet my heart, open Your Word to me, and meet me here. In Jesus' name. Amen.",
@@ -53,6 +75,8 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
   },
   protestant: {
     name: "Protestant",
+    doxology: DEFAULT_DOXOLOGY,
+    crosses: false,
     opening: {
       label: "Invocation",
       text: "Almighty God, you are worthy of all praise. Open my lips and my heart to worship you in spirit and in truth; through Jesus Christ my Lord. Amen.",
@@ -61,6 +85,8 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
   },
   "roman-catholic": {
     name: "Roman Catholic",
+    doxology: DEFAULT_DOXOLOGY,
+    crosses: true,
     opening: {
       label: "The Sign of the Cross",
       text: "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.\n\nO God, come to my assistance.\nO Lord, make haste to help me.",

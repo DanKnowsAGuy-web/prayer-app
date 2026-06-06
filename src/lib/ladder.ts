@@ -17,7 +17,7 @@
  *  - "gospelEpistle": the day's Epistle, then Gospel
  *  - "intercession": the standard prayers wrapping the user's named intentions
  */
-export type DynamicKind = "gospel" | "gospelEpistle" | "psalm";
+export type DynamicKind = "gospel" | "gospelEpistle" | "psalm" | "doxology";
 
 export type PrayerStep = {
   /** Short label shown in the order of service, e.g. "Opening" or "Psalm". */
@@ -59,10 +59,8 @@ const LORDS_PRAYER: PrayerStep = {
   source: "Matthew 6:9–13",
 };
 
-const GLORIA: PrayerStep = {
-  label: "Glory be",
-  text: "Glory be to the Father, and to the Son, and to the Holy Spirit;\nas it was in the beginning, is now, and ever shall be,\nworld without end. Amen.",
-};
+// The doxology is resolved per tradition (Orthodox uses the OCA form).
+const GLORIA: PrayerStep = { label: "Glory be", text: "", dynamic: "doxology" };
 
 /**
  * THE DEFAULT LADDER.
