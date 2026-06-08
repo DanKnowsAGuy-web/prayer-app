@@ -48,14 +48,14 @@ body::before {
   transform-origin: 100% 100%;
   background:
     radial-gradient(
-      34% 30% at 100% 100%,
-      oklch(0.8 0.13 67 / 0.3),
-      transparent 66%
+      44% 40% at 100% 100%,
+      oklch(0.79 0.16 50 / 0.46),
+      transparent 70%
     ),
     radial-gradient(
-      78% 66% at 102% 102%,
-      oklch(0.66 0.1 56 / 0.16),
-      transparent 76%
+      98% 84% at 102% 102%,
+      oklch(0.64 0.13 44 / 0.28),
+      transparent 80%
     );
   animation: candle 7.5s ease-in-out infinite;
   will-change: opacity, transform;
