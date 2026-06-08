@@ -22,23 +22,31 @@ export function App() {
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
+  // A warm candlelight glow accompanies every screen except prayer mode.
+  const withGlow = (node: React.ReactNode) => (
+    <>
+      <div className="candle-glow" aria-hidden="true" />
+      {node}
+    </>
+  );
+
   if (hash === "#dev") {
-    return (
+    return withGlow(
       <DevPanel
         onClose={() => {
           window.location.hash = "";
           setHash("");
         }}
-      />
+      />,
     );
   }
 
   if (!state.onboarded) {
-    return <Onboarding />;
+    return withGlow(<Onboarding />);
   }
 
   if (settingsOpen) {
-    return <Settings onClose={() => setSettingsOpen(false)} />;
+    return withGlow(<Settings onClose={() => setSettingsOpen(false)} />);
   }
 
   const rung = rungAt(state.rung);
@@ -48,25 +56,29 @@ export function App() {
   const petitionPart: DayPart =
     state.petitionTime === "evening" && rung.evening ? "evening" : "morning";
 
-  if (reading) {
-    const practice = reading === "evening" ? rung.evening : rung.morning;
-    if (practice) {
-      return (
-        <PrayerReader
-          practice={practice}
-          part={reading}
-          petitionPart={petitionPart}
-          onClose={() => setReading(null)}
-        />
-      );
-    }
+  const readingPractice = reading
+    ? reading === "evening"
+      ? rung.evening
+      : rung.morning
+    : null;
+
+  // Prayer mode keeps the existing atmosphere — no candle glow.
+  if (reading && readingPractice) {
+    return (
+      <PrayerReader
+        practice={readingPractice}
+        part={reading}
+        petitionPart={petitionPart}
+        onClose={() => setReading(null)}
+      />
+    );
   }
 
-  return (
+  return withGlow(
     <Home
       onBeginPrayer={(part) => setReading(part)}
       onOpenSettings={() => setSettingsOpen(true)}
       defaultPart={dayPart(new Date())}
-    />
+    />,
   );
 }

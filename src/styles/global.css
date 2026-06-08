@@ -29,13 +29,55 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: -2;
   pointer-events: none;
   background: radial-gradient(
     120% 80% at 50% -20%,
     oklch(0.24 0.02 64) 0%,
     var(--bg) 55%
   );
+}
+
+/* Candlelight — a warm glow rising from the bottom-right, breathing like a
+   flame. Present on the home and pre-prayer screens; absent in prayer mode. */
+.candle-glow {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  transform-origin: 100% 100%;
+  background:
+    radial-gradient(
+      34% 30% at 100% 100%,
+      oklch(0.8 0.13 67 / 0.3),
+      transparent 66%
+    ),
+    radial-gradient(
+      78% 66% at 102% 102%,
+      oklch(0.66 0.1 56 / 0.16),
+      transparent 76%
+    );
+  animation: candle 7.5s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+
+/* Uneven keyframes give the irregular shimmer of a real flame. */
+@keyframes candle {
+  0% { opacity: 0.6; transform: scale(1); }
+  18% { opacity: 0.85; transform: scale(1.04); }
+  32% { opacity: 0.66; transform: scale(1.01); }
+  47% { opacity: 0.95; transform: scale(1.07); }
+  61% { opacity: 0.72; transform: scale(1.02); }
+  78% { opacity: 0.88; transform: scale(1.05); }
+  90% { opacity: 0.68; transform: scale(1.02); }
+  100% { opacity: 0.6; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .candle-glow {
+    animation: none;
+    opacity: 0.75;
+  }
 }
 
 h1,
