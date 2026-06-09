@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useStore } from "./lib/store";
-import { rungAt } from "./lib/ladder";
 import { dayPart, type DayPart } from "./lib/daypart";
 import { Onboarding } from "./components/Onboarding";
 import { Home } from "./components/Home";
@@ -49,29 +48,9 @@ export function App() {
     return withGlow(<Settings onClose={() => setSettingsOpen(false)} />);
   }
 
-  const rung = rungAt(state.rung);
-
-  // Petitions go in the chosen prayer, but fall back to morning when the
-  // current rung has no evening prayer yet — so they're never orphaned.
-  const petitionPart: DayPart =
-    state.petitionTime === "evening" && rung.evening ? "evening" : "morning";
-
-  const readingPractice = reading
-    ? reading === "evening"
-      ? rung.evening
-      : rung.morning
-    : null;
-
   // Prayer mode keeps the existing atmosphere — no candle glow.
-  if (reading && readingPractice) {
-    return (
-      <PrayerReader
-        practice={readingPractice}
-        part={reading}
-        petitionPart={petitionPart}
-        onClose={() => setReading(null)}
-      />
-    );
+  if (reading) {
+    return <PrayerReader part={reading} onClose={() => setReading(null)} />;
   }
 
   return withGlow(

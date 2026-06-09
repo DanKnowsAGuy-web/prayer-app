@@ -44,18 +44,15 @@ export type Tradition =
  * along when enabled, pre-checked in the build-out. Standing preferences so the
  * person needn't re-check them each day.
  *   - song: the Gospel song (Benedictus in the morning, Magnificat at night)
- *   - reading: the short reading bundled with the Psalter discipline step
  *   - reflection: a contemplative pause after the readings
  */
 export type Prefs = {
   song: boolean;
-  reading: boolean;
   reflection: boolean;
 };
 
 export const NO_PREFS: Prefs = {
   song: false,
-  reading: false,
   reflection: false,
 };
 
@@ -82,8 +79,12 @@ export type RuleState = {
   psalmTime: "morning" | "evening";
   /** Which daily prayer carries the intercessions (the prayer list). */
   petitionTime: "morning" | "evening";
-  /** Local date the Psalter last advanced, so it moves once per day. */
-  lastPsalmAdvanceDate?: string;
+  /**
+   * The office the Psalter last advanced in ("YYYY-MM-DD:morning"). The Psalter
+   * advances once per office prayed — morning takes one segment, evening the
+   * next — so reopening the same office can't double-count.
+   */
+  lastPsalmAdvanceKey?: string;
   /**
    * Once-daily readings carry: the local date the Gospel / Epistle was last
    * completed (kept through to the Amen). Offered in the morning; offered in the
@@ -98,15 +99,16 @@ export type RuleState = {
   /**
    * The intercessory cycle — a usage-advanced track (its own pointer, like the
    * Psalter). `day` is the Cycle Day (starts at 1), advancing one step per
-   * completion; it freezes while `on` is false and resumes in place. The
-   * Prologue is served once before Day 1, gated by `prologueSeen`.
-   * `lastAdvanceDate` is a same-day safety latch against double-taps/reopens.
+   * office prayed (morning and evening each advance it); it freezes while `on`
+   * is false and resumes in place. The Prologue is served once before Day 1,
+   * gated by `prologueSeen`. `lastAdvanceKey` ("YYYY-MM-DD:morning") is a
+   * per-office latch against double-taps/reopens.
    */
   cycle: {
     day: number;
     on: boolean;
     prologueSeen: boolean;
-    lastAdvanceDate?: string;
+    lastAdvanceKey?: string;
   };
 };
 

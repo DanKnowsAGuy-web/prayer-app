@@ -12,7 +12,6 @@ const TRADITIONS: { value: Tradition; label: string }[] = [
 
 const ELEMENT_TOGGLES: { key: keyof Prefs; label: string; hint: string }[] = [
   { key: "song", label: "The Gospel song", hint: "The Benedictus in the morning, the Magnificat at night." },
-  { key: "reading", label: "A short reading", hint: "A brief reading alongside the Psalms, when appointed." },
   { key: "reflection", label: "A time of reflection", hint: "A pause to sit with the word after the readings." },
 ];
 
@@ -69,20 +68,6 @@ export function Settings({ onClose }: { onClose: () => void }) {
             </button>
           ))}
         </div>
-      </section>
-
-      <section className="settings-group">
-        <h2 className="settings-h">When you pray your Psalms and list</h2>
-        <TimeRow
-          label="Pray the Psalms at"
-          value={state.psalmTime}
-          onChange={(time) => dispatch({ type: "setPsalmTime", time })}
-        />
-        <TimeRow
-          label="Pray your list at"
-          value={state.petitionTime}
-          onChange={(time) => dispatch({ type: "setPetitionTime", time })}
-        />
       </section>
 
       <section className="settings-group">
@@ -197,34 +182,3 @@ function ReminderRow({
   );
 }
 
-function TimeRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: "morning" | "evening";
-  onChange: (t: "morning" | "evening") => void;
-}) {
-  return (
-    <div className="seg">
-      <span className="seg-label">{label}</span>
-      <div className="seg-track">
-        <button
-          className={`seg-btn ${value === "morning" ? "is-on" : ""}`}
-          aria-pressed={value === "morning"}
-          onClick={() => onChange("morning")}
-        >
-          Morning
-        </button>
-        <button
-          className={`seg-btn ${value === "evening" ? "is-on" : ""}`}
-          aria-pressed={value === "evening"}
-          onClick={() => onChange("evening")}
-        >
-          Evening
-        </button>
-      </div>
-    </div>
-  );
-}

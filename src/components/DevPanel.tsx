@@ -26,7 +26,7 @@ const TRADITIONS: (Tradition | "none")[] = [
   "roman-catholic",
 ];
 
-const PREF_KEYS: (keyof Prefs)[] = ["song", "reading", "reflection"];
+const PREF_KEYS: (keyof Prefs)[] = ["song", "reflection"];
 
 /** Build a check-in log ending today: `kept` of the last `window` days. */
 function makeLog(today: string, kept: number, window: number): CheckIn[] {
@@ -132,20 +132,6 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
           />
           <span className="dev-note">Next portion / discipline step.</span>
         </div>
-      </section>
-
-      <section className="dev-group">
-        <h2 className="dev-h">Times</h2>
-        <SegRow
-          label="Psalms at"
-          value={state.psalmTime}
-          onChange={(t) => patch({ psalmTime: t })}
-        />
-        <SegRow
-          label="Prayer list at"
-          value={state.petitionTime}
-          onChange={(t) => patch({ petitionTime: t })}
-        />
       </section>
 
       <section className="dev-group">
@@ -272,7 +258,7 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
                   source: cycleServed.entry.attribution,
                 },
               ],
-              onComplete: () => dispatch({ type: "advanceCycle", date: today }),
+              onComplete: () => dispatch({ type: "advanceCycle", key: `${today}:dev` }),
             })
           }
         >
@@ -295,32 +281,3 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
-function SegRow({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: "morning" | "evening";
-  onChange: (t: "morning" | "evening") => void;
-}) {
-  return (
-    <div className="seg">
-      <span className="seg-label">{label}</span>
-      <div className="seg-track">
-        <button
-          className={`seg-btn ${value === "morning" ? "is-on" : ""}`}
-          onClick={() => onChange("morning")}
-        >
-          Morning
-        </button>
-        <button
-          className={`seg-btn ${value === "evening" ? "is-on" : ""}`}
-          onClick={() => onChange("evening")}
-        >
-          Evening
-        </button>
-      </div>
-    </div>
-  );
-}

@@ -206,16 +206,11 @@ export type OfficeCtx = {
   epistle?: Movement;
   /** The Gospel song (Benedictus / Magnificat) for this part. */
   song?: Movement;
-  /** The short reading bundled with an active Psalter discipline step. */
-  reading?: Movement;
   /** The day's intercessory-cycle prayer, present only when the cycle is on. */
   cycle?: Movement;
-  /** The person's prayer list, prayed in this part. */
+  /** The person's prayer list, prayed in both offices when there are names. */
   intentions: Intention[];
-  showPetitions: boolean;
   date: string;
-  /** A discipline step's collect, replacing the default closing when active. */
-  disciplineCollect?: string;
   /** Once-daily carry: whether each reading was already done today. */
   carry: { gospelDone: boolean; epistleDone: boolean };
 };
@@ -264,29 +259,25 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
   if (showEpistle) push({ ...ctx.epistle!, level: part === "morning" ? 6 : 2 });
   if (showGospel) push(ctx.gospel);
 
-  // Optional depth (off unless opted in): song, reading, reflection.
+  // Optional depth (off unless opted in): song, reflection.
   push(ctx.song && { ...ctx.song, kind: "song", level: OPT });
-  push(ctx.reading && { ...ctx.reading, kind: "reading", level: OPT });
   push(REFLECTION);
 
   // Prayer with the early Church (the intercessory cycle).
   push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 3 });
 
-  // Your prayer list — held space, only when there are names today.
-  if (ctx.showPetitions) {
-    const names = intentionsForDate(ctx.intentions, ctx.date);
-    if (names.length) {
-      const meta = tradition ? TRADITION_META[tradition] : null;
-      const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
-      push(
-        intercessionMovement(
-          ctx.intentions,
-          ctx.date,
-          close,
-          meta?.intercessionCloseAttribution,
-        ),
-      );
-    }
+  // Your prayer list — held space, in both offices, when there are names today.
+  if (intentionsForDate(ctx.intentions, ctx.date).length) {
+    const meta = tradition ? TRADITION_META[tradition] : null;
+    const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
+    push(
+      intercessionMovement(
+        ctx.intentions,
+        ctx.date,
+        close,
+        meta?.intercessionCloseAttribution,
+      ),
+    );
   }
 
   // The night's close in the evening; the day's close in the morning.
@@ -296,11 +287,7 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
     push(PRAYER_NIGHT);
   } else {
     push(LORDS_PRAYER);
-    push(
-      ctx.disciplineCollect
-        ? { kind: "closing", level: 2, label: "Closing prayer", text: ctx.disciplineCollect }
-        : DEFAULT_CLOSING,
-    );
+    push(DEFAULT_CLOSING);
   }
 
   // Mark where crossing traditions make the sign of the cross.
@@ -342,7 +329,6 @@ export function defaultIncluded(
   return movements.map((m) => {
     if (m.level === OPT) {
       if (m.kind === "song") return prefs.song;
-      if (m.kind === "reading") return prefs.reading;
       if (m.kind === "reflection") return prefs.reflection;
       return false;
     }

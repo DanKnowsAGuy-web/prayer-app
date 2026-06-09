@@ -45,8 +45,8 @@ type Action =
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "setCycleOn"; on: boolean }
-  | { type: "advanceCycle"; date: string }
-  | { type: "advancePsalm"; date: string }
+  | { type: "advanceCycle"; key: string }
+  | { type: "advancePsalm"; key: string }
   | { type: "reset" };
 
 function reducer(state: RuleState, action: Action): RuleState {
@@ -122,13 +122,14 @@ function reducer(state: RuleState, action: Action): RuleState {
     case "setCycleOn":
       return { ...state, cycle: { ...state.cycle, on: action.on } };
     case "advanceCycle": {
-      // Same-day latch: a re-open/double-tap can't advance twice.
-      if (state.cycle.lastAdvanceDate === action.date) return state;
+      // Per-office latch: a re-open/double-tap of the same office can't advance
+      // twice, but morning and evening each advance once.
+      if (state.cycle.lastAdvanceKey === action.key) return state;
       // The Prologue is completed once, before Day 1, and does not advance the day.
       if (!state.cycle.prologueSeen) {
         return {
           ...state,
-          cycle: { ...state.cycle, prologueSeen: true, lastAdvanceDate: action.date },
+          cycle: { ...state.cycle, prologueSeen: true, lastAdvanceKey: action.key },
         };
       }
       return {
@@ -136,15 +137,16 @@ function reducer(state: RuleState, action: Action): RuleState {
         cycle: {
           ...state.cycle,
           day: state.cycle.day + 1,
-          lastAdvanceDate: action.date,
+          lastAdvanceKey: action.key,
         },
       };
     }
     case "advancePsalm":
+      if (state.lastPsalmAdvanceKey === action.key) return state;
       return {
         ...state,
         psalmIndex: (state.psalmIndex + 1) % 60,
-        lastPsalmAdvanceDate: action.date,
+        lastPsalmAdvanceKey: action.key,
       };
     case "reset":
       return initialState();

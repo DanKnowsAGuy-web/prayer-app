@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import type { Practice } from "../lib/ladder";
 import type { DayPart } from "../lib/daypart";
 import { useStore } from "../lib/store";
 import { loadPsalter, portionMovements } from "../lib/psalter";
-import { disciplineStep } from "../lib/disciplineSteps";
 import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import {
@@ -39,19 +37,17 @@ export type SoloContent = {
  */
 export function PrayerReader(props: {
   onClose: () => void;
-  practice?: Practice;
   part?: DayPart;
-  petitionPart?: DayPart;
   solo?: SoloContent;
 }) {
   if (props.solo) {
     return <SoloPrayer solo={props.solo} onClose={props.onClose} />;
   }
+  const part = props.part!;
   return (
     <OfficePrayer
-      title={props.practice!.title}
-      part={props.part!}
-      petitionPart={props.petitionPart!}
+      title={part === "evening" ? "Evening Prayer" : "Morning Prayer"}
+      part={part}
       onClose={props.onClose}
     />
   );
@@ -62,8 +58,6 @@ type OfficeData = {
   gospel?: Movement;
   epistle?: Movement;
   psalmMovements: Movement[];
-  reading?: Movement;
-  disciplineCollect?: string;
 };
 
 /**
@@ -76,17 +70,13 @@ type OfficeData = {
 function OfficePrayer({
   title,
   part,
-  petitionPart,
   onClose,
 }: {
   title: string;
   part: DayPart;
-  petitionPart: DayPart;
   onClose: () => void;
 }) {
   const { state, today, dispatch } = useStore();
-  const showPsalms = part === state.psalmTime;
-  const showPetitions = part === petitionPart;
 
   const [data, setData] = useState<OfficeData>({ psalmMovements: [] });
   const [ready, setReady] = useState(false);
@@ -117,22 +107,10 @@ function OfficePrayer({
         );
       }
 
-      // Psalms: the discipline step takes precedence; else the Psalter portion.
-      if (showPsalms) {
-        const ds = disciplineStep(state.psalmIndex + 1);
-        const volume = part === "evening" ? ds?.eveningPsalms : ds?.morningPsalms;
-        if (ds && volume && volume.length) {
-          next.psalmMovements = volume.map((text) => ({ label: "Psalm", text }));
-          const reading =
-            part === "evening" ? ds.eveningShortReading : ds.morningShortReading;
-          if (reading) next.reading = { label: "A reading", text: reading };
-          next.disciplineCollect =
-            part === "evening" ? ds.eveningCollect : ds.morningCollect;
-        } else {
-          const b = await loadPsalter();
-          next.psalmMovements = portionMovements(b, state.psalmIndex);
-        }
-      }
+      // The Psalter in course: the current segment, prayed in either office.
+      const psalter = await loadPsalter();
+      next.psalmMovements = portionMovements(psalter, state.psalmIndex);
+
       if (active) {
         setData(next);
         setReady(true);
@@ -142,7 +120,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, showPsalms, state.translation, state.psalmIndex, state.tradition]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition]);
 
   // The intercessory cycle's prayer for today (only when the cycle is on).
   const cycleMovement = useMemo<Movement | undefined>(() => {
@@ -166,12 +144,9 @@ function OfficePrayer({
         gospel: data.gospel,
         epistle: data.epistle,
         song: canticleMovement(part),
-        reading: data.reading,
         cycle: cycleMovement,
         intentions: state.intentions,
-        showPetitions,
         date: today,
-        disciplineCollect: data.disciplineCollect,
         carry: {
           gospelDone: state.gospelDoneDate === today,
           epistleDone: state.epistleDoneDate === today,
@@ -183,7 +158,6 @@ function OfficePrayer({
       data,
       cycleMovement,
       state.intentions,
-      showPetitions,
       today,
       state.gospelDoneDate,
       state.epistleDoneDate,
@@ -224,11 +198,13 @@ function OfficePrayer({
   // readings — but only for what was actually kept through to the Amen.
   const handleClose = useCallback(() => {
     const keptKinds = new Set(kept.map((m) => m.kind));
-    if (keptKinds.has("psalm") && state.lastPsalmAdvanceDate !== today) {
-      dispatch({ type: "advancePsalm", date: today });
+    // Usage tracks advance once per office prayed (the reducer latches the key).
+    const officeKey = `${today}:${part}`;
+    if (keptKinds.has("psalm")) {
+      dispatch({ type: "advancePsalm", key: officeKey });
     }
     if (keptKinds.has("cycle")) {
-      dispatch({ type: "advanceCycle", date: today });
+      dispatch({ type: "advanceCycle", key: officeKey });
     }
     if (keptKinds.has("gospel")) {
       dispatch({ type: "markReadingDone", which: "gospel", date: today });
@@ -237,7 +213,7 @@ function OfficePrayer({
       dispatch({ type: "markReadingDone", which: "epistle", date: today });
     }
     onClose();
-  }, [kept, state.lastPsalmAdvanceDate, today, dispatch, onClose]);
+  }, [kept, today, part, dispatch, onClose]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
