@@ -45,7 +45,6 @@ type Action =
   | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
-  | { type: "setCycleOn"; on: boolean }
   | { type: "advanceCycle"; key: string }
   | { type: "advancePsalm"; key: string; count: number }
   | { type: "reset" };
@@ -120,8 +119,6 @@ function reducer(state: RuleState, action: Action): RuleState {
         ...state,
         reminders: { ...state.reminders, [action.slot]: action.time },
       };
-    case "setCycleOn":
-      return { ...state, cycle: { ...state.cycle, on: action.on } };
     case "advanceCycle": {
       // Per-office latch: a re-open/double-tap of the same office can't advance
       // twice, but morning and evening each advance once.

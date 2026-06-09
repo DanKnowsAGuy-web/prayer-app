@@ -98,15 +98,15 @@ export type RuleState = {
   reminders: { morning: string | null; evening: string | null };
   /**
    * The intercessory cycle — a usage-advanced track (its own pointer, like the
-   * Psalter). `day` is the Cycle Day (starts at 1), advancing one step per
-   * office prayed (morning and evening each advance it); it freezes while `on`
-   * is false and resumes in place. The Prologue is served once before Day 1,
-   * gated by `prologueSeen`. `lastAdvanceKey` ("YYYY-MM-DD:morning") is a
-   * per-office latch against double-taps/reopens.
+   * Psalter), and a permanent segment of the spine; the slider governs whether
+   * it is prayed on a given day. `day` is the Cycle Day (starts at 1), advancing
+   * one step per office prayed (morning and evening each advance it). The
+   * Prologue is served once before Day 1, gated by `prologueSeen`.
+   * `lastAdvanceKey` ("YYYY-MM-DD:morning") is a per-office latch against
+   * double-taps/reopens.
    */
   cycle: {
     day: number;
-    on: boolean;
     prologueSeen: boolean;
     lastAdvanceKey?: string;
   };
@@ -172,7 +172,7 @@ export function initialState(): RuleState {
     psalmTime: "morning",
     petitionTime: "morning",
     reminders: { morning: null, evening: null },
-    cycle: { day: 1, on: false, prologueSeen: false },
+    cycle: { day: 1, prologueSeen: false },
   };
 }
 

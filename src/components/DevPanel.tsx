@@ -214,12 +214,6 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
         <h2 className="dev-h">Intercessory cycle</h2>
         <div className="dev-row dev-wrap">
           <button
-            className={`pill ${c.on ? "is-on" : ""}`}
-            onClick={() => dispatch({ type: "setCycleOn", on: !c.on })}
-          >
-            {c.on ? "On" : "Off"}
-          </button>
-          <button
             className={`pill ${c.prologueSeen ? "is-on" : ""}`}
             onClick={() =>
               patch({ cycle: { ...c, prologueSeen: !c.prologueSeen } })

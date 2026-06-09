@@ -146,9 +146,10 @@ function OfficePrayer({
     };
   }, [today, part, state.translation, state.psalmIndex, state.tradition]);
 
-  // The intercessory cycle's prayer for today (only when the cycle is on).
-  const cycleMovement = useMemo<Movement | undefined>(() => {
-    if (!state.cycle.on) return undefined;
+  // The intercessory cycle is a permanent spine segment (level 3); the slider,
+  // not a flag, governs whether it's prayed today. The Prologue is served once,
+  // before Day 1.
+  const cycleMovement = useMemo<Movement>(() => {
     const served = state.cycle.prologueSeen
       ? serveCycleDay(state.cycle.day)
       : { theme: "Prologue", entry: prologueEntry() };
@@ -157,7 +158,7 @@ function OfficePrayer({
       text: served.entry.prayer,
       source: served.entry.attribution,
     };
-  }, [state.cycle.on, state.cycle.prologueSeen, state.cycle.day]);
+  }, [state.cycle.prologueSeen, state.cycle.day]);
 
   const movements = useMemo(
     () =>
