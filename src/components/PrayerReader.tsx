@@ -10,6 +10,39 @@ import { resolvePractice, type Movement } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
 import { TraditionEmblem } from "./TraditionEmblem";
 
+/** A single, pre-resolved prayer to render through the reader (e.g. the cycle). */
+export type SoloContent = {
+  title: string;
+  movements: Movement[];
+  /** Called when the reader is finished with Amen (marks the track complete). */
+  onComplete: () => void;
+};
+
+/**
+ * Renders the office (rung-based prayer) by default, or a single pre-resolved
+ * prayer in `solo` mode — reusing the same layout, emblem, and Amen button
+ * without any of the office's resolution machinery.
+ */
+export function PrayerReader(props: {
+  onClose: () => void;
+  practice?: Practice;
+  part?: DayPart;
+  petitionPart?: DayPart;
+  solo?: SoloContent;
+}) {
+  if (props.solo) {
+    return <SoloPrayer solo={props.solo} onClose={props.onClose} />;
+  }
+  return (
+    <OfficePrayer
+      practice={props.practice!}
+      part={props.part!}
+      petitionPart={props.petitionPart!}
+      onClose={props.onClose}
+    />
+  );
+}
+
 /**
  * Praying a longer office happens in two steps:
  *   1. A build-out preview — every segment with its approximate time, where you
@@ -17,7 +50,7 @@ import { TraditionEmblem } from "./TraditionEmblem";
  *   2. The prayer itself, laid out in full as one quiet, scrollable page.
  * Short prayers skip the preview and open straight to praying.
  */
-export function PrayerReader({
+function OfficePrayer({
   practice,
   part,
   petitionPart,
@@ -238,6 +271,68 @@ export function PrayerReader({
 
         <div className="reader-end">
           <button className="btn btn-primary" onClick={handleClose}>
+            Amen
+          </button>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+/**
+ * Solo mode: one pre-resolved prayer laid out like the office, with the
+ * user's own TraditionEmblem (never the prayer's historic origin) and an Amen
+ * that marks the track complete. Closing without Amen does not advance.
+ */
+function SoloPrayer({
+  solo,
+  onClose,
+}: {
+  solo: SoloContent;
+  onClose: () => void;
+}) {
+  const { state } = useStore();
+  const complete = useCallback(() => {
+    solo.onComplete();
+    onClose();
+  }, [solo, onClose]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return (
+    <main className="reader" data-part="morning">
+      <div className="reader-bar">
+        <button className="btn btn-quiet reader-close" onClick={onClose}>
+          ← Close
+        </button>
+        <span className="reader-bar-title">
+          <TraditionEmblem
+            tradition={state.tradition}
+            className="emblem emblem-bar"
+          />
+          {solo.title}
+        </span>
+      </div>
+
+      <div className="reader-scroll">
+        {solo.movements.map((m, n) => (
+          <section className="movement" key={n}>
+            <p className="reader-label">{m.label}</p>
+            {m.ref && <p className="reader-ref">{m.ref}</p>}
+            <p className="reader-text">{m.text}</p>
+            {m.source && <p className="reader-source">{m.source}</p>}
+            {m.note && <p className="reader-note">{m.note}</p>}
+          </section>
+        ))}
+
+        <div className="reader-end">
+          <button className="btn btn-primary" onClick={complete}>
             Amen
           </button>
         </div>

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStore } from "../lib/store";
 import { LADDER } from "../lib/ladder";
 import {
@@ -7,6 +8,8 @@ import {
   type RuleState,
   type Tradition,
 } from "../lib/engine";
+import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
+import { PrayerReader, type SoloContent } from "./PrayerReader";
 
 /**
  * Hidden preview/testing panel — reached at `…/#dev`. Lets you set any state
@@ -50,10 +53,23 @@ function makeLog(today: string, kept: number, window: number): CheckIn[] {
 export function DevPanel({ onClose }: { onClose: () => void }) {
   const { state, today, dispatch } = useStore();
   const patch = (p: Partial<RuleState>) => dispatch({ type: "devPatch", patch: p });
+  const [viewing, setViewing] = useState<SoloContent | null>(null);
 
   const weekdayName = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][
     weekdayOf(today)
   ];
+
+  // What the intercessory cycle would serve right now.
+  const c = state.cycle;
+  const cycleServed = c.prologueSeen
+    ? serveCycleDay(c.day)
+    : { theme: "Prologue", entry: prologueEntry() };
+
+  if (viewing) {
+    return (
+      <PrayerReader solo={viewing} onClose={() => setViewing(null)} />
+    );
+  }
 
   return (
     <main className="app dev">
@@ -200,6 +216,62 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
           Log has {state.log.length} day{state.log.length === 1 ? "" : "s"}.
           Advance offers need ≥5 check-ins.
         </p>
+      </section>
+
+      <section className="dev-group">
+        <h2 className="dev-h">Intercessory cycle</h2>
+        <div className="dev-row dev-wrap">
+          <button
+            className={`pill ${c.on ? "is-on" : ""}`}
+            onClick={() => dispatch({ type: "setCycleOn", on: !c.on })}
+          >
+            {c.on ? "On" : "Off"}
+          </button>
+          <button
+            className={`pill ${c.prologueSeen ? "is-on" : ""}`}
+            onClick={() =>
+              patch({ cycle: { ...c, prologueSeen: !c.prologueSeen } })
+            }
+          >
+            {c.prologueSeen ? "Prologue seen" : "Prologue pending"}
+          </button>
+          <input
+            className="intention-input dev-num"
+            type="number"
+            min={1}
+            max={400}
+            value={c.day}
+            onChange={(e) =>
+              patch({
+                cycle: { ...c, day: Math.max(1, Number(e.target.value) || 1) },
+              })
+            }
+            aria-label="Cycle day"
+          />
+        </div>
+        <p className="dev-note">
+          {c.prologueSeen
+            ? `Day ${c.day} · ${cycleServed.theme} · ${cycleServed.entry.id}`
+            : `Prologue · ${cycleServed.entry.id}`}
+        </p>
+        <button
+          className="btn btn-ghost see-list"
+          onClick={() =>
+            setViewing({
+              title: "Intercessory Cycle",
+              movements: [
+                {
+                  label: cycleServed.theme,
+                  text: cycleServed.entry.prayer,
+                  source: cycleServed.entry.attribution,
+                },
+              ],
+              onComplete: () => dispatch({ type: "advanceCycle", date: today }),
+            })
+          }
+        >
+          Open this prayer
+        </button>
       </section>
 
       <section className="dev-group">

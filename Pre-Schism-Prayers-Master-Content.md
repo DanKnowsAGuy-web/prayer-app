@@ -1,0 +1,545 @@
+# THE PRE-SCHISM INTERCESSORY CYCLE
+## Master Content: The Prayers
+
+*This is the content file. It holds the prayers only. The rules for how an app serves them (the daily theme advance, the per-theme rotation, the recurrence math) live in the separate instruction file. Edit prayers here without touching the logic there.*
+
+---
+
+### How each entry is laid out
+
+Every entry has four parts:
+
+1. A stable ID in bold, for example `CHURCH-WESTSYRIAC`. The app refers to a prayer by this code, never by its position, so entries can be reordered or edited without breaking anything. The reader never sees it.
+2. The prayer itself, written as one continuous piece. The opening bid and the response are woven in; there are no labels like "core" or "response."
+3. An attribution line in italics: manuscript, tradition, and century, as available. The reader sees this, quietly, beneath the prayer.
+4. A metadata line, hidden from the reader, recording provenance and whether the wording has been revised for accessibility.
+
+### The fidelity tags
+
+- **sourced**: a faithful rendering of a public-domain manuscript.
+- **adapted**: authentic patristic prose shaped into a prayer, flagged.
+- **revised: yes**: the wording has been modernized for accessibility from the strict historic text, so it is no longer verbatim. **revised: no** means the historic wording stands.
+
+### Notes on this edition
+
+- Only distinct prayers appear. In deduplicating, every borrowed (surrogate) cell folded back into the native prayer it was standing in for, so this file contains only genuine native and adapted prayers. Two traditions, Aquileia and Beneventan, had no native text of their own and so do not appear here; they remain listed for future work in the Sourcing Worklist.
+- Centuries mark each tradition's formative era and are approximate; a range is used only where a single century would mislead.
+- The Marian title is standardized to "the God-bearer and ever-virgin Mary" throughout, per preference; the historic sources vary between this and "Mother of God."
+- Revisions applied in this edition: oblation to offering or gifts; expiation to atoning; propitiation to appeasement; execration to that which is accursed; confessors to those who suffered for the faith; anchorites and cenobites to solitary hermits and community monks; penitents to those who are penitent; scourges to afflictions; catholic to universal; the sign of faith to marked by baptism; refreshment to rest; the portion of the adversary to the fate that belongs to the adversary; scandals to stumbling block; the uprising of heresies to the spread of false teaching; indulgence to pardon; the Innocents to the Holy Innocents killed by Herod. Kept as is: the font of regeneration, hung upon the tree, crowned among the sheep, the older pronouns and verb forms, and the language of falling asleep and rest for the dead. Dense sentences were lightly untangled where two or more difficulties stacked.
+
+---
+
+# PROLOGUE
+
+The cycle opens outside the rotation, with the thanksgiving of the first Christian generation, a prayer still carrying the shape of the Jewish blessing after meals.
+
+**PROLOGUE-DIDACHE**
+
+We thank Thee, holy Father, for Thy holy name, which Thou hast caused to dwell in our hearts, and for the knowledge, faith, and immortality which Thou hast made known to us through Jesus Thy Servant; to Thee be the glory for ever. Thou, almighty Master, hast created all things for Thy name's sake, and hast given food and drink to all people for their gladness, that they might give Thee thanks; but to us Thou hast freely given spiritual food and drink, and life eternal, through Thy Servant. Remember, Lord, Thy Church, to deliver her from all evil and to perfect her in Thy love; and gather her together from the four winds, made holy, into Thy kingdom which Thou hast prepared for her. Let grace come, and let this world pass away. Hosanna to the God of David. If anyone is holy, let him come; if anyone is not, let him repent. Maranatha. Amen.
+
+*Didache, 1st century*
+
+`provenance: sourced · revised: yes`
+
+---
+
+# THEME 1: THE CHURCH AND UNITY
+*10 prayers.*
+
+**CHURCH-WESTSYRIAC**
+
+In peace let us beseech the Lord. For the peace that is from above, and for the salvation of our souls, let us beseech the Lord. For the peace of the whole world, and for the unity of all the holy churches of God, let us beseech the Lord. For our deliverance from all tribulation, wrath, danger, and distress, let us beseech the Lord. Lord, have mercy upon us. O good King eternal, Creator of all, receive Thy Church as she comes to Thee through Thy Christ, and gather us together within Thy holy Church, which Thou hast purchased by the precious blood of Thine only-begotten Son.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-ALEXANDRIAN**
+
+O Sovereign and Almighty Lord, look down from heaven upon Thy Church, upon all Thy people, and upon all Thy flock. Give us Thy peace, Thy help, and Thy love, that we may be one body and one spirit, in one faith, even as we have been called in one hope of our calling. And subdue all the enemies of Thy holy Church speedily beneath their feet. Lord, have mercy.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-ROMAN**
+
+Grant unto Thy Church, we beseech Thee, O merciful God, that she, being gathered together by the Holy Spirit, may in no way be troubled by attack from her foes.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-EASTSYRIAC**
+
+Accept this offering for the whole holy universal Church, and for all the devout and righteous fathers who have been pleasing to Thee. Amen, and with us.
+
+*Liturgy of Addai and Mari, East Syriac, 3rd century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-ARMENIAN**
+
+For the peace of the whole world, and for the stability of the holy Church, let us beseech the Lord. For all the holy and orthodox bishops, let us beseech the Lord. Lord, have mercy.
+
+*Armenian Divine Liturgy, Armenian, 5th century*
+
+`provenance: sourced · revised: no`
+
+**CHURCH-BYZANTINE**
+
+In peace let us pray to the Lord. For the peace of the whole world, for the stability of the holy churches of God, and for the unity of all, let us pray to the Lord. For this holy house, and for those who enter it with faith, reverence, and the fear of God, let us pray to the Lord. Lord, have mercy. Lord our God, save Thy people and bless Thine inheritance; protect the whole body of Thy Church; sanctify those who love the beauty of Thy house, and do not forsake us who hope in Thee.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: no`
+
+**CHURCH-AMBROSIAN**
+
+Beseeching the gift of divine peace and pardon, with all our heart and with all our mind, we pray Thee. For Thy holy universal Church, which is here and is spread throughout the whole world, we pray Thee, Lord, have mercy. For the Pope and our bishop and all their clergy, and for all priests and ministers, we pray Thee, Lord, have mercy. For the peace of the churches, the calling of the nations, and the quiet of the peoples, we pray Thee, Lord, have mercy.
+
+*Divinae Pacis, Ambrosian, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-BENEDICTINE**
+
+The superior says the Lord's Prayer in the hearing of all, that the brethren, bound by the covenant of that prayer, may be cleansed of the thorns of conflict and kept in the bond of peace: Our Father, forgive us our debts, as we also forgive our debtors. Lord, have mercy.
+
+*Rule of St. Benedict, Benedictine, 6th century*
+
+`provenance: sourced · revised: no`
+
+**CHURCH-MOZARABIC**
+
+Preserve in Thy peace, O Lord, those whom Thou hast redeemed by the abundant outpouring of Thy blood; keep free from every stumbling block those for whom Thou didst hang upon the tree; and make worthy, through works of charity, those whom by Thy grace Thou hast adopted as sons and daughters; that we who celebrate the victory of Thy resurrection may be set, crowned, at Thy right hand among the sheep.
+
+*Mozarabic Ad Pacem, Mozarabic, 7th century*
+
+`provenance: sourced · revised: yes`
+
+**CHURCH-CELTIC**
+
+Let us all say: Lord, hear and have mercy. With all our heart and with all our mind, O Thou who lookest upon the earth and makest it tremble, we pray. For the most high peace and the quiet of our times, and for the holy universal Church from the ends to the bounds of the whole earth, we pray. For our shepherd, the bishop, and for all bishops, priests, deacons, and all the clergy, we pray. Lord, have mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: yes`
+
+---
+
+# THEME 2: CIVIL AUTHORITIES AND PUBLIC PEACE
+*7 prayers.*
+
+**CIVIL-WESTSYRIAC**
+
+Remember all, O Lord, for good; have mercy on all, O Sovereign Lord. Give peace to the multitudes of Thy people; remove every stumbling block; bring wars to an end; and put an end to the spread of false teaching. Grant Thy peace and Thy love to us, O God our Saviour, the hope of all the ends of the earth. Lord, have mercy upon us.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**CIVIL-ALEXANDRIAN**
+
+O God, Sovereign Lord, the Father of our Lord and Saviour Jesus Christ, grant that our ruler may enjoy peace, and be just and brave. Subdue beneath him all his adversaries and enemies; take up Thy shield and armour, and rise to his aid. Give him the victory, that his heart may be set on peace and on the praise of Thy holy name. Lord, have mercy. O King of kings and Lord of lords, defend the kingdom of Thy servant, and be kind to him for the sake of Thy holy and apostolic Church, that we too in his peaceful reign may live a calm and tranquil life, in all reverence and godliness.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**CIVIL-ROMAN**
+
+Almighty and everlasting God, in whose hand are the power and the government of every realm, look down upon and help the Christian people, that the nations who trust in their own fierceness may be crushed by the power of Thine arm.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: no`
+
+**CIVIL-ARMENIAN**
+
+For pious and God-loving civil leaders and their armed forces, let us beseech the Lord. That the Lord may grant them to govern in peace and justice, let us beseech the Lord. Lord, have mercy.
+
+*Armenian Divine Liturgy, Armenian, 5th century*
+
+`provenance: sourced · revised: no`
+
+**CIVIL-BYZANTINE**
+
+For our country, for those in public service, and for all in authority, let us pray to the Lord. For favourable weather, an abundance of the fruits of the earth, and temperate seasons, let us pray to the Lord. We pray also for this country, its rulers, its people, the civil authorities, and the armed forces. Lord, have mercy.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: no`
+
+**CIVIL-AMBROSIAN**
+
+For Thy servants, our sovereign and our ruler, and for the whole of their army, we pray Thee, Lord, have mercy. For this city and its way of life, and for all who dwell in it, we pray Thee, Lord, have mercy. For seasonable weather and the fruitfulness of the lands, we pray Thee, Lord, have mercy.
+
+*Divinae Pacis, Ambrosian, 4th century*
+
+`provenance: sourced · revised: no`
+
+**CIVIL-CELTIC**
+
+For this place and those who dwell in it, for the most pious rulers, and for all the army, we pray. For all who are set in high authority, we pray. Lord, have mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: no`
+
+---
+
+# THEME 3: SEEKERS AND THE WORLD
+*Catechumens and the unconverted. 6 prayers.*
+
+**SEEKERS-WESTSYRIAC**
+
+Let none remain of the catechumens, none of the unbaptized, none of those who are unable to join with us in prayer. Look upon one another. The doors. As many as are catechumens, depart. Lord, have mercy.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: no`
+
+**SEEKERS-ALEXANDRIAN**
+
+O Sovereign Lord our God, who hast chosen the twelve apostles and sent them forth to proclaim throughout the whole world and to teach the Gospel of Thy kingdom: send forth now Thy light and Thy truth, that the nations may become hearers, and not hearers only but doers of Thy word, and bearing good fruit may be counted worthy of the kingdom of heaven. Lord, have mercy.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SEEKERS-ROMAN**
+
+Let us pray also for the catechumens, that our Lord and God would open the ears of their hearts, and the gate of mercy; that, having received by the font of regeneration the forgiveness of all their sins, they also may be found in Christ Jesus our Lord. Let us pray that He would deliver the world from all error, and turn the unconverted from their idols unto the living and true God. Almighty and everlasting God, who dost ever make Thy Church fruitful with new offspring, increase the faith and understanding of our catechumens, that, being born again in the font of Baptism, they may be joined to the children of Thine adoption; and gather the unconverted into Thy holy Church.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: yes`
+
+**SEEKERS-BYZANTINE**
+
+Pray, ye catechumens, to the Lord. That the Lord would have mercy on them, instruct them in the word of truth, and reveal to them the Gospel of righteousness. Ye faithful, let us pray for the catechumens, that the Lord would have mercy on them, and unite them to His holy, universal, and apostolic Church. Lord, have mercy.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SEEKERS-AMBROSIAN**
+
+For the calling of the nations, we pray Thee. Lord, have mercy.
+
+*Divinae Pacis, Ambrosian, 4th century*
+
+`provenance: sourced · revised: no`
+
+**SEEKERS-CELTIC**
+
+For the catechumens, we pray. For pilgrims, and for those who seek the way of truth, we pray. Lord, have mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: no`
+
+---
+
+# THEME 4: THE POOR, AFFLICTED, AND CAPTIVE
+*8 prayers.*
+
+**POOR-WESTSYRIAC**
+
+For those who remember the poor, the widows and the orphans, the strangers and the needy, let us beseech the Lord. For our brethren in captivity, in exile, in prison, and in bitter slavery, and for their peaceful return, let us beseech the Lord. Lord, have mercy upon us.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: no`
+
+**POOR-ALEXANDRIAN**
+
+From the curse and from all that is accursed, from condemnation, imprisonment, and banishment, and from the fate that belongs to the adversary, O Lord, deliver us. Lord, have mercy. Defend, O Lord, this Christ-loving city, lowly and worthy of Thy compassion, from famine and pestilence, and from the assault of the barbarians, as Thou didst spare Nineveh of old.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**POOR-ROMAN**
+
+Let us pray to our Lord God Almighty, that He would open the prisons, set free those in bondage, and grant a safe return to the wayfarers.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: no`
+
+**POOR-CARTHAGINIAN**
+
+For our brethren held captive, and for all the afflicted members of the one body, let us pray. The captivity of our brethren must be counted as our own captivity, and the grief of those in peril as our own grief, since we are one body in our union. In our captive brethren Christ is to be seen, and He who redeemed us from the peril of death is Himself to be ransomed from the peril of captivity. Let not love only, but faith also, move and strengthen us to redeem the members of our brethren. Deliver them, O Lord. Grant, O Lord, that each of us may do for another what he would wish done for himself, were he held captive among the barbarians; through the same Christ who redeemed us by His cross and blood.
+
+*Cyprian of Carthage, 3rd century*
+
+`provenance: adapted · revised: yes`
+
+**POOR-EASTSYRIAC**
+
+Accept this offering for all who are in difficulty and trial, and for all the weak and the oppressed, and for all who ask a prayer from our weakness. Amen, and with us.
+
+*Liturgy of Addai and Mari, East Syriac, 3rd century*
+
+`provenance: sourced · revised: yes`
+
+**POOR-BYZANTINE**
+
+Be mindful, O Lord, of the afflicted and the imprisoned, and of their salvation. Remember those in the mines, in exile, and in bitter bondage, and every soul in distress and need. Lord, have mercy.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**POOR-AMBROSIAN**
+
+For virgins, widows, orphans, captives, and those who are penitent, we pray Thee, Lord, have mercy. For those condemned to the mines, we pray Thee, Lord, have mercy.
+
+*Divinae Pacis, Ambrosian, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**POOR-CELTIC**
+
+For virgins, widows, and orphans, we pray. For those who in the holy Church give the fruits of mercy, O Lord God of hosts, hear our prayers. Lord, have mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: yes`
+
+---
+
+# THEME 5: THE SICK, DYING, AND TRAVELERS
+*6 prayers.*
+
+**SICK-WESTSYRIAC**
+
+For those who are in old age and in weakness, for the sick and the suffering, and for those who are troubled by unclean spirits, that God may grant them a swift healing and salvation, let us beseech the Lord. For Christians who are sailing, traveling, or living among strangers, and for our brethren in every need, let us beseech the Lord. Lord, have mercy upon us.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**SICK-ALEXANDRIAN**
+
+Look down in mercy and compassion, O Lord, and heal the sick among Thy people. May all our brethren who have gone abroad, or who are about to go, reach their destination in safety and in good time. Lord, have mercy.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SICK-ROMAN**
+
+Let us pray that He would take away disease, grant health to the sick, and bring our seafarers to a harbour of safety.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: yes`
+
+**SICK-EASTSYRIAC**
+
+Accept this offering for all who mourn, who are in distress, and who are sick, and for all who are in difficulty and trial. Look upon Thy people according to Thy mercies, not according to our sins and our follies. Amen, and with us. O Lord our God, look upon Thy people, that they may become worthy of the forgiveness of their sins through this holy body which they receive in faith, by the grace of Thy mercy, for ever and ever.
+
+*Liturgy of Addai and Mari, East Syriac, 3rd century*
+
+`provenance: sourced · revised: yes`
+
+**SICK-BYZANTINE**
+
+Be mindful, O Lord, of those who are at sea, of those who travel, of the sick, the afflicted, the imprisoned, and of their salvation. Lord, have mercy.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SICK-CELTIC**
+
+For pilgrims, for those upon their journey, and for those who sail, we pray. For the sick and the suffering, that the Lord may grant them health and salvation, we pray. Lord, have mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: no`
+
+---
+
+# THEME 6: PENITENCE AND DELIVERANCE
+*12 prayers.*
+
+**PENITENCE-WESTSYRIAC**
+
+Truly, O Sovereign Lord, hear my supplication on behalf of Thy servants, and pass by all their errors, remembering them no more. Forgive them every transgression, whether done willingly or unwillingly, and deliver them from everlasting punishment. Lord, have mercy upon us.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-ALEXANDRIAN**
+
+Whatever sin we have committed in thought, word, or deed, do Thou in Thy goodness and mercy be pleased to pardon. Leave us not, O Lord, while we hope in Thee, nor lead us into temptation, but deliver us from the evil one and from his works. Lord, have mercy.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: no`
+
+**PENITENCE-ROMAN**
+
+O God, who art offended by sin and pacified by penance, mercifully regard the prayers of Thy people who make their supplication to Thee, and turn away the afflictions of Thine anger which we deserve for our sins.
+
+*Gelasian Sacramentary, Roman, 6th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-CARTHAGINIAN**
+
+For the fallen and the wounded brother, let us pray. Let us mourn with those who mourn, and weep with those who weep, and raise them up by the help and comfort of our love. As priests of God and of Christ, let us imitate what Christ taught and did, and snatch the wounded brother from the jaws of the enemy, that he may be kept and healed for God. Spare them, O Lord.
+
+*Cyprian of Carthage, 3rd century*
+
+`provenance: adapted · revised: yes`
+
+**PENITENCE-EASTSYRIAC**
+
+Look upon Thy people according to Thy mercies and the abundance of Thy favours, not according to our sins and our follies. Pardon the debts and the sins of all Thy servants. Amen, and with us.
+
+*Liturgy of Addai and Mari, East Syriac, 3rd century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-ARMENIAN**
+
+That this offering in which we share may be not for our condemnation, but for the atoning and the forgiveness of our sins. Have mercy upon us, O Lord our God, according to Thy great mercy. Lord, have mercy. Accept the prayers of us Thy servants, and be merciful to us according to Thy great mercy, for the atoning and the forgiveness of our sins.
+
+*Armenian Divine Liturgy, Armenian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-BYZANTINE**
+
+That these holy gifts may be, to those who partake, for the cleansing of the soul, for the forgiveness of sins, and for the communion of the Holy Spirit, and not for judgment or condemnation. Lord, have mercy.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-AMBROSIAN**
+
+For those who are penitent, we pray Thee, Lord, have mercy. Beseeching the gift of pardon, with all our heart and with all our mind, we pray Thee, Lord, have mercy.
+
+*Divinae Pacis, Ambrosian, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-GALLICAN**
+
+Sanctify, O Lord, the gifts here offered, and cleanse us from the stains of our sins.
+
+*Bobbio Missal, Gallican, 7th century*
+
+`provenance: sourced · revised: no`
+
+**PENITENCE-BENEDICTINE**
+
+Lord, have mercy. Christ, have mercy. Lord, have mercy. Deliver us, O Lord, from all evil, and lead us not into temptation.
+
+*Rule of St. Benedict, Benedictine, 6th century*
+
+`provenance: sourced · revised: no`
+
+**PENITENCE-MOZARABIC**
+
+We beseech Thy pardon, O Christ: hear us. Have mercy, have mercy upon Thy people, O God. Pardon. Lord, have mercy.
+
+*Mozarabic Preces, Mozarabic, 7th century*
+
+`provenance: sourced · revised: yes`
+
+**PENITENCE-CELTIC**
+
+For those who are penitent, we pray. That the Lord may grant them pardon and amendment of life, we pray. Lord, have mercy. We repeat our prayer before the sight of Thy majesty, O almighty God, which we offer for Thy servants, that Thou mayest fulfil their vows, and that their petitions may rise to the ears of Thy mercy.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: yes`
+
+---
+
+# THEME 7: SAINTS AND THE DEPARTED
+*9 prayers.*
+
+**SAINTS-WESTSYRIAC**
+
+For the rest of our fathers and brethren who have fallen asleep before us, let us beseech the Lord. Let us commemorate our all-holy, pure, and most glorious Lady, the God-bearer and ever-virgin Mary, and all the holy and the just, that we may all find mercy through their prayers and intercessions. Lord, have mercy upon us. Remember, O Lord, the souls of our fathers, our brethren, our teachers, and our departed, the children of Thy holy Church; grant rest to their souls and spirits, and sprinkle the dew of Thy grace and mercy upon their bones.
+
+*Liturgy of St. James, West Syriac, 4th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-ALEXANDRIAN**
+
+O Lord our God, give peace to the souls of our fathers and brethren who have fallen asleep in Jesus, remembering our forefathers of old: the patriarchs, prophets, apostles, and martyrs. Lord, have mercy.
+
+*Liturgy of St. Mark, Alexandrian, 5th century*
+
+`provenance: sourced · revised: no`
+
+**SAINTS-ROMAN**
+
+Remember also, O Lord, Thy servants who have gone before us marked by baptism, and who sleep the sleep of peace. To these, O Lord, and to all who rest in Christ, grant, we beseech Thee, a place of rest, light, and peace; through Christ our Lord. Amen.
+
+*Roman Canon, Roman, 6th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-EASTSYRIAC**
+
+For all the prophets and apostles, and for all the martyrs and those who suffered for the faith, and for all the dead who have gone from among us, that they may find pardon and rest. Amen, and with us.
+
+*Liturgy of Addai and Mari, East Syriac, 3rd century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-ARMENIAN**
+
+Remembering the God-bearer and ever-virgin Mary together with all the saints, let us beseech the Lord. For the souls of those who are at rest and have fallen asleep in Christ in the true faith, be mindful, O Lord, and have mercy. Lord, have mercy.
+
+*Armenian Divine Liturgy, Armenian, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-BYZANTINE**
+
+Again we offer this spiritual worship for those who rest in faith: for forefathers, fathers, patriarchs, prophets, apostles, martyrs, and those who suffered for the faith, and for every righteous spirit made perfect in faith. Especially for our most holy and pure Lady, the God-bearer and ever-virgin Mary, and for all the saints, through whose intercessions look down upon us, O God. Be mindful, O Lord, and have mercy. Remember all who sleep in the hope of the resurrection to eternal life, and grant them rest in that place where the light of Thy countenance shines upon them.
+
+*Liturgy of St. John Chrysostom, Byzantine, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-RAVENNA**
+
+Let us honour the holy and ever-virgin Mary, the God-bearer, through whose child-bearing the salvation of the world has shone forth. Through her intercession, O Lord, look upon Thy people. Lord, have mercy.
+
+*Rotulus of Ravenna, 5th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-MOZARABIC**
+
+We commemorate the apostles and martyrs: holy Mary, Zechariah, John the Baptist, the Holy Innocents killed by Herod, and the apostles; and of all the martyrs. We commemorate the spirits of those at rest: Hilary, Athanasius, Martin, Ambrose, Augustine, and the fathers of Toledo; and of all who rest. For Thou art the life of the living, the health of the sick, and the rest of all the faithful departed, unto eternal ages of ages.
+
+*Mozarabic, 7th century*
+
+`provenance: sourced · revised: yes`
+
+**SAINTS-CELTIC**
+
+Let us be mindful of the holy apostles and martyrs, that by their prayers for us we may receive pardon. And of all who rest, that the Lord may grant them light and peace, we pray. O God, who grantest us to grow by imitating Thy most blessed saints, the angels and archangels, the patriarchs, prophets, apostles, martyrs, those who suffered for the faith, virgins, solitary hermits, and community monks, defend us from all dangers by their intercession; through Christ.
+
+*Stowe Missal, Celtic, 8th century*
+
+`provenance: sourced · revised: yes`
+
+---
+
+*End of content. 58 prayers across seven themes, plus the Prologue. Pool sizes for the rotation: Church 10, Civil 7, Seekers 6, Poor 8, Sick 6, Penitence 12, Saints 9. The serving logic lives in the instruction file.*

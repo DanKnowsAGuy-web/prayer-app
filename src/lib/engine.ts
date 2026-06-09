@@ -92,6 +92,19 @@ export type RuleState = {
   previewDate?: string;
   /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
   reminders: { morning: string | null; evening: string | null };
+  /**
+   * The intercessory cycle — a usage-advanced track (its own pointer, like the
+   * Psalter). `day` is the Cycle Day (starts at 1), advancing one step per
+   * completion; it freezes while `on` is false and resumes in place. The
+   * Prologue is served once before Day 1, gated by `prologueSeen`.
+   * `lastAdvanceDate` is a same-day safety latch against double-taps/reopens.
+   */
+  cycle: {
+    day: number;
+    on: boolean;
+    prologueSeen: boolean;
+    lastAdvanceDate?: string;
+  };
 };
 
 export type Cadence = "daily" | "weekly";
@@ -153,6 +166,7 @@ export function initialState(): RuleState {
     psalmTime: "morning",
     petitionTime: "morning",
     reminders: { morning: null, evening: null },
+    cycle: { day: 1, on: false, prologueSeen: false },
   };
 }
 

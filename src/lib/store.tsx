@@ -40,6 +40,8 @@ type Action =
   | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
+  | { type: "setCycleOn"; on: boolean }
+  | { type: "advanceCycle"; date: string }
   | { type: "advancePsalm"; date: string }
   | { type: "reset" };
 
@@ -105,6 +107,27 @@ function reducer(state: RuleState, action: Action): RuleState {
         ...state,
         reminders: { ...state.reminders, [action.slot]: action.time },
       };
+    case "setCycleOn":
+      return { ...state, cycle: { ...state.cycle, on: action.on } };
+    case "advanceCycle": {
+      // Same-day latch: a re-open/double-tap can't advance twice.
+      if (state.cycle.lastAdvanceDate === action.date) return state;
+      // The Prologue is completed once, before Day 1, and does not advance the day.
+      if (!state.cycle.prologueSeen) {
+        return {
+          ...state,
+          cycle: { ...state.cycle, prologueSeen: true, lastAdvanceDate: action.date },
+        };
+      }
+      return {
+        ...state,
+        cycle: {
+          ...state.cycle,
+          day: state.cycle.day + 1,
+          lastAdvanceDate: action.date,
+        },
+      };
+    }
     case "advancePsalm":
       return {
         ...state,
