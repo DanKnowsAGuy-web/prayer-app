@@ -1,57 +1,49 @@
 /**
  * The Psalter (World English Bible, public domain — see scripts/build-psalter.mjs)
- * and the 30-day division scheme, flattened into 60 ordered portions.
+ * as a simple sequential walk, advanced by count (advance-on-prayer).
  *
- * The division follows the traditional 1662 Book of Common Prayer Psalter (we
- * borrow only the *scheme*, not its text). Read one portion per prayer, in
- * order, and the whole Psalter is covered in 60 prayers, then it loops.
+ * The whole Psalter is a flat sequence of UNITS. Each psalm is one unit, taken
+ * whole — with one exception: Psalm 119 (the long acrostic of 22 stanzas) is
+ * portioned into three-stanza blocks, each block counting as one unit, so it is
+ * crossed over several sessions. A session takes N units from the current
+ * pointer (default four), and praying advances the pointer by that many.
  */
 
 export type PsalmSeg = { n: number; from?: number; to?: number };
-export const PORTION_COUNT = 60;
 
 type Verse = { v: number; text: string };
 type PsalterBundle = { translation: string; psalms: Record<string, Verse[]> };
 
-const R = (a: number, b: number): PsalmSeg[] => {
-  const s: PsalmSeg[] = [];
-  for (let n = a; n <= b; n++) s.push({ n });
-  return s;
-};
-
-/** 60 portions: Day 1 morning, Day 1 evening, Day 2 morning, … Day 30 evening. */
-export const PSALM_PORTIONS: PsalmSeg[][] = [
-  R(1, 5), R(6, 8),
-  R(9, 11), R(12, 14),
-  R(15, 17), [{ n: 18 }],
-  R(19, 21), R(22, 23),
-  R(24, 26), R(27, 29),
-  R(30, 31), R(32, 34),
-  R(35, 36), [{ n: 37 }],
-  R(38, 40), R(41, 43),
-  R(44, 46), R(47, 49),
-  R(50, 52), R(53, 55),
-  R(56, 58), R(59, 61),
-  R(62, 64), R(65, 67),
-  [{ n: 68 }], R(69, 70),
-  R(71, 72), R(73, 74),
-  R(75, 77), [{ n: 78 }],
-  R(79, 81), R(82, 85),
-  R(86, 88), [{ n: 89 }],
-  R(90, 92), R(93, 94),
-  R(95, 97), R(98, 101),
-  R(102, 103), [{ n: 104 }],
-  [{ n: 105 }], [{ n: 106 }],
-  [{ n: 107 }], R(108, 109),
-  R(110, 113), R(114, 115),
-  R(116, 118), [{ n: 119, from: 1, to: 32 }],
-  [{ n: 119, from: 33, to: 72 }], [{ n: 119, from: 73, to: 104 }],
-  [{ n: 119, from: 105, to: 144 }], [{ n: 119, from: 145, to: 176 }],
-  R(120, 125), R(126, 131),
-  R(132, 135), R(136, 138),
-  R(139, 140), R(141, 143),
-  R(144, 146), R(147, 150),
+/** Psalm 119's 22 eight-verse stanzas, grouped three at a time (last is one). */
+const PSALM_119_BLOCKS: [number, number][] = [
+  [1, 24],
+  [25, 48],
+  [49, 72],
+  [73, 96],
+  [97, 120],
+  [121, 144],
+  [145, 168],
+  [169, 176],
 ];
+
+/** The flat unit sequence: Psalms 1–150, with 119 split into stanza blocks. */
+function buildUnits(): PsalmSeg[] {
+  const units: PsalmSeg[] = [];
+  for (let n = 1; n <= 150; n++) {
+    if (n === 119) {
+      for (const [from, to] of PSALM_119_BLOCKS) units.push({ n: 119, from, to });
+    } else {
+      units.push({ n });
+    }
+  }
+  return units;
+}
+
+export const PSALM_UNITS: PsalmSeg[] = buildUnits();
+export const UNIT_COUNT = PSALM_UNITS.length; // 157
+
+/** How many psalm units a session may take at most (the slider's top setting). */
+export const MAX_PSALMS = 4;
 
 let cache: PsalterBundle | null = null;
 export async function loadPsalter(): Promise<PsalterBundle> {
@@ -82,20 +74,21 @@ function segText(bundle: PsalterBundle, seg: PsalmSeg): string {
 
 export type PsalmMovement = { label: string; text: string };
 
-/** Each psalm (or verse-range) in the current portion as its own movement. */
-export function portionMovements(
+/** The next `count` units from `index` (wrapping), each as its own movement. */
+export function unitMovements(
   bundle: PsalterBundle,
   index: number,
+  count: number,
 ): PsalmMovement[] {
-  const portion = PSALM_PORTIONS[index % PORTION_COUNT];
-  return portion.map((seg) => ({ label: segLabel(seg), text: segText(bundle, seg) }));
+  const out: PsalmMovement[] = [];
+  for (let i = 0; i < count; i++) {
+    const seg = PSALM_UNITS[(index + i) % UNIT_COUNT];
+    out.push({ label: segLabel(seg), text: segText(bundle, seg) });
+  }
+  return out;
 }
 
-/** A short label for the whole portion, e.g. "Psalms 1–5" or "Psalm 119:1–32". */
-export function portionLabel(index: number): string {
-  const portion = PSALM_PORTIONS[index % PORTION_COUNT];
-  if (portion.length === 1) return segLabel(portion[0]);
-  const first = portion[0].n;
-  const last = portion[portion.length - 1].n;
-  return `Psalms ${first}${EN_DASH}${last}`;
+/** A short label for the unit at `index`, e.g. "Psalm 23" or "Psalm 119:1–24". */
+export function unitLabel(index: number): string {
+  return segLabel(PSALM_UNITS[index % UNIT_COUNT]);
 }

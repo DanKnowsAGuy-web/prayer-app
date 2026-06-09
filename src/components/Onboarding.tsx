@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useStore } from "../lib/store";
+import { useStore, makeId } from "../lib/store";
 import { LAST_RUNG } from "../lib/ladder";
 import type { Tradition } from "../lib/engine";
 
@@ -20,13 +20,29 @@ const TRADITIONS: { value: Tradition; label: string }[] = [
   { value: "roman-catholic", label: "Roman Catholic" },
 ];
 
-type Step = "welcome" | "tradition" | "translation" | "how" | "rotation" | "start";
+type Step =
+  | "welcome"
+  | "tradition"
+  | "translation"
+  | "names"
+  | "how"
+  | "rotation"
+  | "start";
 
 export function Onboarding() {
-  const { dispatch } = useStore();
+  const { dispatch, today } = useStore();
   const [step, setStep] = useState<Step>("welcome");
   const [tradition, setTradition] = useState<Tradition | null>(null);
   const [translation, setTranslation] = useState<"web" | "kjv">("web");
+  const [names, setNames] = useState<string[]>([]);
+  const [nameInput, setNameInput] = useState("");
+
+  const addName = () => {
+    const trimmed = nameInput.trim();
+    if (!trimmed) return;
+    setNames((prev) => [...prev, trimmed]);
+    setNameInput("");
+  };
 
   const traditionName =
     TRADITIONS.find((t) => t.value === tradition)?.label ?? "your";
@@ -125,10 +141,66 @@ export function Onboarding() {
           ))}
         </ul>
         <div className="onboard-actions">
-          <button className="btn btn-primary" onClick={() => setStep("how")}>
+          <button className="btn btn-primary" onClick={() => setStep("names")}>
             Continue
           </button>
           <button className="btn btn-quiet" onClick={() => setStep("tradition")}>
+            Go back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "names") {
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">Those you carry</p>
+        <h2 className="onboard-q">Anyone to hold in prayer?</h2>
+        <p className="lede">
+          Add any names you'd like to pray for each day — or skip this; you can
+          add or change people any time from your prayer list.
+        </p>
+        <form
+          className="intention-add"
+          onSubmit={(e) => {
+            e.preventDefault();
+            addName();
+          }}
+        >
+          <input
+            className="intention-input"
+            value={nameInput}
+            onChange={(e) => setNameInput(e.target.value)}
+            placeholder="A name…"
+            aria-label="A name to pray for"
+            maxLength={120}
+          />
+          <button className="btn btn-ghost" type="submit" disabled={!nameInput.trim()}>
+            Add
+          </button>
+        </form>
+        {names.length > 0 && (
+          <ul className="name-chips">
+            {names.map((n, i) => (
+              <li key={i} className="name-chip">
+                <span>{n}</span>
+                <button
+                  className="name-chip-x"
+                  aria-label={`Remove ${n}`}
+                  onClick={() => setNames((prev) => prev.filter((_, k) => k !== i))}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+        <div className="onboard-actions">
+          <button className="btn btn-primary" onClick={() => setStep("how")}>
+            {names.length > 0 ? "Continue" : "Skip for now"}
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("translation")}>
             Go back
           </button>
         </div>
@@ -159,7 +231,7 @@ export function Onboarding() {
           <button className="btn btn-primary" onClick={() => setStep("rotation")}>
             Continue
           </button>
-          <button className="btn btn-quiet" onClick={() => setStep("translation")}>
+          <button className="btn btn-quiet" onClick={() => setStep("names")}>
             Go back
           </button>
         </div>
@@ -227,9 +299,22 @@ export function Onboarding() {
       <div className="onboard-actions">
         <button
           className="btn btn-primary"
-          onClick={() =>
-            dispatch({ type: "onboard", rung: LAST_RUNG, tradition, translation })
-          }
+          onClick={() => {
+            dispatch({ type: "onboard", rung: LAST_RUNG, tradition, translation });
+            // The names feed the existing prayer list — same data, daily cadence.
+            names.forEach((text, i) =>
+              dispatch({
+                type: "addIntention",
+                intention: {
+                  id: makeId(i + 1),
+                  text,
+                  added: today,
+                  answered: false,
+                  cadence: "daily",
+                },
+              }),
+            );
+          }}
         >
           Start my rule
         </button>

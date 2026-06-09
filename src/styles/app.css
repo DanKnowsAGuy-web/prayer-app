@@ -68,6 +68,33 @@
   font-weight: 600;
 }
 
+.name-chips {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.name-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.3rem 0.4rem 0.3rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--ink);
+}
+.name-chip-x {
+  border: none;
+  background: transparent;
+  color: var(--ink-faint);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 0.3rem;
+  cursor: pointer;
+}
+
 .choices {
   list-style: none;
   margin: var(--space-2) 0 0;
@@ -894,6 +921,37 @@
   color: var(--ink-faint);
   font-style: italic;
   font-variant-numeric: tabular-nums;
+}
+.psalm-count {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) 0 var(--space-2);
+}
+.psalm-count-label {
+  flex: 1;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+.psalm-count-opts {
+  display: flex;
+  gap: var(--space-1);
+}
+.psalm-count-btn {
+  min-width: 2.1rem;
+  padding: 0.3rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--ink-muted);
+  font-size: 0.95rem;
+  font-variant-numeric: tabular-nums;
+  transition: all var(--dur) var(--ease-out);
+}
+.psalm-count-btn.is-on {
+  border-color: var(--clay);
+  background: var(--clay-soft);
+  color: var(--clay);
 }
 .buildout-row.is-off {
   opacity: 0.5;

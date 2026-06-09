@@ -17,6 +17,7 @@ import {
   type Tradition,
 } from "./engine";
 import type { Translation } from "./scripture";
+import { UNIT_COUNT } from "./psalter";
 import { loadState, saveState } from "./storage";
 
 type Action =
@@ -46,7 +47,7 @@ type Action =
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "setCycleOn"; on: boolean }
   | { type: "advanceCycle"; key: string }
-  | { type: "advancePsalm"; key: string }
+  | { type: "advancePsalm"; key: string; count: number }
   | { type: "reset" };
 
 function reducer(state: RuleState, action: Action): RuleState {
@@ -142,10 +143,11 @@ function reducer(state: RuleState, action: Action): RuleState {
       };
     }
     case "advancePsalm":
-      if (state.lastPsalmAdvanceKey === action.key) return state;
+      // Per-office latch; advance by however many psalm units were prayed.
+      if (state.lastPsalmAdvanceKey === action.key || action.count <= 0) return state;
       return {
         ...state,
-        psalmIndex: (state.psalmIndex + 1) % 60,
+        psalmIndex: (state.psalmIndex + action.count) % UNIT_COUNT,
         lastPsalmAdvanceKey: action.key,
       };
     case "reset":

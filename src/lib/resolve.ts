@@ -55,8 +55,11 @@ export type Movement = {
 /** Optional-depth level: above the whole spine, off unless opted in. */
 export const OPT = 99;
 
-/** The top of the spine for each part. */
-export const MAX_LEVEL: Record<DayPart, number> = { morning: 6, evening: 5 };
+/**
+ * The top of the spine for each part. The morning tops out at the Psalms; the
+ * Epistle is an evening-only segment, so the evening reaches one level deeper.
+ */
+export const MAX_LEVEL: Record<DayPart, number> = { morning: 5, evening: 6 };
 
 // ── Fixed office text (the canonical wording lives here) ─────────────────────
 
@@ -252,11 +255,12 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
     });
   }
 
-  // Scripture. Epistle then Gospel, by custom. In the evening the readings are
-  // carried — they appear only if they were not already done in the morning.
+  // Scripture. The Gospel belongs to the morning (carried to the evening only if
+  // not done). The Epistle is evening-only, the deepest evening segment, and
+  // once-daily. Epistle before Gospel, by custom.
   const showGospel = ctx.gospel && (part === "morning" || !ctx.carry.gospelDone);
-  const showEpistle = ctx.epistle && (part === "morning" || !ctx.carry.epistleDone);
-  if (showEpistle) push({ ...ctx.epistle!, level: part === "morning" ? 6 : 2 });
+  const showEpistle = part === "evening" && ctx.epistle && !ctx.carry.epistleDone;
+  if (showEpistle) push({ ...ctx.epistle!, level: 6 });
   if (showGospel) push(ctx.gospel);
 
   // Optional depth (off unless opted in): song, reflection.

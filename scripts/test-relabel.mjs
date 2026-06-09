@@ -67,12 +67,9 @@ function ctx(part, over = {}) {
     gospel,
     epistle,
     song,
-    reading,
     cycle,
     intentions,
-    showPetitions: true,
     date: "2026-06-09",
-    disciplineCollect: undefined,
     carry: { gospelDone: false, epistleDone: false },
     ...over,
   };
@@ -146,13 +143,21 @@ for (const part of ["morning", "evening"]) {
   if (closingIdx >= 0 && eff[closingIdx]) fail("closing stayed on at the bare floor");
 }
 
-// 6. Evening carry: the Gospel/Epistle vanish once done in the morning.
+// 6. The Epistle is evening-only; the morning never shows it.
+{
+  const morning = assembleOffice(ctx("morning"));
+  if (morning.some((m) => m.kind === "epistle")) fail("Epistle appeared in the morning");
+  const evening = assembleOffice(ctx("evening"));
+  if (!evening.some((m) => m.kind === "epistle")) fail("evening Epistle missing");
+}
+
+// 7. Carry: the evening Gospel/Epistle vanish once already done that day.
 {
   const undone = assembleOffice(ctx("evening", { carry: { gospelDone: false, epistleDone: false } }));
   if (!undone.some((m) => m.kind === "gospel")) fail("evening Gospel missing when not yet done");
   const done = assembleOffice(ctx("evening", { carry: { gospelDone: true, epistleDone: true } }));
   if (done.some((m) => m.kind === "gospel" || m.kind === "epistle"))
-    fail("evening reading shown though already done in the morning");
+    fail("evening reading shown though already done");
 }
 
 if (failures) {

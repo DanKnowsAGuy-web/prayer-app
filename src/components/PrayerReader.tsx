@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DayPart } from "../lib/daypart";
 import { useStore } from "../lib/store";
-import { loadPsalter, portionMovements } from "../lib/psalter";
+import { loadPsalter, unitMovements, MAX_PSALMS } from "../lib/psalter";
 import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import {
@@ -61,6 +61,29 @@ type OfficeData = {
 };
 
 /**
+ * Include state for a chosen level, with the psalm count overlaid: the Psalms
+ * are taken from the top of the sequence, so only the first `psalmCount` psalm
+ * units are kept (and only when the level reaches the Psalms at all).
+ */
+function computeIncluded(
+  movements: Movement[],
+  level: number,
+  psalmCount: number,
+  prefs: { song: boolean; reflection: boolean },
+): boolean[] {
+  const base = defaultIncluded(movements, level, prefs);
+  let psalmPos = 0;
+  return base.map((on, i) => {
+    if (movements[i].kind === "psalm") {
+      const keep = on && psalmPos < psalmCount;
+      psalmPos++;
+      return keep;
+    }
+    return on;
+  });
+}
+
+/**
  * Praying the office happens in two steps:
  *   1. A build-out — a single slider sets how much to pray (the value rank),
  *      with the live estimate above it and per-segment toggles below to
@@ -100,16 +123,17 @@ function OfficePrayer({
           state.tradition,
         );
       }
-      if (refs?.epistle) {
+      // The Epistle is evening-only; skip it in the morning.
+      if (part === "evening" && refs?.epistle) {
         next.epistle = buildEpistleMovement(
           refs.epistle,
           passageFor(store, refs.epistle),
         );
       }
 
-      // The Psalter in course: the current segment, prayed in either office.
+      // The Psalter in course: the next units from the pointer, in either office.
       const psalter = await loadPsalter();
-      next.psalmMovements = portionMovements(psalter, state.psalmIndex);
+      next.psalmMovements = unitMovements(psalter, state.psalmIndex, MAX_PSALMS);
 
       if (active) {
         setData(next);
@@ -167,17 +191,23 @@ function OfficePrayer({
   // The office opens at its fullest. The slider trims down the value rank.
   const maxLevel = MAX_LEVEL[part];
   const [level, setLevel] = useState(maxLevel);
+  const [psalmCount, setPsalmCount] = useState(MAX_PSALMS);
   const [included, setIncluded] = useState<boolean[]>([]);
   useEffect(() => {
     setLevel(maxLevel);
-    setIncluded(defaultIncluded(movements, maxLevel, state.prefs));
+    setPsalmCount(MAX_PSALMS);
+    setIncluded(computeIncluded(movements, maxLevel, MAX_PSALMS, state.prefs));
     // Re-seed only when the candidate set changes shape, not on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, movements.length]);
 
   const onLevel = (lvl: number) => {
     setLevel(lvl);
-    setIncluded(defaultIncluded(movements, lvl, state.prefs));
+    setIncluded(computeIncluded(movements, lvl, psalmCount, state.prefs));
+  };
+  const onPsalmCount = (n: number) => {
+    setPsalmCount(n);
+    setIncluded(computeIncluded(movements, level, n, state.prefs));
   };
   const onToggle = (i: number) =>
     setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)));
@@ -200,8 +230,10 @@ function OfficePrayer({
     const keptKinds = new Set(kept.map((m) => m.kind));
     // Usage tracks advance once per office prayed (the reducer latches the key).
     const officeKey = `${today}:${part}`;
-    if (keptKinds.has("psalm")) {
-      dispatch({ type: "advancePsalm", key: officeKey });
+    // The Psalter advances by however many psalm units were prayed.
+    const keptPsalms = kept.filter((m) => m.kind === "psalm").length;
+    if (keptPsalms > 0) {
+      dispatch({ type: "advancePsalm", key: officeKey, count: keptPsalms });
     }
     if (keptKinds.has("cycle")) {
       dispatch({ type: "advanceCycle", key: officeKey });
@@ -251,6 +283,8 @@ function OfficePrayer({
         level={level}
         maxLevel={maxLevel}
         onLevel={onLevel}
+        psalmCount={psalmCount}
+        onPsalmCount={onPsalmCount}
         onToggle={onToggle}
         onBegin={() => setPhase("pray")}
         onClose={handleClose}
@@ -356,6 +390,8 @@ function BuildOut({
   level,
   maxLevel,
   onLevel,
+  psalmCount,
+  onPsalmCount,
   onToggle,
   onBegin,
   onClose,
@@ -366,6 +402,8 @@ function BuildOut({
   level: number;
   maxLevel: number;
   onLevel: (lvl: number) => void;
+  psalmCount: number;
+  onPsalmCount: (n: number) => void;
   onToggle: (i: number) => void;
   onBegin: () => void;
   onClose: () => void;
@@ -375,6 +413,13 @@ function BuildOut({
     0,
   );
   const anyKept = included.some(Boolean);
+
+  // The psalm rows form one contiguous group; a count selector trims from the
+  // top of the sequence, so the walk stays in order.
+  const psalmIdxs = movements.flatMap((m, i) => (m.kind === "psalm" ? [i] : []));
+  const firstPsalm = psalmIdxs[0] ?? -1;
+  const numPsalms = psalmIdxs.length;
+  const psalmOptions = [...Array(numPsalms)].map((_, k) => numPsalms - k); // n..1
 
   return (
     <main className="reader buildout-screen">
@@ -408,11 +453,43 @@ function BuildOut({
           {movements.map((m, i) => {
             const on = included[i];
             const isFloor = m.kind === "lords";
+            const isPsalm = m.kind === "psalm";
+            const psalmPos = isPsalm ? psalmIdxs.indexOf(i) : -1;
             return (
               <li key={i}>
+                {i === firstPsalm && (
+                  <div className="psalm-count" role="group" aria-label="How many psalms">
+                    <span className="psalm-count-label">Psalms</span>
+                    <div className="psalm-count-opts">
+                      {psalmOptions.map((n) => (
+                        <button
+                          key={n}
+                          className={`psalm-count-btn ${psalmCount === n ? "is-on" : ""}`}
+                          onClick={() => onPsalmCount(n)}
+                          aria-pressed={psalmCount === n}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                      <button
+                        className={`psalm-count-btn ${psalmCount === 0 ? "is-on" : ""}`}
+                        onClick={() => onPsalmCount(0)}
+                        aria-pressed={psalmCount === 0}
+                      >
+                        none
+                      </button>
+                    </div>
+                  </div>
+                )}
                 <button
                   className={`buildout-row ${on ? "" : "is-off"}`}
-                  onClick={() => !isFloor && onToggle(i)}
+                  onClick={() =>
+                    isFloor
+                      ? undefined
+                      : isPsalm
+                        ? onPsalmCount(psalmPos + 1)
+                        : onToggle(i)
+                  }
                   aria-pressed={on}
                   disabled={isFloor}
                 >

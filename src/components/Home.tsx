@@ -1,5 +1,5 @@
 import { useStore, makeId } from "../lib/store";
-import { portionLabel } from "../lib/psalter";
+import { unitLabel } from "../lib/psalter";
 import { TraditionEmblem } from "./TraditionEmblem";
 import {
   cadenceOf,
@@ -139,11 +139,11 @@ function PsalmRotation() {
     <section className="psalter" aria-labelledby="psalter-h">
       <p className="eyebrow">The Psalter, in course</p>
       <h2 id="psalter-h" className="psalter-h">
-        Next: {portionLabel(state.psalmIndex)}
+        Next: {unitLabel(state.psalmIndex)}
       </h2>
       <p className="psalter-sub">
-        One segment each office — morning takes one, evening the next — so the
-        whole Psalter is prayed over thirty days, then begun again.
+        A few psalms each office, in order through the whole Psalter — then begun
+        again. Set how many you take when you pray.
       </p>
     </section>
   );
