@@ -11,14 +11,14 @@ const TRADITIONS: { value: Tradition; label: string }[] = [
 ];
 
 const ELEMENT_TOGGLES: { key: keyof Prefs; label: string; hint: string }[] = [
-  { key: "scripture", label: "The daily Gospel", hint: "Read the day's Gospel in your morning prayer." },
-  { key: "psalter", label: "The rotating Psalter", hint: "Pray through the Psalms, a portion a day." },
-  { key: "dailyOffice", label: "A Daily Office canticle", hint: "The Benedictus or Magnificat." },
-  { key: "jesusPrayer", label: "The Jesus Prayer", hint: "Lord Jesus Christ, have mercy on me." },
-  { key: "rosary", label: "The Rosary", hint: "Today's mysteries and prayers." },
-  { key: "litany", label: "A Litany", hint: "A litany below the readings (Gelasian form)." },
-  { key: "silence", label: "A time of silence", hint: "A short stillness before God." },
-  { key: "devotional", label: "Personal devotion", hint: "A prompt for prayer in your own words." },
+  { key: "song", label: "The Gospel song", hint: "The Benedictus in the morning, the Magnificat at night." },
+  { key: "reading", label: "A short reading", hint: "A brief reading alongside the Psalms, when appointed." },
+  { key: "reflection", label: "A time of reflection", hint: "A pause to sit with the word after the readings." },
+];
+
+const TRANSLATIONS: { value: "web" | "kjv"; label: string; hint: string }[] = [
+  { value: "web", label: "World English Bible", hint: "Modern English (public domain)." },
+  { value: "kjv", label: "King James Version", hint: "Traditional English (public domain)." },
 ];
 
 export function Settings({ onClose }: { onClose: () => void }) {
@@ -42,6 +42,28 @@ export function Settings({ onClose }: { onClose: () => void }) {
               className={`pill ${state.tradition === t.value ? "is-on" : ""}`}
               aria-pressed={state.tradition === t.value}
               onClick={() => dispatch({ type: "setTradition", tradition: t.value })}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="settings-group">
+        <h2 className="settings-h">Scripture translation</h2>
+        <p className="settings-note">
+          The readings are the same either way — only the wording changes.
+        </p>
+        <div className="settings-traditions">
+          {TRANSLATIONS.map((t) => (
+            <button
+              key={t.value}
+              className={`pill ${state.translation === t.value ? "is-on" : ""}`}
+              aria-pressed={state.translation === t.value}
+              title={t.hint}
+              onClick={() =>
+                dispatch({ type: "setTranslation", translation: t.value })
+              }
             >
               {t.label}
             </button>

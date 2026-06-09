@@ -26,16 +26,7 @@ const TRADITIONS: (Tradition | "none")[] = [
   "roman-catholic",
 ];
 
-const PREF_KEYS: (keyof Prefs)[] = [
-  "scripture",
-  "psalter",
-  "silence",
-  "jesusPrayer",
-  "rosary",
-  "dailyOffice",
-  "litany",
-  "devotional",
-];
+const PREF_KEYS: (keyof Prefs)[] = ["song", "reading", "reflection"];
 
 /** Build a check-in log ending today: `kept` of the last `window` days. */
 function makeLog(today: string, kept: number, window: number): CheckIn[] {
@@ -177,7 +168,22 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="dev-group">
-        <h2 className="dev-h">Elements</h2>
+        <h2 className="dev-h">Translation</h2>
+        <div className="dev-row dev-wrap">
+          {(["web", "kjv"] as const).map((t) => (
+            <button
+              key={t}
+              className={`pill ${state.translation === t ? "is-on" : ""}`}
+              onClick={() => dispatch({ type: "setTranslation", translation: t })}
+            >
+              {t === "web" ? "World English Bible" : "King James"}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="dev-group">
+        <h2 className="dev-h">Depth toggles</h2>
         <div className="dev-row dev-wrap">
           {PREF_KEYS.map((k) => (
             <button

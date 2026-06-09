@@ -10,6 +10,7 @@
  */
 
 import { FIRST_RUNG, LAST_RUNG } from "./ladder";
+import type { Translation } from "./scripture";
 
 export type CheckIn = {
   /** Local calendar date, "YYYY-MM-DD". */
@@ -38,31 +39,24 @@ export type Tradition =
   | "roman-catholic";
 
 /**
- * Elements an experienced person already practices, switched on so the app
- * integrates their routine. Additive only: these add to a rung, never remove.
+ * Optional depth a person can switch on for the office. These are NOT spine
+ * levels (the slider handles the value rank); they are extra segments that ride
+ * along when enabled, pre-checked in the build-out. Standing preferences so the
+ * person needn't re-check them each day.
+ *   - song: the Gospel song (Benedictus in the morning, Magnificat at night)
+ *   - reading: the short reading bundled with the Psalter discipline step
+ *   - reflection: a contemplative pause after the readings
  */
 export type Prefs = {
-  scripture: boolean;
-  psalter: boolean;
-  silence: boolean;
-  jesusPrayer: boolean;
-  rosary: boolean;
-  dailyOffice: boolean;
-  /** Layer 3 — the litany below the readings. */
-  litany: boolean;
-  /** Recorded but intentionally without fixed content for now. */
-  devotional: boolean;
+  song: boolean;
+  reading: boolean;
+  reflection: boolean;
 };
 
 export const NO_PREFS: Prefs = {
-  scripture: false,
-  psalter: false,
-  silence: false,
-  jesusPrayer: false,
-  rosary: false,
-  dailyOffice: false,
-  litany: false,
-  devotional: false,
+  song: false,
+  reading: false,
+  reflection: false,
 };
 
 export type RuleState = {
@@ -70,7 +64,9 @@ export type RuleState = {
   onboarded: boolean;
   /** The tradition chosen at first launch; null if not yet chosen. */
   tradition: Tradition | null;
-  /** Elements the person already practices, added on top of their rung. */
+  /** Which translation the scripture text is shown in (the plan is identical). */
+  translation: Translation;
+  /** Optional depth toggles (song / reading / reflection). */
   prefs: Prefs;
   /** Current rung index into the LADDER. */
   rung: number;
@@ -88,6 +84,13 @@ export type RuleState = {
   petitionTime: "morning" | "evening";
   /** Local date the Psalter last advanced, so it moves once per day. */
   lastPsalmAdvanceDate?: string;
+  /**
+   * Once-daily readings carry: the local date the Gospel / Epistle was last
+   * completed (kept through to the Amen). Offered in the morning; offered in the
+   * evening only if not already done that day. Finished once done either place.
+   */
+  gospelDoneDate?: string;
+  epistleDoneDate?: string;
   /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
   previewDate?: string;
   /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
@@ -158,6 +161,7 @@ export function initialState(): RuleState {
   return {
     onboarded: false,
     tradition: null,
+    translation: "web",
     prefs: { ...NO_PREFS },
     rung: FIRST_RUNG,
     log: [],

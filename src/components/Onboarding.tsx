@@ -78,32 +78,21 @@ const CONSISTENCY: { key: string; label: string }[] = [
   { key: "few", label: "A few days a week" },
 ];
 
-/** Elements someone may already practice. Some options depend on tradition. */
-function elementOptions(
-  tradition: Tradition | null,
-): { key: string; label: string }[] {
-  const base = [
-    { key: "setprayers", label: "Set or written prayers" },
-    { key: "psalm", label: "A Psalm" },
-    { key: "scripture", label: "Scripture reading" },
-    { key: "silence", label: "Silence or stillness" },
-    { key: "others", label: "Praying for others" },
-  ];
-  const extra: Record<string, { key: string; label: string }> = {
-    "eastern-orthodox": { key: "jesusprayer", label: "The Jesus Prayer" },
-    "roman-catholic": { key: "rosary", label: "The Rosary" },
-    anglican: { key: "office", label: "The Daily Office" },
-    evangelical: { key: "devotional", label: "A devotional or quiet time" },
-    protestant: { key: "devotional", label: "A devotional or quiet time" },
-  };
-  return tradition && extra[tradition] ? [...base, extra[tradition]] : base;
-}
+/** Elements someone may already practice, woven into their rule. */
+const ELEMENT_OPTIONS: { key: string; label: string }[] = [
+  { key: "setprayers", label: "Set or written prayers" },
+  { key: "psalm", label: "A Psalm" },
+  { key: "scripture", label: "Scripture reading" },
+  { key: "song", label: "The Gospel song (Benedictus / Magnificat)" },
+  { key: "others", label: "Praying for others" },
+];
 
 export function Onboarding() {
   const { dispatch } = useStore();
   const [step, setStep] = useState<
     | "welcome"
     | "tradition"
+    | "translation"
     | "practice"
     | "framing"
     | "commitment"
@@ -114,6 +103,7 @@ export function Onboarding() {
   >("welcome");
   const [choice, setChoice] = useState<Answer | null>(null);
   const [tradition, setTradition] = useState<Tradition | null>(null);
+  const [translation, setTranslation] = useState<"web" | "kjv">("web");
   const [commitment, setCommitment] = useState<Commitment | null>(null);
   const [consistency, setConsistency] = useState<string | null>(null);
   const [elements, setElements] = useState<string[]>([]);
@@ -174,11 +164,58 @@ export function Onboarding() {
           <button
             className="btn btn-primary"
             disabled={!tradition}
-            onClick={() => setStep("practice")}
+            onClick={() => setStep("translation")}
           >
             Continue
           </button>
           <button className="btn btn-quiet" onClick={() => setStep("welcome")}>
+            Go back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "translation") {
+    const options: { value: "web" | "kjv"; label: string; meaning: string }[] = [
+      {
+        value: "web",
+        label: "World English Bible",
+        meaning: "Modern English, clear and plain. (Public domain.)",
+      },
+      {
+        value: "kjv",
+        label: "King James Version",
+        meaning: "Traditional English, familiar and stately. (Public domain.)",
+      },
+    ];
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">How scripture reads</p>
+        <h2 className="onboard-q">Which translation would you like?</h2>
+        <p className="lede">
+          The readings are the same either way — only the wording changes. You
+          can switch any time in settings.
+        </p>
+        <ul className="choices">
+          {options.map((o) => (
+            <li key={o.value}>
+              <button
+                className={`choice ${translation === o.value ? "is-selected" : ""}`}
+                onClick={() => setTranslation(o.value)}
+                aria-pressed={translation === o.value}
+              >
+                <span className="choice-label">{o.label}</span>
+                <span className="choice-meaning">{o.meaning}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+        <div className="onboard-actions">
+          <button className="btn btn-primary" onClick={() => setStep("practice")}>
+            Continue
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("tradition")}>
             Go back
           </button>
         </div>
@@ -216,7 +253,7 @@ export function Onboarding() {
           >
             Continue
           </button>
-          <button className="btn btn-quiet" onClick={() => setStep("tradition")}>
+          <button className="btn btn-quiet" onClick={() => setStep("translation")}>
             Go back
           </button>
         </div>
@@ -332,7 +369,7 @@ export function Onboarding() {
   }
 
   if (step === "elements") {
-    const opts = elementOptions(tradition);
+    const opts = ELEMENT_OPTIONS;
     return (
       <main className="app onboard">
         <p className="eyebrow">What's already yours</p>
@@ -422,24 +459,15 @@ export function Onboarding() {
     isBeginner && commitment ? commitment.minutes : rung.morning.minutes;
 
   const prefs = {
-    scripture: elements.includes("scripture"),
-    psalter: elements.includes("psalm"),
-    silence: elements.includes("silence"),
-    jesusPrayer: elements.includes("jesusprayer"),
-    rosary: elements.includes("rosary"),
-    dailyOffice: elements.includes("office"),
-    litany: false,
-    devotional: elements.includes("devotional"),
+    song: elements.includes("song"),
+    reading: elements.includes("scripture"),
+    reflection: false,
   };
   const anchorTime = anchor ?? "morning";
   const integrated = [
     elements.includes("psalm") && "your Psalms",
     elements.includes("scripture") && "Scripture reading",
-    elements.includes("jesusprayer") && "the Jesus Prayer",
-    elements.includes("rosary") && "the Rosary",
-    elements.includes("office") && "a Daily Office canticle",
-    elements.includes("silence") && "a time of silence",
-    elements.includes("devotional") && "personal devotion time",
+    elements.includes("song") && "the Gospel song",
     elements.includes("others") && "your prayer list",
   ].filter(Boolean) as string[];
   return (
@@ -474,11 +502,12 @@ export function Onboarding() {
           onClick={() =>
             dispatch(
               isBeginner
-                ? { type: "onboard", rung: finalRung, tradition }
+                ? { type: "onboard", rung: finalRung, tradition, translation }
                 : {
                     type: "onboard",
                     rung: finalRung,
                     tradition,
+                    translation,
                     prefs,
                     psalmTime: anchorTime,
                     petitionTime: anchorTime,

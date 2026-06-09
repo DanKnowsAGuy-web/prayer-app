@@ -1,30 +1,40 @@
 /**
- * Turns a practice's authored steps into the concrete movements prayed today.
+ * Assembles the office prayed today as a value spine, from a floor upward.
  *
- * Most steps are fixed text. Some are "dynamic": the daily Gospel, the daily
- * Gospel with its Epistle, or the intercession that wraps the names from the
- * person's own prayer list. Those are resolved here against today's readings
- * and intentions, so the reader only ever deals with finished movements.
+ * Every segment carries an explicit `kind` and a `level`. The slider picks a
+ * level; segments with `level <= chosen` are kept, the floor (the Lord's
+ * Prayer) never leaves. Framing elements (the doxology, the closing prayer)
+ * bind to what they belong to rather than to a blanket rule, so they can never
+ * orphan. Placement is driven by `kind`, never by the user-facing label — so
+ * renaming a segment can never move it.
  */
 
-import type { Practice, PrayerStep } from "./ladder";
 import {
   intentionsForDate,
   type Intention,
   type Prefs,
   type Tradition,
 } from "./engine";
-import type { DayReadings } from "./readings";
 import type { DayPart } from "./daypart";
-import { TRADITION_META, DEFAULT_DOXOLOGY, filterMarian } from "./traditions";
-import { calendarGospel } from "./calendarGospels";
-import { GELASIAN_LITANY, LITANY_RESPONSE } from "./litany";
-import {
-  canticleMovement,
-  devotionalMovement,
-  jesusPrayerMovement,
-  rosaryMovements,
-} from "./devotions";
+import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
+
+export type MovementKind =
+  | "tradition-opening"
+  | "opening-line"
+  | "doxology"
+  | "psalm"
+  | "epistle"
+  | "gospel"
+  | "song"
+  | "reading"
+  | "reflection"
+  | "cycle"
+  | "intercession"
+  | "examen"
+  | "night-psalm"
+  | "lords"
+  | "closing"
+  | "prayer-night";
 
 export type Movement = {
   label: string;
@@ -34,48 +44,75 @@ export type Movement = {
   /** Citation shown above the text, so you know what you're about to read. */
   ref?: string;
   note?: string;
-  /** Marks a movement that came from the rotating Psalter portion. */
-  kind?: "psalm";
+  /** What this movement IS — drives placement, bindings, and estimates. */
+  kind?: MovementKind;
+  /** Position on the value spine (1 = floor). Optional segments use OPT. */
+  level?: number;
   /** Show a sign-of-the-cross mark (traditions that cross themselves). */
   cross?: boolean;
 };
 
-/** Everything a practice needs to resolve its dynamic steps for today. */
-export type ResolveCtx = {
-  day?: DayReadings;
-  intentions: Intention[];
-  /** Which practice is being prayed now. */
-  part: DayPart;
-  /** Which practice the user has chosen to carry the Psalm portion. */
-  psalmTime: DayPart;
-  /** The current Psalter portion, already built from the bundle. */
-  psalmMovements: Movement[];
-  /** Today's local date ("YYYY-MM-DD"), for the weekly intercession rotation. */
-  date: string;
-  /** Which practice carries the intercessions (the prayer list). */
-  petitionTime: DayPart;
-  /** The person's tradition, for opening prayer and intercession closing. */
-  tradition: Tradition | null;
-  /** Elements the person already practices, added on top of the rung. */
-  prefs: Prefs;
-  /** The active discipline step's collect — replaces the rung's closing prayer. */
-  disciplineCollect?: string;
+/** Optional-depth level: above the whole spine, off unless opted in. */
+export const OPT = 99;
+
+/** The top of the spine for each part. */
+export const MAX_LEVEL: Record<DayPart, number> = { morning: 6, evening: 5 };
+
+// ── Fixed office text (the canonical wording lives here) ─────────────────────
+
+const OPENING_LINE: Movement = {
+  kind: "opening-line",
+  level: 1,
+  label: "Opening line",
+  text: "O Lord, open thou my lips.\nAnd my mouth shall show forth thy praise.\nO God, make speed to save me;\nO Lord, make haste to help me.",
+  source: "Psalm 51:15; 70:1",
 };
 
-const SILENCE_MOVEMENT: Movement = {
-  label: "Silence",
-  text: "Rest quietly before God for a moment.",
-  note: "Sit in silence, unhurried, for as long as feels natural.",
+const LORDS_PRAYER: Movement = {
+  kind: "lords",
+  level: 1,
+  label: "The Lord's Prayer",
+  text: "Our Father, who art in heaven,\nhallowed be thy name;\nthy kingdom come;\nthy will be done;\non earth as it is in heaven.\nGive us this day our daily bread.\nAnd forgive us our trespasses,\nas we forgive those who trespass against us.\nAnd lead us not into temptation,\nbut deliver us from evil.\nFor thine is the kingdom, the power, and the glory,\nfor ever and ever. Amen.",
+  source: "Matthew 6:9–13",
 };
 
-/** Layer 3: the litany, with Marian/saints petitions filtered by tradition. */
-function litanyMovement(tradition: Tradition | null): Movement {
-  const petitions = filterMarian(GELASIAN_LITANY, tradition);
-  const text = petitions
-    .map((p) => `${p.text}\n${LITANY_RESPONSE}`)
-    .join("\n\n");
-  return { label: "A Litany", text };
-}
+const DEFAULT_CLOSING: Movement = {
+  kind: "closing",
+  level: 2,
+  label: "Closing prayer",
+  text: "O Lord, our heavenly Father, by whose providence the duties of men are appointed: grant me grace to do this day the work set before me, that I may not weary nor faint, but offer it all to thee. Amen.",
+};
+
+const EXAMEN: Movement = {
+  kind: "examen",
+  level: 1,
+  label: "the Examen",
+  text: "Look back over the day. Where did you meet grace? Where did you fall short?",
+  note: "Give thanks for the good; ask forgiveness for the rest.",
+};
+
+const NIGHT_PSALM: Movement = {
+  kind: "night-psalm",
+  level: 1,
+  label: "Night Psalm",
+  text: "I will both lay me down in peace, and sleep:\nfor thou, Lord, only makest me dwell in safety.",
+  source: "Psalm 4:8",
+};
+
+const PRAYER_NIGHT: Movement = {
+  kind: "prayer-night",
+  level: 1,
+  label: "Prayer for the night",
+  text: "Lighten my darkness, I beseech thee, O Lord; and by thy great mercy defend me from all perils and dangers of this night. Amen.",
+};
+
+const REFLECTION: Movement = {
+  kind: "reflection",
+  level: OPT,
+  label: "Reflection",
+  text: "Sit with the word you were given. What is God saying through it?",
+  note: "Hold it in silence rather than analysing it.",
+};
 
 /** The standard prayers said around the names of those being interceded for. */
 export const INTERCESSION_BEFORE =
@@ -83,12 +120,7 @@ export const INTERCESSION_BEFORE =
 export const INTERCESSION_AFTER =
   "Lord, as You will and as You know, have mercy on us and save us, for You are good and love mankind.\n\nThrough the prayers of the holy fathers and holy mothers and all the saints who have gone before us, have mercy on us and save us.\n\nIn the name of the Father, and the Son, and the Holy Spirit. Amen.";
 
-/** A quiet fallback when no scripture is appointed and none is bundled. */
-const PSALM_FALLBACK: Movement = {
-  label: "A Psalm",
-  text: "The Lord is my shepherd; I shall not want.\nHe maketh me to lie down in green pastures;\nhe leadeth me beside the still waters.\nHe restoreth my soul.",
-  source: "Psalm 23:1–3",
-};
+// ── Reading builders (text comes from the chosen translation store) ──────────
 
 /** The evangelist's name from a citation like "Matthew 5.42-48". */
 function evangelist(ref: string): string {
@@ -97,8 +129,8 @@ function evangelist(ref: string): string {
 }
 
 /** "Matthew 5.42-48" -> "Matthew 5:42–48", shown before the reading. */
-function formatRef(ref: string): string {
-  return ref.replace(".", ":").replace(/-/g, "–");
+export function formatRef(ref: string): string {
+  return ref.replace(/\./g, ":").replace(/-/g, "–");
 }
 
 /** The announcement said before the Gospel, in each tradition's voice. */
@@ -118,207 +150,237 @@ function gospelAnnounce(name: string, tradition: Tradition | null): string {
   }
 }
 
-function gospelMovement(
-  day: DayReadings | undefined,
+export function buildGospelMovement(
+  ref: string,
+  text: string,
   tradition: Tradition | null,
-  date: string,
-  part: DayPart,
 ): Movement {
-  // Track B: the date-anchored Gospel calendar takes precedence when the date
-  // is present; otherwise fall back to the bundled daily lectionary.
-  const cal = calendarGospel(date, part);
-  if (cal) {
-    const name = evangelist(cal.ref);
-    return {
-      label: "The Holy Gospel",
-      ref: cal.ref,
-      text: `${gospelAnnounce(name, tradition)}\n\n${cal.text}`,
-    };
-  }
-  if (day?.gospel) {
-    const name = evangelist(day.gospel.ref);
-    return {
-      label: "The Holy Gospel",
-      ref: formatRef(day.gospel.ref),
-      text: `${gospelAnnounce(name, tradition)}\n\n${day.gospel.text}`,
-    };
-  }
-  if (day?.appointed) {
-    return {
-      label: "Today's Reading",
-      ref: formatRef(day.appointed.ref),
-      text: day.appointed.text,
-      note: "No Gospel is appointed today; this is the reading set for the day.",
-    };
-  }
-  return PSALM_FALLBACK;
+  return {
+    kind: "gospel",
+    level: 2,
+    label: "The Gospel",
+    ref: formatRef(ref),
+    text: `${gospelAnnounce(evangelist(ref), tradition)}\n\n${text}`,
+  };
+}
+
+export function buildEpistleMovement(ref: string, text: string): Movement {
+  return {
+    kind: "epistle",
+    level: 6,
+    label: "The Epistle",
+    ref: formatRef(ref),
+    text,
+  };
 }
 
 function intercessionMovement(
   intentions: Intention[],
   date: string,
   close: string,
+  attribution?: string,
 ): Movement {
-  // Daily names every day, plus the weekly names whose rotation lands today.
   const today = intentionsForDate(intentions, date).map((i) => i.text);
   const names = today.length
     ? today.join("\n")
     : "(bring to mind those you carry, and name them before God)";
   return {
-    label: "Intercession",
+    kind: "intercession",
+    level: 4,
+    label: "Your prayer list",
     text: `${INTERCESSION_BEFORE}\n\n${names}\n\n${close}`,
+    ...(attribution ? { source: attribution } : {}),
   };
 }
 
-function expandStep(step: PrayerStep, ctx: ResolveCtx): Movement[] {
-  switch (step.dynamic) {
-    case "gospel":
-      return [gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part)];
-    case "gospelEpistle": {
-      const out: Movement[] = [];
-      if (ctx.day?.epistle) {
-        out.push({
-          label: "The Epistle",
-          ref: formatRef(ctx.day.epistle.ref),
-          text: ctx.day.epistle.text,
-        });
-      }
-      out.push(gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part));
-      return out;
-    }
-    case "psalm":
-      // The Psalm portion belongs only to the prayer the user chose for it.
-      // Movements are already tagged (psalms carry kind: "psalm") by the reader.
-      return ctx.part === ctx.psalmTime ? ctx.psalmMovements : [];
-    case "doxology": {
-      const dox = ctx.tradition
-        ? TRADITION_META[ctx.tradition].doxology
-        : DEFAULT_DOXOLOGY;
-      return [{ label: dox.label, text: dox.text }];
-    }
-    default:
-      return [
-        { label: step.label, text: step.text, source: step.source, note: step.note },
-      ];
-  }
-}
+// ── Assembly ─────────────────────────────────────────────────────────────────
 
-/** Movements that conclude a practice; intercessions go just before these. */
-const CLOSING = /closing prayer|prayer for the night/i;
-const LORDS = /lord's prayer/i;
+export type OfficeCtx = {
+  part: DayPart;
+  tradition: Tradition | null;
+  /** The rotating Psalm portion for this part (kind "psalm"); [] if none. */
+  psalmMovements: Movement[];
+  /** Resolved Gospel for today, or undefined if none appointed/available. */
+  gospel?: Movement;
+  /** Resolved Epistle for today, or undefined. */
+  epistle?: Movement;
+  /** The Gospel song (Benedictus / Magnificat) for this part. */
+  song?: Movement;
+  /** The short reading bundled with an active Psalter discipline step. */
+  reading?: Movement;
+  /** The day's intercessory-cycle prayer, present only when the cycle is on. */
+  cycle?: Movement;
+  /** The person's prayer list, prayed in this part. */
+  intentions: Intention[];
+  showPetitions: boolean;
+  date: string;
+  /** A discipline step's collect, replacing the default closing when active. */
+  disciplineCollect?: string;
+  /** Once-daily carry: whether each reading was already done today. */
+  carry: { gospelDone: boolean; epistleDone: boolean };
+};
 
-/** Where added elements slot in: before the Lord's Prayer, else the closing. */
-function bodyEnd(movements: Movement[]): number {
-  const lords = movements.findIndex((m) => LORDS.test(m.label));
-  if (lords >= 0) return lords;
-  const closing = movements.findIndex((m) => CLOSING.test(m.label));
-  if (closing >= 0) return closing;
-  return movements.length;
-}
+/** Build the full candidate set for the office, in canonical order. */
+export function assembleOffice(ctx: OfficeCtx): Movement[] {
+  const { part, tradition } = ctx;
+  const out: Movement[] = [];
+  const push = (m: Movement | undefined | false) => {
+    if (m) out.push(m);
+  };
 
-export function resolvePractice(practice: Practice, ctx: ResolveCtx): Movement[] {
-  const movements: Movement[] = [];
+  // Tradition opening (carries the Sign of the Cross where applicable).
+  if (tradition) {
+    const meta = TRADITION_META[tradition];
+    push({
+      kind: "tradition-opening",
+      level: 1,
+      label: meta.opening.label,
+      text: meta.opening.text,
+      ...(meta.openingAttribution ? { source: meta.openingAttribution } : {}),
+    });
+  }
+  push(OPENING_LINE);
+  if (part === "evening") push(EXAMEN);
 
-  // A tradition-specific opening prayer begins the office.
-  if (ctx.tradition) {
-    const opening = TRADITION_META[ctx.tradition].opening;
-    movements.push({ label: opening.label, text: opening.text });
+  // Psalms (and the doxology that answers them).
+  const hasPsalms = ctx.psalmMovements.length > 0;
+  for (const p of ctx.psalmMovements) {
+    push({ ...p, kind: "psalm", level: 5 });
   }
-
-  movements.push(...practice.steps.flatMap((s) => expandStep(s, ctx)));
-
-  // Additive preferences: include what an experienced person already practices,
-  // only when the rung doesn't already provide it. Slotted into the body.
-  const additions: Movement[] = [];
-  const has = (test: (m: Movement) => boolean) => movements.some(test);
-
-  if (
-    ctx.prefs.psalter &&
-    ctx.part === ctx.psalmTime &&
-    !has((m) => m.kind === "psalm")
-  ) {
-    additions.push(...ctx.psalmMovements);
-  }
-  if (ctx.prefs.dailyOffice && !has((m) => /benedictus|magnificat/i.test(m.label))) {
-    additions.push(canticleMovement(ctx.part));
-  }
-  if (
-    ctx.prefs.scripture &&
-    ctx.part === "morning" &&
-    !has((m) => m.label === "The Holy Gospel" || m.label === "Today's Reading")
-  ) {
-    additions.push(gospelMovement(ctx.day, ctx.tradition, ctx.date, ctx.part));
-  }
-  if (ctx.prefs.jesusPrayer && !has((m) => m.label === "The Jesus Prayer")) {
-    additions.push(jesusPrayerMovement());
-  }
-  if (ctx.prefs.rosary && !has((m) => m.label === "The Holy Rosary")) {
-    additions.push(...rosaryMovements(ctx.date));
-  }
-  if (ctx.prefs.devotional && !has((m) => m.label === "Personal Devotion")) {
-    additions.push(devotionalMovement());
-  }
-  if (ctx.prefs.litany && !has((m) => m.label === "A Litany")) {
-    additions.push(litanyMovement(ctx.tradition));
-  }
-  if (ctx.prefs.silence && !has((m) => /silence/i.test(m.label))) {
-    additions.push(SILENCE_MOVEMENT);
-  }
-  if (additions.length) {
-    movements.splice(bodyEnd(movements), 0, ...additions);
+  if (hasPsalms) {
+    const dox = tradition ? TRADITION_META[tradition].doxology : DEFAULT_DOXOLOGY;
+    push({
+      kind: "doxology",
+      level: 5,
+      label: "Doxology (words of praise)",
+      text: dox.text,
+    });
   }
 
-  // When the Psalter is active (rotating or discipline), it replaces the rung's
-  // own fixed Psalms — both the morning Psalm and the evening night Psalm — so
-  // nothing doubles up on screen.
-  if (movements.some((m) => m.kind === "psalm")) {
-    for (let i = movements.length - 1; i >= 0; i--) {
-      const m = movements[i];
-      if ((m.label === "Psalm" || m.label === "A Psalm") && m.kind !== "psalm") {
-        movements.splice(i, 1);
-      }
-    }
-  }
+  // Scripture. Epistle then Gospel, by custom. In the evening the readings are
+  // carried — they appear only if they were not already done in the morning.
+  const showGospel = ctx.gospel && (part === "morning" || !ctx.carry.gospelDone);
+  const showEpistle = ctx.epistle && (part === "morning" || !ctx.carry.epistleDone);
+  if (showEpistle) push({ ...ctx.epistle!, level: part === "morning" ? 6 : 2 });
+  if (showGospel) push(ctx.gospel);
 
-  // The prayer list is prayed in whichever practice the person chose, and only
-  // when there are names for today — so prayers without a list stay simple.
-  if (ctx.part === ctx.petitionTime) {
+  // Optional depth (off unless opted in): song, reading, reflection.
+  push(ctx.song && { ...ctx.song, kind: "song", level: OPT });
+  push(ctx.reading && { ...ctx.reading, kind: "reading", level: OPT });
+  push(REFLECTION);
+
+  // Prayer with the early Church (the intercessory cycle).
+  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 3 });
+
+  // Your prayer list — held space, only when there are names today.
+  if (ctx.showPetitions) {
     const names = intentionsForDate(ctx.intentions, ctx.date);
     if (names.length) {
-      const close = ctx.tradition
-        ? TRADITION_META[ctx.tradition].intercessionClose
-        : INTERCESSION_AFTER;
-      const intercession = intercessionMovement(ctx.intentions, ctx.date, close);
-      const last = movements[movements.length - 1];
-      if (last && CLOSING.test(last.label)) {
-        movements.splice(movements.length - 1, 0, intercession);
-      } else {
-        movements.push(intercession);
-      }
+      const meta = tradition ? TRADITION_META[tradition] : null;
+      const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
+      push(
+        intercessionMovement(
+          ctx.intentions,
+          ctx.date,
+          close,
+          meta?.intercessionCloseAttribution,
+        ),
+      );
     }
   }
 
-  // When the discipline step is active, its collect replaces the rung's closing.
-  if (ctx.disciplineCollect) {
-    const collect: Movement = { label: "A Collect", text: ctx.disciplineCollect };
-    const idx = movements.findIndex((m) => CLOSING.test(m.label));
-    if (idx >= 0) movements[idx] = collect;
-    else movements.push(collect);
+  // The night's close in the evening; the day's close in the morning.
+  if (part === "evening") {
+    push(NIGHT_PSALM);
+    push(LORDS_PRAYER);
+    push(PRAYER_NIGHT);
+  } else {
+    push(LORDS_PRAYER);
+    push(
+      ctx.disciplineCollect
+        ? { kind: "closing", level: 2, label: "Closing prayer", text: ctx.disciplineCollect }
+        : DEFAULT_CLOSING,
+    );
   }
 
-  // In traditions that cross themselves, mark the moments where they would:
-  // the sign-of-the-cross invocation, the opening versicle, and the doxology.
-  if (ctx.tradition && TRADITION_META[ctx.tradition].crosses) {
-    for (const m of movements) {
+  // Mark where crossing traditions make the sign of the cross.
+  if (tradition && TRADITION_META[tradition].crosses) {
+    for (const m of out) {
       if (
-        /^In the name of the Father/.test(m.text) ||
-        /^O Lord, open thou my lips/.test(m.text) ||
-        /^Glory (be )?to the Father/.test(m.text)
+        m.kind === "tradition-opening" ||
+        m.kind === "opening-line" ||
+        m.kind === "doxology"
       ) {
         m.cross = true;
       }
     }
   }
 
-  return movements;
+  return out;
+}
+
+// ── Slider ↔ toggles: pure helpers over the candidate set ────────────────────
+
+/** The floor and pure-frame kinds (never count as "a body to close"). */
+const FLOOR_KINDS = new Set<MovementKind>([
+  "tradition-opening",
+  "opening-line",
+  "examen",
+  "night-psalm",
+  "lords",
+  "prayer-night",
+  "doxology",
+  "closing",
+]);
+
+/** Initial include state for a chosen spine level (optional depth from prefs). */
+export function defaultIncluded(
+  movements: Movement[],
+  level: number,
+  prefs: Prefs,
+): boolean[] {
+  return movements.map((m) => {
+    if (m.level === OPT) {
+      if (m.kind === "song") return prefs.song;
+      if (m.kind === "reading") return prefs.reading;
+      if (m.kind === "reflection") return prefs.reflection;
+      return false;
+    }
+    return (m.level ?? 1) <= level;
+  });
+}
+
+/**
+ * Enforce frame bindings after any change: the doxology rides with the Psalms,
+ * the closing prayer appears only when there is a body to close.
+ */
+export function applyBindings(movements: Movement[], included: boolean[]): boolean[] {
+  const psalmKept = movements.some((m, i) => included[i] && m.kind === "psalm");
+  const bodyKept = movements.some(
+    (m, i) => included[i] && m.kind !== undefined && !FLOOR_KINDS.has(m.kind),
+  );
+  return movements.map((m, i) => {
+    if (m.kind === "doxology") return included[i] && psalmKept;
+    if (m.kind === "closing") return included[i] && bodyKept;
+    return included[i];
+  });
+}
+
+/**
+ * The spine level the current include set corresponds to, or null if it no
+ * longer matches a clean bracket (a "Custom" set the slider can't represent).
+ */
+export function derivedLevel(movements: Movement[], included: boolean[]): number | null {
+  for (let lvl = 1; lvl <= 6; lvl++) {
+    const matches = movements.every((m, i) => {
+      if (m.level === OPT) return true; // opt-ins don't define the bracket
+      if (m.kind === "doxology" || m.kind === "closing") return true; // frame-bound
+      return included[i] === ((m.level ?? 1) <= lvl);
+    });
+    if (matches) {
+      const anyOpt = movements.some((m, i) => m.level === OPT && included[i]);
+      return anyOpt ? null : lvl;
+    }
+  }
+  return null;
 }

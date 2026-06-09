@@ -6,3 +6,6 @@ dist
 
 # build cache
 scripts/.chapter-cache.json
+
+# scripture build cache
+scripts/.scripture-cache.json

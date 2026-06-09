@@ -2,11 +2,25 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Practice } from "../lib/ladder";
 import type { DayPart } from "../lib/daypart";
 import { useStore } from "../lib/store";
-import { loadReadings, readingsForDay, type DayReadings } from "../lib/readings";
-import { loadCalendar } from "../lib/calendarGospels";
 import { loadPsalter, portionMovements } from "../lib/psalter";
 import { disciplineStep } from "../lib/disciplineSteps";
-import { resolvePractice, type Movement } from "../lib/resolve";
+import { canticleMovement } from "../lib/devotions";
+import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
+import {
+  loadLectionary,
+  lectionaryFor,
+  loadScripture,
+  passageFor,
+} from "../lib/scripture";
+import {
+  assembleOffice,
+  applyBindings,
+  defaultIncluded,
+  buildGospelMovement,
+  buildEpistleMovement,
+  MAX_LEVEL,
+  type Movement,
+} from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
 import { TraditionEmblem } from "./TraditionEmblem";
 
@@ -19,9 +33,9 @@ export type SoloContent = {
 };
 
 /**
- * Renders the office (rung-based prayer) by default, or a single pre-resolved
- * prayer in `solo` mode — reusing the same layout, emblem, and Amen button
- * without any of the office's resolution machinery.
+ * Renders the office (the value-spine prayer) by default, or a single
+ * pre-resolved prayer in `solo` mode — reusing the same layout, emblem, and
+ * Amen button without any of the office's assembly machinery.
  */
 export function PrayerReader(props: {
   onClose: () => void;
@@ -35,7 +49,7 @@ export function PrayerReader(props: {
   }
   return (
     <OfficePrayer
-      practice={props.practice!}
+      title={props.practice!.title}
       part={props.part!}
       petitionPart={props.petitionPart!}
       onClose={props.onClose}
@@ -43,152 +57,187 @@ export function PrayerReader(props: {
   );
 }
 
+/** Everything the office needs from today's data, loaded once. */
+type OfficeData = {
+  gospel?: Movement;
+  epistle?: Movement;
+  psalmMovements: Movement[];
+  reading?: Movement;
+  disciplineCollect?: string;
+};
+
 /**
- * Praying a longer office happens in two steps:
- *   1. A build-out preview — every segment with its approximate time, where you
- *      can drop the parts you don't have time for and watch the total shrink.
- *   2. The prayer itself, laid out in full as one quiet, scrollable page.
- * Short prayers skip the preview and open straight to praying.
+ * Praying the office happens in two steps:
+ *   1. A build-out — a single slider sets how much to pray (the value rank),
+ *      with the live estimate above it and per-segment toggles below to
+ *      fine-tune.
+ *   2. The prayer itself, laid out as one quiet, scrollable page.
  */
 function OfficePrayer({
-  practice,
+  title,
   part,
   petitionPart,
   onClose,
 }: {
-  practice: Practice;
+  title: string;
   part: DayPart;
   petitionPart: DayPart;
   onClose: () => void;
 }) {
   const { state, today, dispatch } = useStore();
+  const showPsalms = part === state.psalmTime;
+  const showPetitions = part === petitionPart;
 
-  const hasGospel =
-    practice.steps.some(
-      (s) => s.dynamic === "gospel" || s.dynamic === "gospelEpistle",
-    ) ||
-    (state.prefs.scripture && part === "morning");
-  const showsPsalm =
-    (practice.steps.some((s) => s.dynamic === "psalm") || state.prefs.psalter) &&
-    part === state.psalmTime;
-
-  // The discipline step's collect for this part (if a step is active), passed
-  // through to replace the rung's closing prayer.
-  const activeStep = showsPsalm ? disciplineStep(state.psalmIndex + 1) : null;
-  const disciplineCollect = activeStep
-    ? part === "evening"
-      ? activeStep.eveningCollect
-      : activeStep.morningCollect
-    : undefined;
-
-  const [day, setDay] = useState<DayReadings | undefined>(undefined);
-  const [psalmMovements, setPsalmMovements] = useState<Movement[]>([]);
+  const [data, setData] = useState<OfficeData>({ psalmMovements: [] });
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let active = true;
-    const jobs: Promise<unknown>[] = [];
-    if (hasGospel) {
-      jobs.push(
-        loadReadings().then((b) => {
-          if (active) setDay(readingsForDay(b, today));
-        }),
-      );
-      // The date-anchored Gospel calendar (Track B) is consulted first.
-      jobs.push(loadCalendar());
-    }
-    if (showsPsalm) {
-      // Track A: the discipline step (psalms + reading + collect for this part)
-      // takes precedence; otherwise fall back to the bundled BCP Psalter portion.
-      const ds = disciplineStep(state.psalmIndex + 1);
-      const volume = part === "evening" ? ds?.eveningPsalms : ds?.morningPsalms;
-      if (ds && volume && volume.length) {
-        const block: Movement[] = volume.map((text) => ({
-          label: "Psalm",
-          text,
-          kind: "psalm" as const,
-        }));
-        const reading =
-          part === "evening" ? ds.eveningShortReading : ds.morningShortReading;
-        if (reading) block.push({ label: "A Reading", text: reading });
-        // The collect is delivered via ctx.disciplineCollect so it can replace
-        // the rung's closing prayer rather than sit mid-body.
-        setPsalmMovements(block);
-      } else {
-        jobs.push(
-          loadPsalter().then((b) => {
-            if (active) {
-              setPsalmMovements(
-                portionMovements(b, state.psalmIndex).map((m) => ({
-                  ...m,
-                  kind: "psalm" as const,
-                })),
-              );
-            }
-          }),
+    setReady(false);
+    async function load() {
+      const next: OfficeData = { psalmMovements: [] };
+
+      // Scripture: one matched plan, text in the chosen translation.
+      const [lect, store] = await Promise.all([
+        loadLectionary(),
+        loadScripture(state.translation),
+      ]);
+      const refs = lectionaryFor(lect, today);
+      if (refs?.gospel) {
+        next.gospel = buildGospelMovement(
+          refs.gospel,
+          passageFor(store, refs.gospel),
+          state.tradition,
         );
       }
+      if (refs?.epistle) {
+        next.epistle = buildEpistleMovement(
+          refs.epistle,
+          passageFor(store, refs.epistle),
+        );
+      }
+
+      // Psalms: the discipline step takes precedence; else the Psalter portion.
+      if (showPsalms) {
+        const ds = disciplineStep(state.psalmIndex + 1);
+        const volume = part === "evening" ? ds?.eveningPsalms : ds?.morningPsalms;
+        if (ds && volume && volume.length) {
+          next.psalmMovements = volume.map((text) => ({ label: "Psalm", text }));
+          const reading =
+            part === "evening" ? ds.eveningShortReading : ds.morningShortReading;
+          if (reading) next.reading = { label: "A reading", text: reading };
+          next.disciplineCollect =
+            part === "evening" ? ds.eveningCollect : ds.morningCollect;
+        } else {
+          const b = await loadPsalter();
+          next.psalmMovements = portionMovements(b, state.psalmIndex);
+        }
+      }
+      if (active) {
+        setData(next);
+        setReady(true);
+      }
     }
-    Promise.allSettled(jobs).finally(() => {
-      if (active) setReady(true);
-    });
+    load().catch(() => active && setReady(true));
     return () => {
       active = false;
     };
-  }, [today, hasGospel, showsPsalm, state.psalmIndex]);
+  }, [today, part, showPsalms, state.translation, state.psalmIndex, state.tradition]);
+
+  // The intercessory cycle's prayer for today (only when the cycle is on).
+  const cycleMovement = useMemo<Movement | undefined>(() => {
+    if (!state.cycle.on) return undefined;
+    const served = state.cycle.prologueSeen
+      ? serveCycleDay(state.cycle.day)
+      : { theme: "Prologue", entry: prologueEntry() };
+    return {
+      label: served.theme,
+      text: served.entry.prayer,
+      source: served.entry.attribution,
+    };
+  }, [state.cycle.on, state.cycle.prologueSeen, state.cycle.day]);
 
   const movements = useMemo(
     () =>
-      resolvePractice(practice, {
-        day,
-        intentions: state.intentions,
+      assembleOffice({
         part,
-        psalmTime: state.psalmTime,
-        psalmMovements,
-        date: today,
-        petitionTime: petitionPart,
         tradition: state.tradition,
-        prefs: state.prefs,
-        disciplineCollect,
+        psalmMovements: data.psalmMovements,
+        gospel: data.gospel,
+        epistle: data.epistle,
+        song: canticleMovement(part),
+        reading: data.reading,
+        cycle: cycleMovement,
+        intentions: state.intentions,
+        showPetitions,
+        date: today,
+        disciplineCollect: data.disciplineCollect,
+        carry: {
+          gospelDone: state.gospelDoneDate === today,
+          epistleDone: state.epistleDoneDate === today,
+        },
       }),
     [
-      practice,
-      day,
-      state.intentions,
       part,
-      state.psalmTime,
-      psalmMovements,
-      today,
-      petitionPart,
       state.tradition,
-      state.prefs,
-      disciplineCollect,
-      ready,
+      data,
+      cycleMovement,
+      state.intentions,
+      showPetitions,
+      today,
+      state.gospelDoneDate,
+      state.epistleDoneDate,
     ],
   );
 
-  // Which segments are kept for today. Reset to "all" whenever the set changes.
+  // The office opens at its fullest. The slider trims down the value rank.
+  const maxLevel = MAX_LEVEL[part];
+  const [level, setLevel] = useState(maxLevel);
   const [included, setIncluded] = useState<boolean[]>([]);
   useEffect(() => {
-    setIncluded(Array(movements.length).fill(true));
-  }, [movements.length]);
+    setLevel(maxLevel);
+    setIncluded(defaultIncluded(movements, maxLevel, state.prefs));
+    // Re-seed only when the candidate set changes shape, not on every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, movements.length]);
 
-  const [phase, setPhase] = useState<"preview" | "pray">("preview");
+  const onLevel = (lvl: number) => {
+    setLevel(lvl);
+    setIncluded(defaultIncluded(movements, lvl, state.prefs));
+  };
+  const onToggle = (i: number) =>
+    setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)));
 
-  const kept = useMemo(
-    () => movements.filter((_, i) => included[i]),
+  // Frame bindings (doxology ↔ Psalms, closing ↔ a body) applied after changes.
+  const effective = useMemo(
+    () => applyBindings(movements, included.length ? included : []),
     [movements, included],
   );
-  const psalmKept = movements.some((m, i) => included[i] && m.kind === "psalm");
 
-  // Finishing a Psalm-bearing prayer moves the Psalter on — once a day, and only
-  // if the Psalm portion was actually kept in the build-out.
+  const [phase, setPhase] = useState<"preview" | "pray">("preview");
+  const kept = useMemo(
+    () => movements.filter((_, i) => effective[i]),
+    [movements, effective],
+  );
+
+  // Finishing the office advances the usage tracks and marks the once-daily
+  // readings — but only for what was actually kept through to the Amen.
   const handleClose = useCallback(() => {
-    if (showsPsalm && psalmKept && state.lastPsalmAdvanceDate !== today) {
+    const keptKinds = new Set(kept.map((m) => m.kind));
+    if (keptKinds.has("psalm") && state.lastPsalmAdvanceDate !== today) {
       dispatch({ type: "advancePsalm", date: today });
     }
+    if (keptKinds.has("cycle")) {
+      dispatch({ type: "advanceCycle", date: today });
+    }
+    if (keptKinds.has("gospel")) {
+      dispatch({ type: "markReadingDone", which: "gospel", date: today });
+    }
+    if (keptKinds.has("epistle")) {
+      dispatch({ type: "markReadingDone", which: "epistle", date: today });
+    }
     onClose();
-  }, [showsPsalm, psalmKept, state.lastPsalmAdvanceDate, today, dispatch, onClose]);
+  }, [kept, state.lastPsalmAdvanceDate, today, dispatch, onClose]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -198,10 +247,7 @@ function OfficePrayer({
     return () => window.removeEventListener("keydown", onKey);
   }, [handleClose]);
 
-  const loading = (hasGospel || showsPsalm) && !ready;
-  const usePreview = movements.length > 3 && phase === "preview";
-
-  if (loading) {
+  if (!ready) {
     return (
       <main className="reader" data-part={part}>
         <div className="reader-bar">
@@ -209,12 +255,9 @@ function OfficePrayer({
             ← Close
           </button>
           <span className="reader-bar-title">
-          <TraditionEmblem
-            tradition={state.tradition}
-            className="emblem emblem-bar"
-          />
-          {practice.title}
-        </span>
+            <TraditionEmblem tradition={state.tradition} className="emblem emblem-bar" />
+            {title}
+          </span>
         </div>
         <div className="reader-stage">
           <p className="reader-loading">Preparing today's prayer…</p>
@@ -223,15 +266,16 @@ function OfficePrayer({
     );
   }
 
-  if (usePreview) {
+  if (phase === "preview") {
     return (
       <BuildOut
-        title={practice.title}
+        title={title}
         movements={movements}
-        included={included}
-        onToggle={(i) =>
-          setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)))
-        }
+        included={effective}
+        level={level}
+        maxLevel={maxLevel}
+        onLevel={onLevel}
+        onToggle={onToggle}
         onBegin={() => setPhase("pray")}
         onClose={handleClose}
       />
@@ -245,11 +289,8 @@ function OfficePrayer({
           ← Close
         </button>
         <span className="reader-bar-title">
-          <TraditionEmblem
-            tradition={state.tradition}
-            className="emblem emblem-bar"
-          />
-          {practice.title}
+          <TraditionEmblem tradition={state.tradition} className="emblem emblem-bar" />
+          {title}
         </span>
       </div>
 
@@ -284,13 +325,7 @@ function OfficePrayer({
  * user's own TraditionEmblem (never the prayer's historic origin) and an Amen
  * that marks the track complete. Closing without Amen does not advance.
  */
-function SoloPrayer({
-  solo,
-  onClose,
-}: {
-  solo: SoloContent;
-  onClose: () => void;
-}) {
+function SoloPrayer({ solo, onClose }: { solo: SoloContent; onClose: () => void }) {
   const { state } = useStore();
   const complete = useCallback(() => {
     solo.onComplete();
@@ -312,10 +347,7 @@ function SoloPrayer({
           ← Close
         </button>
         <span className="reader-bar-title">
-          <TraditionEmblem
-            tradition={state.tradition}
-            className="emblem emblem-bar"
-          />
+          <TraditionEmblem tradition={state.tradition} className="emblem emblem-bar" />
           {solo.title}
         </span>
       </div>
@@ -345,6 +377,9 @@ function BuildOut({
   title,
   movements,
   included,
+  level,
+  maxLevel,
+  onLevel,
   onToggle,
   onBegin,
   onClose,
@@ -352,6 +387,9 @@ function BuildOut({
   title: string;
   movements: Movement[];
   included: boolean[];
+  level: number;
+  maxLevel: number;
+  onLevel: (lvl: number) => void;
   onToggle: (i: number) => void;
   onBegin: () => void;
   onClose: () => void;
@@ -373,23 +411,34 @@ function BuildOut({
 
       <div className="buildout">
         <header className="buildout-head">
-          <p className="eyebrow">Today's prayer · about {formatTotal(totalSecs)}</p>
-          <h1 className="buildout-title">How much time today?</h1>
+          <p className="buildout-estimate">about {formatTotal(totalSecs)}</p>
+          <input
+            className="buildout-slider"
+            type="range"
+            min={1}
+            max={maxLevel}
+            step={1}
+            value={level}
+            onChange={(e) => onLevel(Number(e.target.value))}
+            aria-label="How much to pray today"
+          />
           <p className="buildout-sub">
-            Keep what you have time for. Tap a part to set it aside; you can
-            always pray it tomorrow.
+            Slide to set how much you pray today, or fine-tune below. The Lord's
+            Prayer always stays.
           </p>
         </header>
 
         <ul className="buildout-list">
           {movements.map((m, i) => {
             const on = included[i];
+            const isFloor = m.kind === "lords";
             return (
               <li key={i}>
                 <button
                   className={`buildout-row ${on ? "" : "is-off"}`}
-                  onClick={() => onToggle(i)}
+                  onClick={() => !isFloor && onToggle(i)}
                   aria-pressed={on}
+                  disabled={isFloor}
                 >
                   <span className="buildout-check" aria-hidden="true">
                     {on ? "✓" : "+"}
@@ -405,11 +454,7 @@ function BuildOut({
         </ul>
 
         <div className="buildout-actions">
-          <button
-            className="btn btn-primary"
-            onClick={onBegin}
-            disabled={!anyKept}
-          >
+          <button className="btn btn-primary" onClick={onBegin} disabled={!anyKept}>
             Begin · {formatTotal(totalSecs)}
           </button>
         </div>

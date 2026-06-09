@@ -7,14 +7,15 @@
 import type { Movement } from "./resolve";
 
 const WORDS_PER_MINUTE = 100;
-const CONTEMPLATIVE = /silence|reflection|looking back/i;
 const CONTEMPLATIVE_FLOOR_S = 90;
+/** Segments held in stillness get a floor beyond their reading time. */
+const CONTEMPLATIVE = new Set(["examen", "reflection"]);
 
 export function estimateSeconds(m: Movement): number {
   const trimmed = m.text.trim();
   const words = trimmed ? trimmed.split(/\s+/).length : 0;
   let secs = (words / WORDS_PER_MINUTE) * 60;
-  if (CONTEMPLATIVE.test(m.label)) secs = Math.max(secs, CONTEMPLATIVE_FLOOR_S);
+  if (m.kind && CONTEMPLATIVE.has(m.kind)) secs = Math.max(secs, CONTEMPLATIVE_FLOOR_S);
   return Math.max(12, Math.round(secs));
 }
 

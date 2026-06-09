@@ -17,7 +17,16 @@ type TraditionMeta = {
   doxology: { label: string; text: string };
   /** Whether the faithful make the sign of the cross. */
   crosses: boolean;
+  /**
+   * Quiet provenance, shown the understated way the cycle marks its entries.
+   * Present only on text the app composed itself (vs. sourced/traditional).
+   */
+  openingAttribution?: string;
+  intercessionCloseAttribution?: string;
 };
+
+/** The understated marker shown beneath app-composed prayers. */
+const COMPOSED = "Composed for this app";
 
 /** The Western doxology, used when no tradition is set. */
 export const DEFAULT_DOXOLOGY = {
@@ -62,6 +71,7 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
       text: "Almighty God, unto whom all hearts are open, all desires known, and from whom no secrets are hid: cleanse the thoughts of our hearts by the inspiration of thy Holy Spirit, that we may perfectly love thee, and worthily magnify thy holy Name; through Christ our Lord. Amen.",
     },
     intercessionClose: CLOSE_MEDIATOR,
+    intercessionCloseAttribution: COMPOSED,
   },
   "eastern-orthodox": {
     name: "Eastern Orthodox",
@@ -82,7 +92,9 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
       label: "Coming to God",
       text: "Be still, and know that I am God. (Psalm 46:10)\n\nLord, I come to You now. Quiet my heart, open Your Word to me, and meet me here. In Jesus' name. Amen.",
     },
+    openingAttribution: COMPOSED,
     intercessionClose: CLOSE_REFORMED,
+    intercessionCloseAttribution: COMPOSED,
   },
   protestant: {
     name: "Protestant",
@@ -92,7 +104,9 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
       label: "Invocation",
       text: "Almighty God, you are worthy of all praise. Open my lips and my heart to worship you in spirit and in truth; through Jesus Christ my Lord. Amen.",
     },
+    openingAttribution: COMPOSED,
     intercessionClose: CLOSE_REFORMED,
+    intercessionCloseAttribution: COMPOSED,
   },
   "roman-catholic": {
     name: "Roman Catholic",

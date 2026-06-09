@@ -16,6 +16,7 @@ import {
   type RuleState,
   type Tradition,
 } from "./engine";
+import type { Translation } from "./scripture";
 import { loadState, saveState } from "./storage";
 
 type Action =
@@ -23,6 +24,7 @@ type Action =
       type: "onboard";
       rung: number;
       tradition: Tradition | null;
+      translation?: Translation;
       prefs?: Prefs;
       psalmTime?: "morning" | "evening";
       petitionTime?: "morning" | "evening";
@@ -37,6 +39,8 @@ type Action =
   | { type: "setPsalmTime"; time: "morning" | "evening" }
   | { type: "setPetitionTime"; time: "morning" | "evening" }
   | { type: "setTradition"; tradition: Tradition }
+  | { type: "setTranslation"; translation: Translation }
+  | { type: "markReadingDone"; which: "gospel" | "epistle"; date: string }
   | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
@@ -53,6 +57,7 @@ function reducer(state: RuleState, action: Action): RuleState {
         onboarded: true,
         rung: action.rung,
         tradition: action.tradition,
+        ...(action.translation ? { translation: action.translation } : {}),
         ...(action.prefs ? { prefs: action.prefs } : {}),
         ...(action.psalmTime ? { psalmTime: action.psalmTime } : {}),
         ...(action.petitionTime ? { petitionTime: action.petitionTime } : {}),
@@ -98,6 +103,13 @@ function reducer(state: RuleState, action: Action): RuleState {
       return { ...state, petitionTime: action.time };
     case "setTradition":
       return { ...state, tradition: action.tradition };
+    case "setTranslation":
+      return { ...state, translation: action.translation };
+    case "markReadingDone": {
+      const key = action.which === "gospel" ? "gospelDoneDate" : "epistleDoneDate";
+      if (state[key] === action.date) return state;
+      return { ...state, [key]: action.date };
+    }
     case "setPref":
       return { ...state, prefs: { ...state.prefs, [action.key]: action.value } };
     case "devPatch":

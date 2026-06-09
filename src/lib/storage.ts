@@ -7,8 +7,17 @@ export function loadState(): RuleState {
     const raw = localStorage.getItem(KEY);
     if (!raw) return initialState();
     const parsed = JSON.parse(raw) as Partial<RuleState>;
-    // Merge over defaults so older/partial saves stay valid.
-    return { ...initialState(), ...parsed };
+    const base = initialState();
+    // Merge over defaults so older/partial saves stay valid. Nested objects are
+    // merged field-by-field so newly added keys (e.g. translation, the reshaped
+    // prefs, the cycle) auto-default instead of being clobbered by old shapes.
+    return {
+      ...base,
+      ...parsed,
+      prefs: { ...base.prefs, ...(parsed.prefs as object) },
+      cycle: { ...base.cycle, ...(parsed.cycle as object) },
+      reminders: { ...base.reminders, ...(parsed.reminders as object) },
+    };
   } catch {
     return initialState();
   }
