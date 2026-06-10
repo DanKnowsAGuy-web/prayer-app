@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useStore, makeId } from "../lib/store";
 import { LAST_RUNG } from "../lib/ladder";
 import type { Tradition } from "../lib/engine";
+import { buildReminderIcs, downloadIcs } from "../lib/ics";
 
 /**
  * Onboarding sets the two things that actually shape the prayer — the
@@ -25,6 +26,7 @@ type Step =
   | "tradition"
   | "translation"
   | "names"
+  | "reminder"
   | "how"
   | "rotation"
   | "start";
@@ -36,6 +38,14 @@ export function Onboarding() {
   const [translation, setTranslation] = useState<"web" | "kjv">("web");
   const [names, setNames] = useState<string[]>([]);
   const [nameInput, setNameInput] = useState("");
+  const [remMorning, setRemMorning] = useState<string | null>(null);
+  const [remEvening, setRemEvening] = useState<string | null>(null);
+
+  /** Persist any chosen reminder times (the existing reminders state). */
+  const commitReminders = () => {
+    dispatch({ type: "setReminder", slot: "morning", time: remMorning });
+    dispatch({ type: "setReminder", slot: "evening", time: remEvening });
+  };
 
   const addName = () => {
     const trimmed = nameInput.trim();
@@ -197,10 +207,84 @@ export function Onboarding() {
           </ul>
         )}
         <div className="onboard-actions">
-          <button className="btn btn-primary" onClick={() => setStep("how")}>
+          <button className="btn btn-primary" onClick={() => setStep("reminder")}>
             {names.length > 0 ? "Continue" : "Skip for now"}
           </button>
           <button className="btn btn-quiet" onClick={() => setStep("translation")}>
+            Go back
+          </button>
+        </div>
+      </main>
+    );
+  }
+
+  if (step === "reminder") {
+    const anySet = remMorning !== null || remEvening !== null;
+    const row = (
+      label: string,
+      value: string | null,
+      fallback: string,
+      set: (t: string | null) => void,
+    ) => (
+      <div className="reminder-row">
+        <span className="toggle-label">{label}</span>
+        <div className="reminder-controls">
+          {value !== null && (
+            <input
+              className="intention-input reminder-time"
+              type="time"
+              value={value}
+              onChange={(e) => set(e.target.value)}
+              aria-label={`${label} time`}
+            />
+          )}
+          <button
+            className={`switch ${value !== null ? "is-on" : ""}`}
+            role="switch"
+            aria-checked={value !== null}
+            aria-label={`${label} reminder ${value !== null ? "on" : "off"}`}
+            onClick={() => set(value !== null ? null : fallback)}
+          >
+            <span className="switch-knob" />
+          </button>
+        </div>
+      </div>
+    );
+    return (
+      <main className="app onboard">
+        <p className="eyebrow">A daily nudge</p>
+        <h2 className="onboard-q">Would a reminder help?</h2>
+        <p className="lede">
+          Set a time for morning or evening prayer and add it to your phone's
+          calendar — it will remind you each day, even with the app closed. If
+          you skip this, you can set it any time in Settings.
+        </p>
+        {row("Morning prayer", remMorning, "07:00", setRemMorning)}
+        {row("Evening prayer", remEvening, "20:00", setRemEvening)}
+        {anySet && (
+          <button
+            className="btn btn-ghost see-list"
+            onClick={() =>
+              downloadIcs(
+                "prayer-reminders.ics",
+                buildReminderIcs({ morning: remMorning, evening: remEvening }),
+              )
+            }
+          >
+            Add to my phone's calendar
+          </button>
+        )}
+        <div className="onboard-actions">
+          <button
+            className="btn btn-primary"
+            onClick={() => {
+              commitReminders();
+              setStep("how");
+            }}
+          >
+            {anySet ? "Continue" : "Skip for now"}
+          </button>
+          <button className="btn btn-quiet" onClick={() => setStep("names")}>
             Go back
           </button>
         </div>
@@ -231,7 +315,7 @@ export function Onboarding() {
           <button className="btn btn-primary" onClick={() => setStep("rotation")}>
             Continue
           </button>
-          <button className="btn btn-quiet" onClick={() => setStep("names")}>
+          <button className="btn btn-quiet" onClick={() => setStep("reminder")}>
             Go back
           </button>
         </div>
