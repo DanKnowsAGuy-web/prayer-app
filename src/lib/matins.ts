@@ -74,68 +74,107 @@ export function weekdayTheme(weekday: number, tone?: number | null): Omit<Moveme
   };
 }
 
-// ── The featured fragment rotation (the familiarity engine) ──────────────────
+// ── The Psalms of Matins (the first psalm slot's fixed loop) ───────────────────
 //
-// One structural window into Orthros per session, advancing by usage, each
-// with a location label saying where it sits in the service. The Great
-// Doxology is its own top-tier segment rather than a rotation stop, so the
-// rotation holds five fragments.
+// Not the Psalter walk: an eleven-psalm loop through the psalms that belong to
+// Matins itself — the Six Psalms, the Polyeleos, and the Praises — one per
+// session, advancing by usage on its own pointer.
 
 type PsalterBundle = { psalms: Record<string, { v: number; text: string }[]> };
 
-const SIX_PSALMS = [3, 38, 63, 88, 103, 143];
-
-function psalmText(bundle: PsalterBundle, n: number, from?: number, to?: number): string {
-  const verses = bundle.psalms[String(n)] || [];
-  const chosen = from != null ? verses.filter((v) => v.v >= from && v.v <= (to ?? 999)) : verses;
-  return chosen.map((v) => v.text).join("\n");
+function psalmText(bundle: PsalterBundle, n: number): string {
+  return (bundle.psalms[String(n)] || []).map((v) => v.text).join("\n");
 }
 
-export const FRAGMENT_COUNT = 5;
+const MATINS_PSALM_LOOP: { n: number; place: string }[] = [
+  { n: 3, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 38, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 63, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 88, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 103, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 143, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 135, place: "from the Polyeleos, the festal psalms of praise" },
+  { n: 136, place: "from the Polyeleos, the festal psalms of praise" },
+  { n: 148, place: "from the Praises (Lauds), near the end of Matins" },
+  { n: 149, place: "from the Praises (Lauds), near the end of Matins" },
+  { n: 150, place: "from the Praises (Lauds), near the end of Matins" },
+];
 
-/**
- * The featured fragment at a rotation index. Psalm-based fragments draw from
- * the bundled WEB Psalter; the rest are fixed traditional texts.
- */
-export function matinsFragment(
+export const MATINS_PSALM_COUNT = MATINS_PSALM_LOOP.length; // 11
+
+/** The Matins psalm at a rotation index (wrapping). */
+export function serveMatinsPsalm(
   bundle: PsalterBundle,
   index: number,
 ): Omit<Movement, "kind" | "level"> {
+  const i = ((index % MATINS_PSALM_COUNT) + MATINS_PSALM_COUNT) % MATINS_PSALM_COUNT;
+  const { n, place } = MATINS_PSALM_LOOP[i];
+  return {
+    label: `Psalm ${n}`,
+    ref: `A psalm of Matins — ${place}`,
+    text: psalmText(bundle, n),
+  };
+}
+
+// ── The featured fragment rotation (the familiarity engine) ──────────────────────
+//
+// Two stops, alternating: the grouped troparia moment ("God is the Lord", the
+// day's exapostilarion, and the Song of the Theotokos), and the biblical
+// canticles of the Canon, toured one ode per visit.
+
+/** The daily exapostilaria (the hymn of light), fixed per weekday, 0=Sun…6=Sat. */
+const WEEKDAY_EXAPOSTILARIA: string[] = [
+  "Holy is the Lord our God.\nHoly is the Lord our God.\nExalt the Lord our God, and worship at the footstool of His feet, for He is holy.",
+  "As Thou didst adorn the heaven with stars, O God, and dost enlighten all the earth through Thine angels: O Creator of all, save them that hymn Thee.",
+  "Let us all praise the Forerunner and Baptist of the Savior, the prophet among prophets and nurtured in the wilderness: by his intercessions, O Lord, save our souls.",
+  "The Cross is the guardian of the whole world; the Cross is the beauty of the Church; the Cross is the might of kings; the Cross is the confirmation of the faithful; the Cross is the glory of angels and the wounding of demons.",
+  "O Word, Wisdom of the Father most high: visit us through Thine all-praised Apostles, and grant us Thy mercy.",
+  "The Cross is the guardian of the whole world; the Cross is the beauty of the Church; the Cross is the might of kings; the Cross is the confirmation of the faithful; the Cross is the glory of angels and the wounding of demons.",
+  "Thou who as God hast authority over the living and the dead: give rest with Thy saints to the souls of Thy servants; for Thou alone art the Lover of mankind.",
+];
+
+const GOD_IS_THE_LORD =
+  "God is the Lord, and has revealed Himself to us. Blessed is He who comes in the name of the Lord.\n\nO give thanks to the Lord, for He is good; for His loving kindness endures forever.";
+
+const MAGNIFICAT_ODE9 =
+  "My soul magnifies the Lord, and my spirit rejoices in God my Savior.\n\nMore honorable than the cherubim, and more glorious beyond compare than the seraphim: without defilement you gave birth to God the Word — true Theotokos, we magnify you.\n\nFor He has regarded the low estate of His handmaiden; for behold, henceforth all generations will call me blessed. For He who is mighty has done great things for me, and holy is His name; and His mercy is on those who fear Him from generation to generation.\n\nMore honorable than the cherubim, and more glorious beyond compare than the seraphim: without defilement you gave birth to God the Word — true Theotokos, we magnify you.";
+
+type CanticlesBundle = { odes: { ode: number; name: string; ref: string; text: string }[] };
+
+export const FRAGMENT_COUNT = 2;
+
+/**
+ * The featured window at a rotation index: even visits get the grouped
+ * troparia moment (matched to the weekday); odd visits tour the canticles.
+ */
+export function matinsFragment(
+  canticles: CanticlesBundle,
+  index: number,
+  weekday: number,
+): Omit<Movement, "kind" | "level"> {
   const which = ((index % FRAGMENT_COUNT) + FRAGMENT_COUNT) % FRAGMENT_COUNT;
   const round = Math.floor(index / FRAGMENT_COUNT);
-  switch (which) {
-    case 0: {
-      // Tour the Six Psalms one at a time across visits.
-      const n = SIX_PSALMS[round % SIX_PSALMS.length];
-      return {
-        label: "A window into Matins",
-        ref: `Psalm ${n} — from the Six Psalms, the quiet opening of Matins`,
-        text: psalmText(bundle, n),
-      };
-    }
-    case 1:
-      return {
-        label: "A window into Matins",
-        ref: "Psalm 135 — from the Polyeleos, the festal psalms of praise",
-        text: psalmText(bundle, 135),
-      };
-    case 2:
-      return {
-        label: "A window into Matins",
-        ref: "The Song of the Theotokos — Ode 9 of the Canon, with its refrain",
-        text: "My soul magnifies the Lord, and my spirit rejoices in God my Savior.\n\nMore honorable than the cherubim, and more glorious beyond compare than the seraphim: without defilement you gave birth to God the Word — true Theotokos, we magnify you.\n\nFor He has regarded the low estate of His handmaiden; for behold, henceforth all generations will call me blessed. For He who is mighty has done great things for me, and holy is His name; and His mercy is on those who fear Him from generation to generation.\n\nMore honorable than the cherubim, and more glorious beyond compare than the seraphim: without defilement you gave birth to God the Word — true Theotokos, we magnify you.",
-      };
-    case 3:
-      return {
-        label: "A window into Matins",
-        ref: "The Exapostilarion — the hymn of light, near the end of Matins",
-        text: "Holy is the Lord our God.\nHoly is the Lord our God.\nExalt the Lord our God, and worship at the footstool of His feet, for He is holy.",
-      };
-    default:
-      return {
-        label: "A window into Matins",
-        ref: "Psalm 148 — from the Praises (Lauds), near the end of Matins",
-        text: psalmText(bundle, 148),
-      };
+  if (which === 0) {
+    const exap = WEEKDAY_EXAPOSTILARIA[weekday] ?? WEEKDAY_EXAPOSTILARIA[0];
+    return {
+      label: "A window into Matins",
+      ref: "God is the Lord · the day's Exapostilarion · Ode 9, the Song of the Theotokos",
+      text: `${GOD_IS_THE_LORD}
+
+—
+
+${exap}
+
+—
+
+${MAGNIFICAT_ODE9}`,
+    };
   }
+  const odes = canticles.odes;
+  const o = odes[round % odes.length];
+  return {
+    label: "A window into Matins",
+    ref: `Ode ${o.ode} of the Canon — ${o.name} (${o.ref})`,
+    text: o.text,
+  };
 }

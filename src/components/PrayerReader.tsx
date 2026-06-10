@@ -9,7 +9,7 @@ import { serveEoEvening } from "../lib/eoEveningPrayers";
 import { IS_EO } from "../lib/flavor";
 import { weekdayOf } from "../lib/engine";
 import { loadPropers, propersFor, type ProperDay } from "../lib/propers";
-import { weekdayTheme, matinsFragment } from "../lib/matins";
+import { weekdayTheme, matinsFragment, serveMatinsPsalm } from "../lib/matins";
 import {
   loadLectionary,
   lectionaryFor,
@@ -69,6 +69,7 @@ type OfficeData = {
   /** EO Matins morning only: the day's propers and the featured fragment. */
   propers?: ProperDay;
   fragment?: Movement;
+  matinsPsalm?: Movement;
   /** EO morning only: the rotating morning-prayer slot (needs the Psalter). */
   morningPrayer?: Movement;
 };
@@ -148,9 +149,14 @@ function OfficePrayer({
         );
       }
 
-      // The Psalter in course: the next units from the pointer, in either office.
+      // The Psalter in course: the next units from the pointer — two in the
+      // Matins morning (the third psalm slot is the Matins loop), four elsewhere.
       const psalter = await loadPsalter();
-      next.psalmMovements = unitMovements(psalter, state.psalmIndex, MAX_PSALMS);
+      next.psalmMovements = unitMovements(
+        psalter,
+        state.psalmIndex,
+        isMatins ? 2 : MAX_PSALMS,
+      );
 
       // EO morning: the rotating morning-prayer slot (eleven prayers, Psalm 50,
       // the Creed — one per morning, in course).
@@ -166,14 +172,22 @@ function OfficePrayer({
         };
       }
 
-      // EO Matins morning: the day's propers and the featured fragment.
+      // EO Matins morning: the day's propers, the Matins psalm, the fragment.
       if (isMatins) {
         const propers = await loadPropers();
         next.propers = propersFor(propers, today);
+        next.matinsPsalm = serveMatinsPsalm(
+          psalter as Parameters<typeof serveMatinsPsalm>[0],
+          state.matinsPsalmIndex,
+        ) as Movement;
+        const canticles = (await import("../data/canticles.json")) as unknown as {
+          default?: Parameters<typeof matinsFragment>[0];
+        } & Parameters<typeof matinsFragment>[0];
         next.fragment = matinsFragment(
-          psalter as Parameters<typeof matinsFragment>[0],
+          (canticles.default ?? canticles) as Parameters<typeof matinsFragment>[0],
           state.matinsFragmentIndex,
-        );
+          weekdayOf(today),
+        ) as Movement;
       }
 
       if (active) {
@@ -185,7 +199,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex, state.eoMorningIndex]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex, state.matinsPsalmIndex, state.eoMorningIndex]);
 
   // The intercessory cycle is a permanent spine segment (level 3); the slider,
   // not a flag, governs whether it's prayed today. The Prologue is served once,
@@ -244,6 +258,7 @@ function OfficePrayer({
       return assembleMatins({
         tradition: state.tradition,
         psalmMovements: data.psalmMovements,
+        matinsPsalm: data.matinsPsalm,
         traditionPrayer,
         troparion,
         kontakion,
@@ -380,6 +395,9 @@ function OfficePrayer({
     }
     if (keptKinds.has("fragment")) {
       dispatch({ type: "advanceFragment", date: today });
+    }
+    if (keptKinds.has("matins-psalm")) {
+      dispatch({ type: "advanceMatinsPsalm", date: today });
     }
     if (keptKinds.has("gospel")) {
       dispatch({ type: "markReadingDone", which: "gospel", date: today });

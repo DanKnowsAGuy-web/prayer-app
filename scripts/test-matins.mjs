@@ -11,7 +11,13 @@ import {
   defaultIncluded,
   MATINS_MAX_LEVEL,
 } from "../src/lib/resolve.ts";
-import { weekdayTheme, matinsFragment, FRAGMENT_COUNT } from "../src/lib/matins.ts";
+import {
+  weekdayTheme,
+  matinsFragment,
+  serveMatinsPsalm,
+  FRAGMENT_COUNT,
+  MATINS_PSALM_COUNT,
+} from "../src/lib/matins.ts";
 import { readFileSync } from "node:fs";
 
 const psalter = JSON.parse(
@@ -27,7 +33,10 @@ const ok = (cond, msg) => {
   }
 };
 
-const psalms = [1, 2, 3, 4].map((n) => ({ label: `Psalm ${n}`, text: `psalm ${n}` }));
+const canticles = JSON.parse(
+  readFileSync(new URL("../src/data/canticles.json", import.meta.url)),
+);
+const psalms = [1, 2].map((n) => ({ label: `Psalm ${n}`, text: `psalm ${n}` }));
 const ctx = (over = {}) => ({
   tradition: "eastern-orthodox",
   psalmMovements: psalms,
@@ -35,7 +44,8 @@ const ctx = (over = {}) => ({
   troparion: { label: "Troparion of the day", text: "trop", source: "OCA" },
   kontakion: { label: "Kontakion of the day", text: "kont", source: "OCA" },
   theme: weekdayTheme(1),
-  fragment: matinsFragment(psalter, 0),
+  matinsPsalm: serveMatinsPsalm(psalter, 0),
+  fragment: matinsFragment(canticles, 0, 1),
   gospel: { kind: "gospel", label: "The Gospel", text: "g" },
   cycle: { label: "Prayer with the early Church", text: "c" },
   intentions: [{ id: "1", text: "For a friend", added: "2026-06-10", answered: false, cadence: "daily" }],
@@ -62,13 +72,21 @@ for (const k of ["tradition-opening", "trisagion", "lords", "tradition-prayer", 
   ok(on.includes("troparion") && on.includes("lords"), "floor: troparion + Lord's Prayer");
 }
 
-// The interleave: one psalm early (L2), the rest later (L6, L7, L9).
+// The psalm structure: the Matins loop at notch 4, the walk at 7 and 10.
 {
+  const mp = ms.find((m) => m.kind === "matins-psalm");
+  ok(mp && mp.level === 4, "Matins psalm at notch 4");
   const levels = ms.filter((m) => m.kind === "psalm").map((m) => m.level);
-  ok(JSON.stringify(levels) === "[4,7,10,11]", `psalm levels interleave (got ${levels})`);
+  ok(JSON.stringify(levels) === "[7,10]", `walk psalm levels (got ${levels})`);
   const at5 = defaultIncluded(ms, 5);
-  const psalmsAt5 = ms.filter((m, i) => at5[i] && m.kind === "psalm").length;
-  ok(psalmsAt5 === 1, "mid-session keeps exactly one psalm");
+  const walkAt5 = ms.filter((m, i) => at5[i] && m.kind === "psalm").length;
+  const matinsAt5 = ms.filter((m, i) => at5[i] && m.kind === "matins-psalm").length;
+  ok(walkAt5 === 0 && matinsAt5 === 1, "mid-session: the Matins psalm only, no walk psalms");
+  ok(MATINS_PSALM_COUNT === 11, "eleven psalms in the Matins loop");
+  ok(/Psalm 3/.test(serveMatinsPsalm(psalter, 0).label), "loop starts at Psalm 3");
+  ok(/Polyeleos/.test(serveMatinsPsalm(psalter, 6).ref), "loop reaches the Polyeleos");
+  ok(/Praises/.test(serveMatinsPsalm(psalter, 10).ref), "loop ends in the Praises");
+  ok(/Psalm 3/.test(serveMatinsPsalm(psalter, 11).label), "loop wraps");
 }
 
 // Full means full: the Gospel and the cycle are in at the top of the slider.
@@ -82,14 +100,18 @@ for (const k of ["tradition-opening", "trisagion", "lords", "tradition-prayer", 
   ok(!onFloor.includes("gospel") && !onFloor.includes("cycle"), "floor excludes Gospel and cycle");
 }
 
-// The fragment rotation cycles with location labels and tours the Six Psalms.
+// The window rotation: the grouped troparia moment, then the canticles tour.
 {
-  ok(FRAGMENT_COUNT === 5, "five fragments in the rotation");
-  const f0 = matinsFragment(psalter, 0);
-  const f5 = matinsFragment(psalter, 5);
-  ok(/Six Psalms/.test(f0.ref) && /Psalm 3/.test(f0.ref), "fragment 0: Six Psalms, Psalm 3");
-  ok(/Psalm 38/.test(f5.ref), `next round tours on (got "${f5.ref}")`);
-  ok([0,1,2,3,4].every((i) => matinsFragment(psalter, i).text.trim().length > 50), "all fragments have real text");
+  ok(FRAGMENT_COUNT === 2, "two stops in the window rotation");
+  const f0 = matinsFragment(canticles, 0, 3); // Wednesday
+  ok(/God is the Lord/.test(f0.text) && /Cross is the guardian/.test(f0.text) && /magnifies the Lord/.test(f0.text),
+    "grouped stop: God is the Lord + weekday exapostilarion + Magnificat");
+  const f1 = matinsFragment(canticles, 1, 3);
+  ok(/Ode 1/.test(f1.ref) && /Moses/.test(f1.ref), "canticle stop starts at Ode 1");
+  const f3 = matinsFragment(canticles, 3, 3);
+  ok(/Ode 3/.test(f3.ref), `second canticle visit tours on (got "${f3.ref}")`);
+  ok(matinsFragment(canticles, 9, 3).ref.includes("Ode 6") || /Jonah/.test(matinsFragment(canticles, 9, 3).ref),
+    "the tour reaches Jonah");
 }
 
 // The morning slot rotation: eleven prayers, then Psalm 50, then the Creed.

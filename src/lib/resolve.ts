@@ -19,6 +19,7 @@ export type MovementKind =
   | "tradition-prayer"
   | "opening-line"
   | "trisagion"
+  | "matins-psalm"
   | "troparion"
   | "kontakion"
   | "theme"
@@ -346,14 +347,16 @@ export function applyBindings(movements: Movement[], included: boolean[]): boole
 // at the top the Great Doxology. The Gospel and the intercessory cycle are
 // opt-ins that extend the session beyond the slider's budget.
 
-/** The value rank, floor (1) → full (11). */
-export const MATINS_MAX_LEVEL = 11;
-const MATINS_PSALM_LEVELS = [4, 7, 10, 11];
+/** The value rank, floor (1) → full (10). */
+export const MATINS_MAX_LEVEL = 10;
+const MATINS_PSALM_LEVELS = [7, 10];
 
 export type MatinsCtx = {
   tradition: Tradition | null;
-  /** Up to four Psalter units (the walk continues here as everywhere). */
+  /** Up to two Psalter-walk units (the walk continues here as everywhere). */
   psalmMovements: Movement[];
+  /** The Matins psalm — the fixed eleven-psalm loop, on its own pointer. */
+  matinsPsalm?: Movement;
   /** "A Morning Prayer" — the rotating classic morning prayer. */
   traditionPrayer?: Movement;
   /** The saint of the day's troparion / kontakion (sourced), or a gap flag. */
@@ -391,10 +394,12 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   push(LORDS_PRAYER);
   push(ctx.traditionPrayer && { ...ctx.traditionPrayer, kind: "tradition-prayer", level: 1 });
 
-  // The Psalter walk: one psalm survives deep (level 2); the rest return as
-  // the slider rises (levels 6, 7, 9), interleaved with the propers.
+  // The Psalms of Matins: the fixed loop (Six Psalms, Polyeleos, Praises).
+  push(ctx.matinsPsalm && { ...ctx.matinsPsalm, kind: "matins-psalm", level: 4 });
+
+  // The Psalter walk: two psalms, returning as the slider rises.
   ctx.psalmMovements.forEach((p, i) => {
-    push({ ...p, kind: "psalm", level: MATINS_PSALM_LEVELS[i] ?? MATINS_PSALM_LEVELS[3] });
+    push({ ...p, kind: "psalm", level: MATINS_PSALM_LEVELS[i] ?? MATINS_PSALM_LEVELS[1] });
   });
 
   // The day's propers: the troparion belongs to the floor; the kontakion and
