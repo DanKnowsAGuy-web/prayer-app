@@ -15,6 +15,7 @@ import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 
 export type MovementKind =
   | "tradition-opening"
+  | "tradition-prayer"
   | "opening-line"
   | "doxology"
   | "psalm"
@@ -191,6 +192,8 @@ export type OfficeCtx = {
   epistle?: Movement;
   /** The Gospel song (Benedictus / Magnificat) for this part. */
   song?: Movement;
+  /** A rotating prayer of the person's tradition (EO mornings), in the floor. */
+  traditionPrayer?: Movement;
   /** The day's intercessory-cycle prayer, present only when the cycle is on. */
   cycle?: Movement;
   /** The person's prayer list, prayed in both offices when there are names. */
@@ -219,6 +222,10 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
       ...(meta.openingAttribution ? { source: meta.openingAttribution } : {}),
     });
   }
+  // A rotating prayer of the tradition rides with the opening, in the floor.
+  push(
+    ctx.traditionPrayer && { ...ctx.traditionPrayer, kind: "tradition-prayer", level: 1 },
+  );
   push(OPENING_LINE);
   if (part === "evening") push(EXAMEN);
 
@@ -296,6 +303,7 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
 /** The floor and pure-frame kinds (never count as "a body to close"). */
 const FLOOR_KINDS = new Set<MovementKind>([
   "tradition-opening",
+  "tradition-prayer",
   "opening-line",
   "examen",
   "night-psalm",

@@ -44,6 +44,7 @@ type Action =
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "advanceCycle"; key: string }
   | { type: "advancePsalm"; key: string; count: number }
+  | { type: "advanceEoMorning"; date: string }
   | { type: "reset" };
 
 function reducer(state: RuleState, action: Action): RuleState {
@@ -133,6 +134,14 @@ function reducer(state: RuleState, action: Action): RuleState {
         },
       };
     }
+    case "advanceEoMorning":
+      // One morning prayer per day; a re-open/double-Amen can't advance twice.
+      if (state.lastEoMorningAdvanceDate === action.date) return state;
+      return {
+        ...state,
+        eoMorningIndex: state.eoMorningIndex + 1,
+        lastEoMorningAdvanceDate: action.date,
+      };
     case "advancePsalm":
       // Per-office latch; advance by however many psalm units were prayed.
       if (state.lastPsalmAdvanceKey === action.key || action.count <= 0) return state;

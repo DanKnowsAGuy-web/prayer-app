@@ -21,6 +21,7 @@ import {
 // non-decreasing rank, whatever their labels say.
 const RANK = {
   "tradition-opening": 1,
+  "tradition-prayer": 1.5,
   "opening-line": 2,
   examen: 3,
   psalm: 4,
@@ -51,6 +52,7 @@ const psalms = [
   { label: "Psalm 2", text: "p2" },
 ];
 const song = { label: "Benedictus", text: "s" };
+const traditionPrayer = { label: "A morning prayer of the Church", ref: "Of St. Basil the Great", text: "tp" };
 const cycle = { label: "Church", text: "c", source: "Hippolytus" };
 const intentions = [
   { id: "1", text: "For a friend", added: "2026-06-09", answered: false, cadence: "daily" },
@@ -66,6 +68,7 @@ function ctx(part, over = {}) {
     gospel,
     epistle,
     song,
+    traditionPrayer,
     cycle,
     intentions,
     date: "2026-06-09",

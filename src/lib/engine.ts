@@ -72,6 +72,13 @@ export type RuleState = {
    */
   gospelDoneDate?: string;
   epistleDoneDate?: string;
+  /**
+   * The Eastern Orthodox morning-prayer rotation (eleven classic prayers, one
+   * per morning, advancing by usage). `eoMorningIndex` points at the next
+   * prayer; `lastEoMorningAdvanceDate` latches the once-a-day advance.
+   */
+  eoMorningIndex: number;
+  lastEoMorningAdvanceDate?: string;
   /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
   previewDate?: string;
   /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
@@ -152,6 +159,7 @@ export function initialState(): RuleState {
     petitionTime: "morning",
     reminders: { morning: null, evening: null },
     cycle: { day: 1, prologueSeen: false },
+    eoMorningIndex: 0,
   };
 }
 
