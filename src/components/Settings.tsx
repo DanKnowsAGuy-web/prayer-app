@@ -2,6 +2,7 @@ import { useStore } from "../lib/store";
 import type { Tradition } from "../lib/engine";
 import { IS_EO } from "../lib/flavor";
 import { buildReminderIcs, downloadIcs } from "../lib/ics";
+import { useInstallState } from "../lib/install";
 
 const TRADITIONS: { value: Tradition; label: string }[] = [
   { value: "anglican", label: "Anglican" },
@@ -102,6 +103,8 @@ export function Settings({ onClose }: { onClose: () => void }) {
         </button>
       </section>
 
+      <InstallSection />
+
       <div className="onboard-actions">
         <button className="btn btn-primary" onClick={onClose}>
           Done
@@ -110,6 +113,39 @@ export function Settings({ onClose }: { onClose: () => void }) {
 
       <p className="settings-version">Build {__BUILD__}</p>
     </main>
+  );
+}
+
+/**
+ * A permanent home for the install action — always reachable, even after the
+ * one-time banner was dismissed. Hidden only once the app is already installed.
+ */
+function InstallSection() {
+  const { canPrompt, standalone, iOS, promptInstall } = useInstallState();
+  if (standalone) return null;
+
+  return (
+    <section className="settings-group">
+      <h2 className="settings-h">Install the app</h2>
+      <p className="settings-note">
+        Add Prayer to your home screen and it opens full-screen, with no address
+        bar — and the screen stays awake while you pray.
+      </p>
+      {iOS ? (
+        <p className="settings-note">
+          In Safari, tap the Share icon, then <strong>Add to Home Screen</strong>.
+        </p>
+      ) : canPrompt ? (
+        <button className="btn btn-ghost see-list" onClick={() => void promptInstall()}>
+          Add to home screen
+        </button>
+      ) : (
+        <p className="settings-note">
+          Open your browser menu and choose <strong>Install</strong> or{" "}
+          <strong>Add to Home screen</strong>.
+        </p>
+      )}
+    </section>
   );
 }
 
