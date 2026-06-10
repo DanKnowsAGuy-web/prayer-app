@@ -5,9 +5,9 @@
 
 export const MILESTONE_TEXT: Record<string, string> = {
   psalter:
-    "You have prayed the whole Psalter — all one hundred fifty psalms, in course. Begun again.",
+    "You have prayed the whole Psalter, all one hundred fifty psalms, in course. Begun again.",
   "matins-psalms":
-    "You have prayed all the psalms of Matins — the Six Psalms, the Polyeleos, and the Praises.",
+    "You have prayed all the psalms of Matins: the Six Psalms, the Polyeleos, and the Praises.",
   "gospel-Matthew":
     "You have read the Gospel of Matthew entire, through the Church's daily readings.",
   "gospel-Mark":
@@ -18,7 +18,7 @@ export const MILESTONE_TEXT: Record<string, string> = {
     "You have read the Gospel of John entire, through the Church's daily readings.",
   "gospels-all": "You have now read all four Gospels entire.",
   "matins-full":
-    "For the first time, you prayed the morning rule whole — the full shape of Matins.",
+    "For the first time, you prayed the morning rule whole: the full shape of Matins.",
 };
 
 /** Chapter counts for Gospel-coverage milestones. */

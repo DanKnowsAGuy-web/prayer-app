@@ -96,8 +96,8 @@ export function buildSummary(
   const which = mornings.length ? "in the morning" : "each time";
 
   let msg = `Father, bless. Over the last ${WINDOW_PHRASE[window]} I've kept ${keptPhrase}`;
-  if (content) msg += ` — usually ${content}, about ${minutes} minutes ${which}`;
+  if (content) msg += `, usually ${content}, about ${minutes} minutes ${which}`;
   msg += ".";
-  if (name.trim()) msg += ` — ${name.trim()}`;
+  if (name.trim()) msg += `\n${name.trim()}`;
   return msg;
 }

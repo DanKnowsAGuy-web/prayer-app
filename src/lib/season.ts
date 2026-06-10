@@ -52,5 +52,7 @@ export function fastLine(day?: ProperDay): string | null {
   if (!level || !desc || /no fast/i.test(desc)) {
     return /fast[- ]free/i.test(exception || "") ? "Fast-free week" : null;
   }
-  return exception ? `${desc} — ${exception}` : desc;
+  return exception
+    ? `${desc} (${exception.toLowerCase()})`
+    : `${desc} (strict fast)`;
 }

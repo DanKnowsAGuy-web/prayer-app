@@ -241,19 +241,19 @@ function OfficePrayer({
       const troparion: Movement = p?.troparion
         ? {
             label: "Troparion of the day",
-            ref: `${p.saint} — Tone ${p.troparion.tone}`,
+            ref: `${p.saint} · Tone ${p.troparion.tone}`,
             text: p.troparion.text,
             source: "OCA",
           }
         : {
             label: "Troparion of the day",
-            text: "(Today's troparion could not be sourced — OCA, Antiochian, and ROCOR were checked at build time. See oca.org/saints for the day's commemorations.)",
-            note: "Source gap — nothing is shown in its place rather than inventing a text.",
+            text: "(Today's troparion could not be sourced. OCA, Antiochian, and ROCOR were checked at build time; see oca.org/saints for the day's commemorations.)",
+            note: "Source gap: nothing is shown in its place rather than inventing a text.",
           };
       const kontakion: Movement | undefined = p?.kontakion
         ? {
             label: "Kontakion of the day",
-            ref: `${p.saint} — Tone ${p.kontakion.tone}`,
+            ref: `${p.saint} · Tone ${p.kontakion.tone}`,
             text: p.kontakion.text,
             source: "OCA",
           }

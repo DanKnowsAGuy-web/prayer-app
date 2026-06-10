@@ -50,7 +50,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
       <section className="settings-group">
         <h2 className="settings-h">Scripture translation</h2>
         <p className="settings-note">
-          The readings are the same either way — only the wording changes.
+          The readings are the same either way; only the wording changes.
         </p>
         <div className="settings-traditions">
           {TRANSLATIONS.filter((t) => !IS_EO || t.value !== "web").map((t) => (
@@ -72,7 +72,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
       <section className="settings-group">
         <h2 className="settings-h">Reminders</h2>
         <p className="settings-note">
-          Set a time and add it to your phone's calendar — it will remind you
+          Set a time and add it to your phone's calendar, and it will remind you
           every day, even when the app is closed.
         </p>
         <ReminderRow

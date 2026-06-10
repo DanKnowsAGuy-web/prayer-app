@@ -94,9 +94,9 @@ export function serveEoMorningSlot(
   if (which === EO_MORNING_COUNT) {
     const verses = bundle.psalms["51"] || [];
     return {
-      title: "Psalm 50 — the psalm of repentance",
+      title: "Psalm 50 · the psalm of repentance",
       text: verses.map((v) => v.text).join("\n"),
     };
   }
-  return { title: "The Symbol of Faith — the Nicene Creed", text: CREED };
+  return { title: "The Symbol of Faith · the Nicene Creed", text: CREED };
 }

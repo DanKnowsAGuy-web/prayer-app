@@ -240,7 +240,7 @@ function PsalmRotation() {
         Next: {unitLabel(state.psalmIndex)}
       </h2>
       <p className="psalter-sub">
-        A few psalms each office, in order through the whole Psalter — then begun
+        A few psalms each office, in order through the whole Psalter, then begun
         again. Set how many you take when you pray.
       </p>
     </section>
@@ -364,7 +364,7 @@ function FatherShare() {
           </div>
           {copied && (
             <p className="petition-note" role="status">
-              Copied to your clipboard — paste it into any message.
+              Copied to your clipboard. Paste it into any message.
             </p>
           )}
         </div>
@@ -459,7 +459,7 @@ function CheckInPanel({
           <p className="checkin-result">
             {kept
               ? "Marked as kept. Well done, and thanks be to God."
-              : "Marked as missed — no shame in it. Tomorrow is open."}
+              : "Marked as missed. No shame in it; tomorrow is open."}
           </p>
           <button
             className="btn btn-quiet"

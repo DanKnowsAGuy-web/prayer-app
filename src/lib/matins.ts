@@ -111,7 +111,7 @@ export function serveMatinsPsalm(
   const { n, place } = MATINS_PSALM_LOOP[i];
   return {
     label: `Psalm ${n}`,
-    ref: `A psalm of Matins — ${place}`,
+    ref: `A psalm of Matins · ${place}`,
     text: psalmText(bundle, n),
   };
 }
@@ -174,7 +174,7 @@ ${MAGNIFICAT_ODE9}`,
   const o = odes[round % odes.length];
   return {
     label: "A window into Matins",
-    ref: `Ode ${o.ode} of the Canon — ${o.name} (${o.ref})`,
+    ref: `Ode ${o.ode} of the Canon · ${o.name} (${o.ref})`,
     text: o.text,
   };
 }

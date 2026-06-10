@@ -52,7 +52,7 @@ ok(/evening prayer 1 of 7/.test(msg), "evening count 1 of 7");
 ok(/the Psalms in course/.test(msg), "content: Psalms");
 ok(/the daily Gospel and Epistle/.test(msg), "content: Gospel and Epistle merged");
 ok(/about 15 minutes in the morning/.test(msg), "average morning minutes");
-ok(/ — Daniel$/.test(msg), "signed with the name");
+ok(msg.endsWith("\nDaniel"), "signed with the name on its own line");
 
 const unsigned = buildSummary(amens, 7, day(10), "");
 ok(!/—\s*$/.test(unsigned) && unsigned.endsWith("."), "no name → no signature");

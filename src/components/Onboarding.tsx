@@ -150,7 +150,7 @@ export function Onboarding() {
         <p className="eyebrow">How scripture reads</p>
         <h2 className="onboard-q">Which translation would you like?</h2>
         <p className="lede">
-          The readings are the same either way — only the wording changes. You
+          The readings are the same either way; only the wording changes. You
           can switch any time in settings.
         </p>
         <ul className="choices">
@@ -188,7 +188,7 @@ export function Onboarding() {
         <p className="eyebrow">Those you carry</p>
         <h2 className="onboard-q">Anyone to hold in prayer?</h2>
         <p className="lede">
-          Add any names you'd like to pray for each day — or skip this; you can
+          Add any names you'd like to pray for each day, or skip this. You can
           add or change people any time from your prayer list.
         </p>
         <form
@@ -291,7 +291,7 @@ export function Onboarding() {
         <h2 className="onboard-q">Would a reminder help?</h2>
         <p className="lede">
           Set a time for morning or evening prayer and add it to your phone's
-          calendar — it will remind you each day, even with the app closed. If
+          calendar, and it will remind you each day, even with the app closed. If
           you skip this, you can set it any time in Settings.
         </p>
         {row("Morning prayer", remMorning, "07:00", setRemMorning)}
@@ -333,18 +333,9 @@ export function Onboarding() {
         <p className="eyebrow">How this works</p>
         <h2 className="onboard-q">One prayer, sized to your day</h2>
         <p className="lede">
-          Each prayer is built full — around fifteen unhurried minutes. But no
-          two days are the same.
-        </p>
-        <p className="lede">
-          A single slider at the top sets how much you pray. On an open morning,
-          pray the whole of it. On a crowded day, slide down — the prayer
-          shortens toward its heart, and never falls below the Lord's Prayer.
-        </p>
-        <p className="lede">
-          The point is simply never to break the thread: pray fully when you can,
-          briefly when you can't, but pray every day. That daily thread is the
-          whole of it.
+          The prayer rule adjusts to each day with a single slider. The point is
+          never to break the thread: pray fully when you can, briefly when you
+          can't, but pray every day. The daily thread is the whole of it.
         </p>
         <div className="onboard-actions">
           <button className="btn btn-primary" onClick={() => setStep("rotation")}>
@@ -364,44 +355,43 @@ export function Onboarding() {
         <p className="eyebrow">What you'll pray</p>
         <h2 className="onboard-q">The streams that come round</h2>
         <p className="lede">
-          As you pray, the same few streams rotate through, so the prayer stays
-          alive rather than rote:
+          These are the rotating parts of the daily prayer rule:
         </p>
         {IS_EO ? (
           <ul className="rotation-list">
             <li>
-              <span className="rotation-name">The morning prayers of the Church</span> —
+              <span className="rotation-name">The morning prayers of the Church</span>:
               the classic prayers of the prayer book, with Psalm 50 and the
               Creed, one each morning in course.
             </li>
             <li>
-              <span className="rotation-name">The saint of the day</span> — the
+              <span className="rotation-name">The saint of the day</span>: the
               troparion and kontakion of the day's commemoration, with the
               day's remembrance through the week.
             </li>
             <li>
-              <span className="rotation-name">The Psalms</span> — the psalms of
+              <span className="rotation-name">The Psalms</span>: the psalms of
               Matins in course, and a steady walk through the whole Psalter.
             </li>
             <li>
-              <span className="rotation-name">The day's Gospel and Epistle</span> —
+              <span className="rotation-name">The day's Gospel and Epistle</span>:
               the Church's daily readings, in your translation.
             </li>
             <li>
-              <span className="rotation-name">A window into Matins</span> — one
+              <span className="rotation-name">A window into Matins</span>: one
               piece of the morning service each day, in its proper place, until
               the whole shape grows familiar.
             </li>
             <li>
-              <span className="rotation-name">Prayer with the early Church</span> —
+              <span className="rotation-name">Prayer with the early Church</span>:
               an ancient intercession, a different one each day.
             </li>
             <li>
-              <span className="rotation-name">Your prayer list</span> — the
+              <span className="rotation-name">Your prayer list</span>: the
               people and needs you carry, named before God.
             </li>
             <li>
-              <span className="rotation-name">The evening prayers</span> — the
+              <span className="rotation-name">The evening prayers</span>: the
               prayers before sleep, one each evening, with a night psalm to
               close the day.
             </li>
@@ -409,23 +399,23 @@ export function Onboarding() {
         ) : (
           <ul className="rotation-list">
             <li>
-              <span className="rotation-name">The Psalms, in course</span> — a
+              <span className="rotation-name">The Psalms, in course</span>: a
               portion each day, the whole Psalter over time, then begun again.
             </li>
             <li>
-              <span className="rotation-name">The day's Gospel and Epistle</span> —
+              <span className="rotation-name">The day's Gospel and Epistle</span>:
               one shared daily lectionary, read in your translation.
             </li>
             <li>
-              <span className="rotation-name">Prayer with the early Church</span> —
+              <span className="rotation-name">Prayer with the early Church</span>:
               an ancient intercession, a different one each day.
             </li>
             <li>
-              <span className="rotation-name">Your prayer list</span> — the people
+              <span className="rotation-name">Your prayer list</span>: the people
               and needs you carry, named before God.
             </li>
             <li>
-              <span className="rotation-name">A night prayer</span> — to close the
+              <span className="rotation-name">A night prayer</span>: to close the
               evening in peace.
             </li>
           </ul>
@@ -455,12 +445,13 @@ export function Onboarding() {
         {IS_EO
           ? "Everything's set, in the voice of the Orthodox Church."
           : `Everything's set, in the ${traditionName} voice you chose.`}{" "}
-        Open today's prayer whenever you're ready — pray it in full, or pray
-        just the Lord's Prayer. Either is faithful.
+        Open today's prayer whenever you're ready. Pray it in full, or pray
+        just the Lord's Prayer; either is faithful.
       </p>
       <div className="onboard-actions">
         <button
           className="btn btn-primary"
+          disabled={started}
           onClick={() => {
             if (started) return; // a double-fired tap must not onboard twice
             setStarted(true);
@@ -483,7 +474,7 @@ export function Onboarding() {
             );
           }}
         >
-          Start my rule
+          {started ? "Beginning…" : "Start my rule"}
         </button>
         <button className="btn btn-quiet" onClick={() => setStep("rotation")}>
           Go back
