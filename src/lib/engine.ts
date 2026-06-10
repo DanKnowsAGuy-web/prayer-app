@@ -81,6 +81,14 @@ export type RuleState = {
   lastEoMorningAdvanceDate?: string;
   eoEveningIndex: number;
   lastEoEveningAdvanceDate?: string;
+  /**
+   * The prayer history: one record per completed office (kept through to the
+   * Amen), universal across editions — the basis for summaries and any future
+   * dashboards. A same-day repeat of the same office replaces its record.
+   */
+  amens: AmenRecord[];
+  /** The spiritual father's contact, remembered for the share feature (EO). */
+  father: { phone: string; name: string };
   /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
   previewDate?: string;
   /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
@@ -99,6 +107,17 @@ export type RuleState = {
     prologueSeen: boolean;
     lastAdvanceKey?: string;
   };
+};
+
+/** One completed office: what was prayed, and roughly how long it ran. */
+export type AmenRecord = {
+  /** Local calendar date, "YYYY-MM-DD". */
+  date: string;
+  part: "morning" | "evening";
+  /** The kinds of the segments kept through to the Amen. */
+  kinds: string[];
+  /** The estimator's total for the kept segments, in seconds. */
+  secs: number;
 };
 
 export type Cadence = "daily" | "weekly";
@@ -163,6 +182,8 @@ export function initialState(): RuleState {
     cycle: { day: 1, prologueSeen: false },
     eoMorningIndex: 0,
     eoEveningIndex: 0,
+    amens: [],
+    father: { phone: "", name: "" },
   };
 }
 

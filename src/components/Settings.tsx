@@ -1,5 +1,6 @@
 import { useStore } from "../lib/store";
 import type { Tradition } from "../lib/engine";
+import { IS_EO } from "../lib/flavor";
 import { buildReminderIcs, downloadIcs } from "../lib/ics";
 
 const TRADITIONS: { value: Tradition; label: string }[] = [
@@ -27,21 +28,23 @@ export function Settings({ onClose }: { onClose: () => void }) {
         <span className="reader-bar-title">Settings</span>
       </div>
 
-      <section className="settings-group">
-        <h2 className="settings-h">Tradition</h2>
-        <div className="settings-traditions">
-          {TRADITIONS.map((t) => (
-            <button
-              key={t.value}
-              className={`pill ${state.tradition === t.value ? "is-on" : ""}`}
-              aria-pressed={state.tradition === t.value}
-              onClick={() => dispatch({ type: "setTradition", tradition: t.value })}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </section>
+      {!IS_EO && (
+        <section className="settings-group">
+          <h2 className="settings-h">Tradition</h2>
+          <div className="settings-traditions">
+            {TRADITIONS.map((t) => (
+              <button
+                key={t.value}
+                className={`pill ${state.tradition === t.value ? "is-on" : ""}`}
+                aria-pressed={state.tradition === t.value}
+                onClick={() => dispatch({ type: "setTradition", tradition: t.value })}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="settings-group">
         <h2 className="settings-h">Scripture translation</h2>

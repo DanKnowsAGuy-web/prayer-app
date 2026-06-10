@@ -3,6 +3,7 @@ import { useStore, makeId } from "../lib/store";
 import { LAST_RUNG } from "../lib/ladder";
 import type { Tradition } from "../lib/engine";
 import { buildReminderIcs, downloadIcs } from "../lib/ics";
+import { IS_EO } from "../lib/flavor";
 
 /**
  * Onboarding sets the two things that actually shape the prayer — the
@@ -34,7 +35,10 @@ type Step =
 export function Onboarding() {
   const { dispatch, today } = useStore();
   const [step, setStep] = useState<Step>("welcome");
-  const [tradition, setTradition] = useState<Tradition | null>(null);
+  // The EO edition is Eastern Orthodox from the first breath — no choosing.
+  const [tradition, setTradition] = useState<Tradition | null>(
+    IS_EO ? "eastern-orthodox" : null,
+  );
   const [translation, setTranslation] = useState<"web" | "kjv">("web");
   const [names, setNames] = useState<string[]>([]);
   const [nameInput, setNameInput] = useState("");
@@ -69,7 +73,10 @@ export function Onboarding() {
           pace.
         </p>
         <div className="onboard-actions">
-          <button className="btn btn-primary" onClick={() => setStep("tradition")}>
+          <button
+            className="btn btn-primary"
+            onClick={() => setStep(IS_EO ? "translation" : "tradition")}
+          >
             Begin
           </button>
         </div>
@@ -154,7 +161,10 @@ export function Onboarding() {
           <button className="btn btn-primary" onClick={() => setStep("names")}>
             Continue
           </button>
-          <button className="btn btn-quiet" onClick={() => setStep("tradition")}>
+          <button
+            className="btn btn-quiet"
+            onClick={() => setStep(IS_EO ? "welcome" : "tradition")}
+          >
             Go back
           </button>
         </div>
@@ -376,9 +386,11 @@ export function Onboarding() {
       <p className="eyebrow">You're ready</p>
       <h2 className="onboard-q">Let us begin</h2>
       <p className="lede">
-        Everything's set, in the {traditionName} voice you chose. Open today's
-        prayer whenever you're ready — pray it in full, or pray just the Lord's
-        Prayer. Either is faithful.
+        {IS_EO
+          ? "Everything's set, in the voice of the Orthodox Church."
+          : `Everything's set, in the ${traditionName} voice you chose.`}{" "}
+        Open today's prayer whenever you're ready — pray it in full, or pray
+        just the Lord's Prayer. Either is faithful.
       </p>
       <div className="onboard-actions">
         <button

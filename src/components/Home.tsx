@@ -1,5 +1,11 @@
 import { useStore, makeId } from "../lib/store";
 import { unitLabel } from "../lib/psalter";
+import { IS_EO } from "../lib/flavor";
+import {
+  availableWindows,
+  buildSummary,
+  type SummaryWindow,
+} from "../lib/ruleSummary";
 import { TraditionEmblem } from "./TraditionEmblem";
 import {
   cadenceOf,
@@ -73,6 +79,8 @@ export function Home({
 
       <Intentions />
 
+      {IS_EO && <FatherShare />}
+
       <p className="benediction">
         The Lord bless you and keep you, this day and always.
       </p>
@@ -145,6 +153,132 @@ function PsalmRotation() {
         A few psalms each office, in order through the whole Psalter — then begun
         again. Set how many you take when you pray.
       </p>
+    </section>
+  );
+}
+
+/**
+ * EO edition: text your spiritual father a short overview of your prayer rule.
+ * The message is generated from the prayer history, previewed and editable,
+ * then handed to the phone's own texting app (sms:) — nothing is sent by the
+ * app itself. On a desktop, the message is copied to the clipboard instead.
+ */
+function FatherShare() {
+  const { state, today, dispatch } = useStore();
+  const windows = availableWindows(state.amens, today);
+  const [open, setOpen] = useState(false);
+  const [window_, setWindow] = useState<SummaryWindow | null>(null);
+  const [text, setText] = useState("");
+  const [phone, setPhone] = useState(state.father.phone);
+  const [name, setName] = useState(state.father.name);
+  const [copied, setCopied] = useState(false);
+
+  const begin = () => {
+    const w = windows[windows.length - 1];
+    setWindow(w);
+    setText(buildSummary(state.amens, w, today, state.father.name));
+    setPhone(state.father.phone);
+    setName(state.father.name);
+    setOpen(true);
+  };
+  const pickWindow = (w: SummaryWindow) => {
+    setWindow(w);
+    setText(buildSummary(state.amens, w, today, name));
+  };
+
+  const send = () => {
+    dispatch({ type: "setFather", phone: phone.trim(), name: name.trim() });
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (isMobile) {
+      // `?&body` is the form both iOS and Android accept.
+      globalThis.location.href = `sms:${phone.trim()}?&body=${encodeURIComponent(text)}`;
+    } else {
+      navigator.clipboard
+        ?.writeText(text)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 4000);
+        })
+        .catch(() => {
+          // Clipboard unavailable — select the message so Ctrl+C works.
+          const box = document.querySelector<HTMLTextAreaElement>(".father-text");
+          box?.focus();
+          box?.select();
+        });
+    }
+  };
+
+  return (
+    <section className="father-share" aria-labelledby="father-h">
+      <p className="eyebrow">Your spiritual father</p>
+      <h2 id="father-h" className="intentions-h">
+        Share your rule
+      </h2>
+
+      {windows.length === 0 ? (
+        <p className="intentions-empty">
+          Once you've been praying for a week, you can send your spiritual
+          father a short overview of your rule from here.
+        </p>
+      ) : !open ? (
+        <button className="btn btn-ghost see-list" onClick={begin}>
+          Text an overview of my prayer rule
+        </button>
+      ) : (
+        <div className="father-form">
+          <div className="dev-row dev-wrap" role="group" aria-label="Over what period">
+            {windows.map((w) => (
+              <button
+                key={w}
+                className={`pill ${window_ === w ? "is-on" : ""}`}
+                aria-pressed={window_ === w}
+                onClick={() => pickWindow(w)}
+              >
+                {w === 7 ? "Last week" : w === 14 ? "Two weeks" : "Last month"}
+              </button>
+            ))}
+          </div>
+          <textarea
+            className="intention-input father-text"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            rows={4}
+            aria-label="The message to send"
+          />
+          <input
+            className="intention-input"
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="His phone number"
+            aria-label="Your spiritual father's phone number"
+          />
+          <input
+            className="intention-input"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your name (optional, signs the message)"
+            aria-label="Your name"
+          />
+          <div className="intention-add-btns">
+            <button
+              className="btn btn-primary"
+              onClick={send}
+              disabled={!text.trim() || !phone.trim()}
+            >
+              Open in Messages
+            </button>
+            <button className="btn btn-quiet" onClick={() => setOpen(false)}>
+              Close
+            </button>
+          </div>
+          {copied && (
+            <p className="petition-note" role="status">
+              Copied to your clipboard — paste it into any message.
+            </p>
+          )}
+        </div>
+      )}
     </section>
   );
 }

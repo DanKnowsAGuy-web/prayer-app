@@ -16,6 +16,7 @@ export function loadState(): RuleState {
       ...parsed,
       cycle: { ...base.cycle, ...(parsed.cycle as object) },
       reminders: { ...base.reminders, ...(parsed.reminders as object) },
+      father: { ...base.father, ...(parsed.father as object) },
     };
   } catch {
     return initialState();

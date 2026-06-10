@@ -13,10 +13,16 @@ const commit = (() => {
 })();
 const build = `${commit} · ${new Date().toISOString().slice(0, 10)}`;
 
-export default defineConfig({
+// One codebase, two editions. `--mode eo` builds the Eastern Orthodox edition:
+// tradition locked to Eastern Orthodox and the EO-exclusive features enabled.
+// The default build is the general app, unchanged.
+export default defineConfig(({ mode }) => ({
   // Relative paths so the built app also works when opened directly (file://).
   base: "./",
   plugins: [react()],
-  define: { __BUILD__: JSON.stringify(build) },
+  define: {
+    __BUILD__: JSON.stringify(build),
+    __FLAVOR__: JSON.stringify(mode === "eo" ? "eo" : "general"),
+  },
   server: { port: 5173 },
-});
+}));

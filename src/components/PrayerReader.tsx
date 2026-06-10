@@ -298,6 +298,16 @@ function OfficePrayer({
     if (keptKinds.has("epistle")) {
       dispatch({ type: "markReadingDone", which: "epistle", date: today });
     }
+    // The prayer history: what was prayed and roughly how long, for summaries.
+    dispatch({
+      type: "recordAmen",
+      record: {
+        date: today,
+        part,
+        kinds: [...keptKinds].filter((k) => k !== undefined) as string[],
+        secs: kept.reduce((sum, m) => sum + estimateSeconds(m), 0),
+      },
+    });
     onClose();
   }, [kept, today, part, dispatch, onClose]);
 

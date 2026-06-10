@@ -11,6 +11,7 @@ import {
   initialState,
   localDate,
   nextWeeklyBucket,
+  type AmenRecord,
   type Intention,
   type RuleState,
   type Tradition,
@@ -46,6 +47,8 @@ type Action =
   | { type: "advancePsalm"; key: string; count: number }
   | { type: "advanceEoMorning"; date: string }
   | { type: "advanceEoEvening"; date: string }
+  | { type: "recordAmen"; record: AmenRecord }
+  | { type: "setFather"; phone: string; name: string }
   | { type: "reset" };
 
 function reducer(state: RuleState, action: Action): RuleState {
@@ -150,6 +153,17 @@ function reducer(state: RuleState, action: Action): RuleState {
         eoEveningIndex: state.eoEveningIndex + 1,
         lastEoEveningAdvanceDate: action.date,
       };
+    case "recordAmen": {
+      // One record per office per day; a repeat replaces it.
+      const amens = state.amens.filter(
+        (a) => !(a.date === action.record.date && a.part === action.record.part),
+      );
+      amens.push(action.record);
+      amens.sort((a, b) => a.date.localeCompare(b.date));
+      return { ...state, amens };
+    }
+    case "setFather":
+      return { ...state, father: { phone: action.phone, name: action.name } };
     case "advancePsalm":
       // Per-office latch; advance by however many psalm units were prayed.
       if (state.lastPsalmAdvanceKey === action.key || action.count <= 0) return state;

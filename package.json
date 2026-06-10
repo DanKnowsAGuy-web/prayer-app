@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:eo": "vite --mode eo",
     "build": "tsc -b && vite build",
+    "build:eo": "tsc -b && vite build --mode eo",
     "preview": "vite preview",
     "deploy": "npm run build && node scripts/deploy.mjs"
   },

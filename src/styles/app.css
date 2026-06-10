@@ -68,6 +68,21 @@
   font-weight: 600;
 }
 
+.father-share {
+  margin-top: var(--space-5);
+}
+.father-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.father-text {
+  resize: vertical;
+  min-height: 6rem;
+  line-height: 1.5;
+}
+
 .name-chips {
   list-style: none;
   margin: var(--space-2) 0 0;
