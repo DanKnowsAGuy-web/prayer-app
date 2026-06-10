@@ -64,6 +64,8 @@ export function PrayerReader(props: {
 /** Everything the office needs from today's data, loaded once. */
 type OfficeData = {
   gospel?: Movement;
+  /** The raw lectionary reference behind the Gospel (for coverage tracking). */
+  gospelRef?: string;
   epistle?: Movement;
   psalmMovements: Movement[];
   /** EO Matins morning only: the day's propers and the featured fragment. */
@@ -140,6 +142,7 @@ function OfficePrayer({
           passageFor(store, refs.gospel),
           state.tradition,
         );
+        next.gospelRef = refs.gospel;
       }
       // The Epistle is evening-only; skip it in the morning.
       if (part === "evening" && refs?.epistle) {
@@ -412,11 +415,15 @@ function OfficePrayer({
         date: today,
         part,
         kinds: [...keptKinds].filter((k) => k !== undefined) as string[],
+        ...(keptKinds.has("gospel") && data.gospelRef
+          ? { gospelRef: data.gospelRef }
+          : {}),
+        ...(isMatins && kept.length === movements.length ? { full: true } : {}),
         secs: kept.reduce((sum, m) => sum + estimateSeconds(m), 0),
       },
     });
     onClose();
-  }, [kept, today, part, dispatch, onClose]);
+  }, [kept, movements.length, data.gospelRef, isMatins, today, part, dispatch, onClose]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {

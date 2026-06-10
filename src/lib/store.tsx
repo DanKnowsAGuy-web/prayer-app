@@ -18,7 +18,15 @@ import {
 } from "./engine";
 import type { Translation } from "./scripture";
 import { UNIT_COUNT } from "./psalter";
+import { MATINS_PSALM_COUNT } from "./matins";
+import { GOSPEL_CHAPTERS, gospelRefChapters } from "./milestones";
 import { loadState, saveState } from "./storage";
+
+/** Note a quiet first, once; later occurrences leave the state untouched. */
+function withMilestone(state: RuleState, id: string, date: string): RuleState {
+  if (state.milestones.some((m) => m.id === id)) return state;
+  return { ...state, milestones: [...state.milestones, { id, date }] };
+}
 
 type Action =
   | {
@@ -162,13 +170,18 @@ function reducer(state: RuleState, action: Action): RuleState {
         matinsFragmentIndex: state.matinsFragmentIndex + 1,
         lastFragmentAdvanceDate: action.date,
       };
-    case "advanceMatinsPsalm":
+    case "advanceMatinsPsalm": {
       if (state.lastMatinsPsalmAdvanceDate === action.date) return state;
-      return {
+      let next: RuleState = {
         ...state,
         matinsPsalmIndex: state.matinsPsalmIndex + 1,
         lastMatinsPsalmAdvanceDate: action.date,
       };
+      if (next.matinsPsalmIndex === MATINS_PSALM_COUNT) {
+        next = withMilestone(next, "matins-psalms", action.date);
+      }
+      return next;
+    }
     case "recordAmen": {
       // One record per office per day; a repeat replaces it.
       const amens = state.amens.filter(
@@ -176,18 +189,50 @@ function reducer(state: RuleState, action: Action): RuleState {
       );
       amens.push(action.record);
       amens.sort((a, b) => a.date.localeCompare(b.date));
-      return { ...state, amens };
+      let next: RuleState = { ...state, amens };
+
+      // Gospel coverage: track the chapters read; whole books are quiet firsts.
+      if (action.record.gospelRef) {
+        const parsed = gospelRefChapters(action.record.gospelRef);
+        if (parsed) {
+          const had = next.gospelChapters[parsed.book] ?? [];
+          const merged = [...new Set([...had, ...parsed.chapters])].sort((a, b) => a - b);
+          next = {
+            ...next,
+            gospelChapters: { ...next.gospelChapters, [parsed.book]: merged },
+          };
+          if (merged.length >= GOSPEL_CHAPTERS[parsed.book]) {
+            next = withMilestone(next, `gospel-${parsed.book}`, action.record.date);
+            const allFour = Object.entries(GOSPEL_CHAPTERS).every(
+              ([b, n]) => (next.gospelChapters[b] ?? []).length >= n,
+            );
+            if (allFour) next = withMilestone(next, "gospels-all", action.record.date);
+          }
+        }
+      }
+
+      // The first time the whole morning rule was prayed entire.
+      if (action.record.full) {
+        next = withMilestone(next, "matins-full", action.record.date);
+      }
+      return next;
     }
     case "setFather":
       return { ...state, father: { phone: action.phone, name: action.name } };
-    case "advancePsalm":
+    case "advancePsalm": {
       // Per-office latch; advance by however many psalm units were prayed.
       if (state.lastPsalmAdvanceKey === action.key || action.count <= 0) return state;
-      return {
+      const raw = state.psalmIndex + action.count;
+      const wrapped = raw >= UNIT_COUNT;
+      let next: RuleState = {
         ...state,
-        psalmIndex: (state.psalmIndex + action.count) % UNIT_COUNT,
+        psalmIndex: raw % UNIT_COUNT,
+        psalterRounds: state.psalterRounds + (wrapped ? 1 : 0),
         lastPsalmAdvanceKey: action.key,
       };
+      if (wrapped) next = withMilestone(next, "psalter", action.key.slice(0, 10));
+      return next;
+    }
     case "reset":
       return initialState();
     default:

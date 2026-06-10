@@ -68,6 +68,48 @@
   font-weight: 600;
 }
 
+.dayinfo {
+  font-size: 1.05rem;
+  font-style: italic;
+  color: var(--ink-muted);
+  margin-top: 0.15rem;
+}
+.dayinfo-season {
+  font-weight: 600;
+  font-style: normal;
+}
+
+.myrule {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.dash-grid {
+  display: grid;
+  grid-template-columns: repeat(14, 1fr);
+  gap: 6px;
+  max-width: 22rem;
+}
+.dash-day {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: center;
+}
+.dash-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+}
+.dash-dot.is-on {
+  background: var(--olive);
+  border-color: var(--olive);
+}
+
 .father-share {
   margin-top: var(--space-5);
 }

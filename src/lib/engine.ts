@@ -98,6 +98,12 @@ export type RuleState = {
   amens: AmenRecord[];
   /** The spiritual father's contact, remembered for the share feature (EO). */
   father: { phone: string; name: string };
+  /** Quiet firsts, noted once: { id, date achieved }. */
+  milestones: { id: string; date: string }[];
+  /** Gospel chapters read through the daily readings, per book. */
+  gospelChapters: Record<string, number[]>;
+  /** How many times the whole Psalter walk has been completed. */
+  psalterRounds: number;
   /** Dev/preview only: override "today" (YYYY-MM-DD) to time-travel. */
   previewDate?: string;
   /** Reminder clock times ("HH:MM", 24h) for the calendar alarm; null = off. */
@@ -125,6 +131,10 @@ export type AmenRecord = {
   part: "morning" | "evening";
   /** The kinds of the segments kept through to the Amen. */
   kinds: string[];
+  /** The raw lectionary reference, when the Gospel was kept. */
+  gospelRef?: string;
+  /** True when every segment of the office was kept (a full Matins). */
+  full?: boolean;
   /** The estimator's total for the kept segments, in seconds. */
   secs: number;
 };
@@ -195,6 +205,9 @@ export function initialState(): RuleState {
     matinsPsalmIndex: 0,
     amens: [],
     father: { phone: "", name: "" },
+    milestones: [],
+    gospelChapters: {},
+    psalterRounds: 0,
   };
 }
 

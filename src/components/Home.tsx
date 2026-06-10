@@ -1,6 +1,17 @@
 import { useStore, makeId } from "../lib/store";
-import { unitLabel } from "../lib/psalter";
+import { unitLabel, UNIT_COUNT } from "../lib/psalter";
 import { IS_EO } from "../lib/flavor";
+import { useEffect } from "react";
+import {
+  loadPropers,
+  propersFor,
+  loadSaintLives,
+  type ProperDay,
+} from "../lib/propers";
+import { dayAccent, fastLine } from "../lib/season";
+import { MILESTONE_TEXT } from "../lib/milestones";
+import { MATINS_PSALM_COUNT } from "../lib/matins";
+import { PrayerReader, type SoloContent } from "./PrayerReader";
 import {
   availableWindows,
   buildSummary,
@@ -28,6 +39,36 @@ export function Home({
   defaultPart: DayPart;
 }) {
   const { state, today, dispatch } = useStore();
+  const [properDay, setProperDay] = useState<ProperDay | undefined>(undefined);
+  const [life, setLife] = useState<SoloContent | null>(null);
+  useEffect(() => {
+    if (!IS_EO) return;
+    let active = true;
+    loadPropers().then((p) => {
+      if (active) setProperDay(propersFor(p, today));
+    });
+    return () => {
+      active = false;
+    };
+  }, [today]);
+  const accent = IS_EO ? dayAccent(today, properDay) : {};
+  const fasting = IS_EO ? fastLine(properDay) : null;
+  const openLife = async () => {
+    const lives = await loadSaintLives();
+    const stories = lives.days[today] ?? [];
+    setLife({
+      title: "The Saint of the Day",
+      movements: stories.length
+        ? stories.map((st) => ({ label: st.t, text: st.s, source: "orthocal.info" }))
+        : [
+            {
+              label: "The Saint of the Day",
+              text: "No life of a saint is recorded for today. See oca.org/saints for the full calendar.",
+            },
+          ],
+      onComplete: () => {},
+    });
+  };
   const checkIn = todaysCheckIn(state, today);
   const streak = keptStreak(state.log);
   const kept = keptInWindow(state.log);
@@ -35,6 +76,15 @@ export function Home({
   const now = new Date();
   // Lead with whichever office the time of day suggests, but show both.
   const leadPart: DayPart = defaultPart;
+
+  if (life) {
+    return <PrayerReader solo={life} onClose={() => setLife(null)} />;
+  }
+
+  // The most recent quiet first, mentioned for a week.
+  const recentMilestone = [...state.milestones]
+    .reverse()
+    .find((m) => daysBetween(m.date, today) <= 7 && MILESTONE_TEXT[m.id]);
 
   return (
     <main className="app home">
@@ -44,7 +94,26 @@ export function Home({
           className="emblem emblem-home"
         />
         <p className="eyebrow">{longDate(now)}</p>
-        <h1 className="home-greeting">{greeting(now)}.</h1>
+        <h1
+          className="home-greeting"
+          style={accent.color ? { color: accent.color } : undefined}
+        >
+          {greeting(now)}.
+        </h1>
+        {(accent.label || fasting) && (
+          <p className="dayinfo">
+            {accent.label && (
+              <span
+                className="dayinfo-season"
+                style={accent.color ? { color: accent.color } : undefined}
+              >
+                {accent.label}
+              </span>
+            )}
+            {accent.label && fasting && <span className="dayinfo-sep"> · </span>}
+            {fasting && <span className="dayinfo-fast">{fasting}</span>}
+          </p>
+        )}
         <Faithfulness streak={streak} kept={kept} logged={state.log.length} />
       </header>
 
@@ -67,7 +136,26 @@ export function Home({
             label="Begin evening prayer"
           />
         </div>
+
+        {IS_EO && (
+          <div className="evening-block">
+            <h3 className="evening-title">The Saint of the Day</h3>
+            {properDay?.saint && <p className="today-goal">{properDay.saint}</p>}
+            <div className="practice-row">
+              <button className="btn btn-ghost" onClick={openLife}>
+                Read the life of the saint
+              </button>
+            </div>
+          </div>
+        )}
       </section>
+
+      {recentMilestone && (
+        <aside className="offer offer-advance" role="status">
+          <p className="offer-eyebrow">A quiet first</p>
+          <p className="offer-body">{MILESTONE_TEXT[recentMilestone.id]}</p>
+        </aside>
+      )}
 
       <PsalmRotation />
 
@@ -78,6 +166,8 @@ export function Home({
       />
 
       <Intentions />
+
+      <MyRule />
 
       {IS_EO && <FatherShare />}
 
@@ -279,6 +369,63 @@ function FatherShare() {
           )}
         </div>
       )}
+    </section>
+  );
+}
+
+/** Whole days from a to b (local dates, b >= a). */
+function daysBetween(a: string, b: string): number {
+  const [ay, am, ad] = a.split("-").map(Number);
+  const [by, bm, bd] = b.split("-").map(Number);
+  return Math.round(
+    (new Date(by, bm - 1, bd).getTime() - new Date(ay, am - 1, ad).getTime()) / 86400000,
+  );
+}
+
+/** The quiet dashboard: the rule as it has actually been kept. */
+function MyRule() {
+  const { state, today } = useStore();
+  if (!state.amens.length) return null;
+
+  const [ty, tm, td] = today.split("-").map(Number);
+  const days: { date: string; m: boolean; e: boolean }[] = [];
+  for (let i = 27; i >= 0; i--) {
+    const dt = new Date(ty, tm - 1, td - i);
+    const date = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+    days.push({
+      date,
+      m: state.amens.some((a) => a.date === date && a.part === "morning"),
+      e: state.amens.some((a) => a.date === date && a.part === "evening"),
+    });
+  }
+  const mornings = state.amens.filter((a) => a.part === "morning").length;
+  const evenings = state.amens.filter((a) => a.part === "evening").length;
+
+  return (
+    <section className="myrule" aria-labelledby="myrule-h">
+      <p className="eyebrow">Your rule, kept</p>
+      <h2 id="myrule-h" className="intentions-h">
+        My rule
+      </h2>
+      <div className="dash-grid" aria-label="The last four weeks">
+        {days.map((d) => (
+          <span key={d.date} className="dash-day" title={d.date}>
+            <span className={`dash-dot ${d.m ? "is-on" : ""}`} aria-hidden="true" />
+            <span className={`dash-dot ${d.e ? "is-on" : ""}`} aria-hidden="true" />
+          </span>
+        ))}
+      </div>
+      <p className="psalter-sub">
+        {mornings} morning{mornings === 1 ? "" : "s"} and {evenings} evening
+        {evenings === 1 ? "" : "s"} prayed. The Psalter walk is at {unitLabel(state.psalmIndex)}
+        {" "}({state.psalmIndex + 1} of {UNIT_COUNT}
+        {state.psalterRounds > 0
+          ? `, completed ${state.psalterRounds} time${state.psalterRounds === 1 ? "" : "s"}`
+          : ""}
+        ).
+        {IS_EO &&
+          ` The psalms of Matins are at ${(state.matinsPsalmIndex % MATINS_PSALM_COUNT) + 1} of ${MATINS_PSALM_COUNT}.`}
+      </p>
     </section>
   );
 }
