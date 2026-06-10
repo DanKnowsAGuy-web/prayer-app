@@ -139,6 +139,8 @@ export function Settings({ onClose }: { onClose: () => void }) {
           Done
         </button>
       </div>
+
+      <p className="settings-version">Build {__BUILD__}</p>
     </main>
   );
 }

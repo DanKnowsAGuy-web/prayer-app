@@ -595,6 +595,13 @@
   color: var(--ink-muted);
   font-style: italic;
 }
+.settings-version {
+  margin-top: var(--space-4);
+  text-align: center;
+  color: var(--ink-faint);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
 .settings-traditions {
   display: flex;
   flex-wrap: wrap;
