@@ -47,16 +47,17 @@ export function InstallHint() {
       // Private mode without storage: fall through and show once per session.
     }
 
-    // Chrome/Android: capture the install prompt and surface our own button.
+    // Show the hint on any not-yet-installed browser — the manual "Add to Home
+    // Screen" path works everywhere. Chrome's `beforeinstallprompt` is only an
+    // enhancement: when it fires, we also offer a one-tap native button. We do
+    // NOT wait for it, since on desktop it's unreliable and often never fires.
+    setShow(true);
+
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as InstallEvent);
-      setShow(true);
     };
     window.addEventListener("beforeinstallprompt", onPrompt);
-
-    // iOS gives no event; show the manual instruction directly.
-    if (iOS) setShow(true);
 
     const onInstalled = () => dismiss();
     window.addEventListener("appinstalled", onInstalled);
@@ -95,8 +96,14 @@ export function InstallHint() {
             <strong>Add to Home Screen</strong> — and it opens full-screen, like
             an app.
           </>
-        ) : (
+        ) : deferred ? (
           <>Add Prayer to your home screen and it opens full-screen, like an app.</>
+        ) : (
+          <>
+            Install Prayer to open it full-screen, like an app — use your
+            browser menu and choose <strong>Install</strong> or{" "}
+            <strong>Add to Home screen</strong>.
+          </>
         )}
       </p>
       <div className="install-hint-actions">
