@@ -16,6 +16,11 @@ export function App() {
 
   // Hidden preview/testing panel at `…/#dev`.
   const [hash, setHash] = useState(() => window.location.hash);
+
+  // Each screen starts at its top; the old screen's scroll must not carry over.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [reading, settingsOpen, state.onboarded, hash]);
   useEffect(() => {
     const onHash = () => setHash(window.location.hash);
     window.addEventListener("hashchange", onHash);

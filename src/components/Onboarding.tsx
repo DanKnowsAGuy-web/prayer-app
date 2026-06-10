@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore, makeId } from "../lib/store";
 import { LAST_RUNG } from "../lib/ladder";
 import type { Tradition } from "../lib/engine";
@@ -47,6 +47,11 @@ export function Onboarding() {
   const [remMorning, setRemMorning] = useState<string | null>(null);
   const [remEvening, setRemEvening] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
+
+  // Each step opens at the top of the page.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [step]);
 
   /** Persist any chosen reminder times (the existing reminders state). */
   const commitReminders = () => {

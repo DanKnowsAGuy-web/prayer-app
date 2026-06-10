@@ -370,6 +370,11 @@ function OfficePrayer({
   );
 
   const [phase, setPhase] = useState<"preview" | "pray">("preview");
+
+  // Start at the top when the build-out appears and again when prayer begins.
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [ready, phase]);
   const kept = useMemo(
     () => movements.filter((_, i) => effective[i]),
     [movements, effective],
@@ -516,6 +521,10 @@ function OfficePrayer({
  */
 function SoloPrayer({ solo, onClose }: { solo: SoloContent; onClose: () => void }) {
   const { state } = useStore();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   const complete = useCallback(() => {
     solo.onComplete();
     onClose();
