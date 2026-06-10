@@ -6,6 +6,10 @@ import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import { serveEoMorning } from "../lib/eoMorningPrayers";
 import { serveEoEvening } from "../lib/eoEveningPrayers";
+import { IS_EO } from "../lib/flavor";
+import { weekdayOf } from "../lib/engine";
+import { loadPropers, propersFor, type ProperDay } from "../lib/propers";
+import { weekdayTheme, matinsFragment } from "../lib/matins";
 import {
   loadLectionary,
   lectionaryFor,
@@ -14,11 +18,13 @@ import {
 } from "../lib/scripture";
 import {
   assembleOffice,
+  assembleMatins,
   applyBindings,
   defaultIncluded,
   buildGospelMovement,
   buildEpistleMovement,
   MAX_LEVEL,
+  MATINS_MAX_LEVEL,
   type Movement,
 } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
@@ -60,6 +66,9 @@ type OfficeData = {
   gospel?: Movement;
   epistle?: Movement;
   psalmMovements: Movement[];
+  /** EO Matins morning only: the day's propers and the featured fragment. */
+  propers?: ProperDay;
+  fragment?: Movement;
 };
 
 /**
@@ -102,6 +111,11 @@ function OfficePrayer({
 }) {
   const { state, today, dispatch } = useStore();
 
+  // The EO edition's morning is the Matins-shaped rule; everything else keeps
+  // the value-spine office.
+  const isMatins =
+    IS_EO && part === "morning" && state.tradition === "eastern-orthodox";
+
   const [data, setData] = useState<OfficeData>({ psalmMovements: [] });
   const [ready, setReady] = useState(false);
 
@@ -136,6 +150,16 @@ function OfficePrayer({
       const psalter = await loadPsalter();
       next.psalmMovements = unitMovements(psalter, state.psalmIndex, MAX_PSALMS);
 
+      // EO Matins morning: the day's propers and the featured fragment.
+      if (isMatins) {
+        const propers = await loadPropers();
+        next.propers = propersFor(propers, today);
+        next.fragment = matinsFragment(
+          psalter as Parameters<typeof matinsFragment>[0],
+          state.matinsFragmentIndex,
+        );
+      }
+
       if (active) {
         setData(next);
         setReady(true);
@@ -145,7 +169,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, state.translation, state.psalmIndex, state.tradition]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex]);
 
   // The intercessory cycle is a permanent spine segment (level 3); the slider,
   // not a flag, governs whether it's prayed today. The Prologue is served once,
@@ -181,43 +205,86 @@ function OfficePrayer({
     };
   }, [state.tradition, part, state.eoMorningIndex, state.eoEveningIndex]);
 
-  const movements = useMemo(
-    () =>
-      assembleOffice({
-        part,
+  const movements = useMemo(() => {
+    if (isMatins) {
+      const p = data.propers;
+      // The sourced propers, or a visible gap flag — never invented content.
+      const troparion: Movement = p?.troparion
+        ? {
+            label: "Troparion of the day",
+            ref: `${p.saint} — Tone ${p.troparion.tone}`,
+            text: p.troparion.text,
+            source: "OCA",
+          }
+        : {
+            label: "Troparion of the day",
+            text: "(Today's troparion could not be sourced — OCA, Antiochian, and ROCOR were checked at build time. See oca.org/saints for the day's commemorations.)",
+            note: "Source gap — nothing is shown in its place rather than inventing a text.",
+          };
+      const kontakion: Movement | undefined = p?.kontakion
+        ? {
+            label: "Kontakion of the day",
+            ref: `${p.saint} — Tone ${p.kontakion.tone}`,
+            text: p.kontakion.text,
+            source: "OCA",
+          }
+        : undefined;
+      return assembleMatins({
         tradition: state.tradition,
         psalmMovements: data.psalmMovements,
-        gospel: data.gospel,
-        epistle: data.epistle,
-        song: canticleMovement(part),
         traditionPrayer,
+        troparion,
+        kontakion,
+        theme: weekdayTheme(weekdayOf(today), p?.tone) as Movement,
+        fragment: (data.fragment ?? { label: "", text: "" }) as Movement,
+        gospel: state.gospelDoneDate === today ? undefined : data.gospel,
         cycle: cycleMovement,
         intentions: state.intentions,
         date: today,
-        carry: {
-          gospelDone: state.gospelDoneDate === today,
-          epistleDone: state.epistleDoneDate === today,
-        },
-      }),
-    [
+      });
+    }
+    return assembleOffice({
       part,
-      state.tradition,
-      data,
+      tradition: state.tradition,
+      psalmMovements: data.psalmMovements,
+      gospel: data.gospel,
+      epistle: data.epistle,
+      song: canticleMovement(part),
       traditionPrayer,
-      cycleMovement,
-      state.intentions,
-      today,
-      state.gospelDoneDate,
-      state.epistleDoneDate,
-    ],
-  );
+      cycle: cycleMovement,
+      intentions: state.intentions,
+      date: today,
+      carry: {
+        gospelDone: state.gospelDoneDate === today,
+        epistleDone: state.epistleDoneDate === today,
+      },
+    });
+  }, [
+    isMatins,
+    part,
+    state.tradition,
+    data,
+    traditionPrayer,
+    cycleMovement,
+    state.intentions,
+    today,
+    state.gospelDoneDate,
+    state.epistleDoneDate,
+  ]);
 
   // The office opens at its fullest. The slider trims down the value rank.
-  const maxLevel = MAX_LEVEL[part];
+  const maxLevel = isMatins ? MATINS_MAX_LEVEL : MAX_LEVEL[part];
 
-  // The slider's notches walk the value rank one segment at a time: levels 1–4,
-  // then the Psalms one psalm per notch, then (evening) the Epistle on top.
+  // The slider's notches walk the value rank one segment at a time. The Matins
+  // rank already interleaves the psalms (levels carry the rank directly); the
+  // value-spine office expands the psalms into per-psalm notches.
   const notches = useMemo(() => {
+    if (isMatins) {
+      return Array.from({ length: MATINS_MAX_LEVEL }, (_, i) => ({
+        level: i + 1,
+        count: MAX_PSALMS,
+      }));
+    }
     const arr: { level: number; count: number }[] = [
       { level: 1, count: MAX_PSALMS },
       { level: 2, count: MAX_PSALMS },
@@ -227,7 +294,7 @@ function OfficePrayer({
     for (let n = 1; n <= MAX_PSALMS; n++) arr.push({ level: 5, count: n });
     if (maxLevel >= 6) arr.push({ level: 6, count: MAX_PSALMS });
     return arr;
-  }, [maxLevel]);
+  }, [isMatins, maxLevel]);
 
   const [sliderPos, setSliderPos] = useState(notches.length);
   const [level, setLevel] = useState(maxLevel);
@@ -242,19 +309,26 @@ function OfficePrayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, movements.length]);
 
+  // Opt-ins (the toggles that extend the session) survive slider moves.
+  const recompute = (lvl: number, count: number) =>
+    setIncluded((prev) =>
+      computeIncluded(movements, lvl, count).map((v, i) =>
+        movements[i].optional ? (prev[i] ?? false) : v,
+      ),
+    );
   const onSlider = (pos: number) => {
     const notch = notches[Math.max(1, Math.min(notches.length, pos)) - 1];
     setSliderPos(pos);
     setLevel(notch.level);
     setPsalmCount(notch.count);
-    setIncluded(computeIncluded(movements, notch.level, notch.count));
+    recompute(notch.level, notch.count);
   };
   const onPsalmCount = (n: number) => {
     setPsalmCount(n);
     // Keep the slider on the matching notch when one exists (psalms are in view
     // and at least one is kept); otherwise it's a custom set and the thumb stays.
     if (level === 5 && n > 0) setSliderPos(4 + n);
-    setIncluded(computeIncluded(movements, level, n));
+    recompute(level, n);
   };
   const onToggle = (i: number) =>
     setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)));
@@ -291,6 +365,9 @@ function OfficePrayer({
         type: part === "morning" ? "advanceEoMorning" : "advanceEoEvening",
         date: today,
       });
+    }
+    if (keptKinds.has("fragment")) {
+      dispatch({ type: "advanceFragment", date: today });
     }
     if (keptKinds.has("gospel")) {
       dispatch({ type: "markReadingDone", which: "gospel", date: today });
@@ -349,6 +426,7 @@ function OfficePrayer({
         onSlider={onSlider}
         psalmCount={psalmCount}
         onPsalmCount={onPsalmCount}
+        hidePsalmCount={isMatins}
         onToggle={onToggle}
         onBegin={() => setPhase("pray")}
         onClose={onClose}
@@ -456,6 +534,7 @@ function BuildOut({
   onSlider,
   psalmCount,
   onPsalmCount,
+  hidePsalmCount,
   onToggle,
   onBegin,
   onClose,
@@ -468,6 +547,7 @@ function BuildOut({
   onSlider: (pos: number) => void;
   psalmCount: number;
   onPsalmCount: (n: number) => void;
+  hidePsalmCount?: boolean;
   onToggle: (i: number) => void;
   onBegin: () => void;
   onClose: () => void;
@@ -521,7 +601,7 @@ function BuildOut({
             const psalmPos = isPsalm ? psalmIdxs.indexOf(i) : -1;
             return (
               <li key={i}>
-                {i === firstPsalm && (
+                {i === firstPsalm && !hidePsalmCount && (
                   <div className="psalm-count" role="group" aria-label="How many psalms">
                     <span className="psalm-count-label">Psalms</span>
                     <div className="psalm-count-opts">
@@ -550,7 +630,7 @@ function BuildOut({
                   onClick={() =>
                     isFloor
                       ? undefined
-                      : isPsalm
+                      : isPsalm && !hidePsalmCount
                         ? onPsalmCount(psalmPos + 1)
                         : onToggle(i)
                   }

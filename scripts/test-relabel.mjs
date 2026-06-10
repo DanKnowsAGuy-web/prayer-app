@@ -23,7 +23,6 @@ const RANK = {
   "tradition-opening": 1,
   "tradition-prayer": 1.5,
   "opening-line": 2,
-  examen: 3,
   psalm: 4,
   doxology: 5,
   epistle: 6,

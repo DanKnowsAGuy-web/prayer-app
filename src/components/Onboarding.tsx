@@ -360,8 +360,8 @@ export function Onboarding() {
             and needs you carry, named before God.
           </li>
           <li>
-            <span className="rotation-name">The Examen and a night prayer</span> —
-            a look back over the day, to close the evening.
+            <span className="rotation-name">A night prayer</span> — to close the
+            evening in peace.
           </li>
         </ul>
         <p className="lede">

@@ -82,6 +82,12 @@ export type RuleState = {
   eoEveningIndex: number;
   lastEoEveningAdvanceDate?: string;
   /**
+   * The featured-fragment rotation of the EO Matins-shaped morning: one
+   * structural window into Orthros per session, advancing by usage.
+   */
+  matinsFragmentIndex: number;
+  lastFragmentAdvanceDate?: string;
+  /**
    * The prayer history: one record per completed office (kept through to the
    * Amen), universal across editions — the basis for summaries and any future
    * dashboards. A same-day repeat of the same office replaces its record.
@@ -182,6 +188,7 @@ export function initialState(): RuleState {
     cycle: { day: 1, prologueSeen: false },
     eoMorningIndex: 0,
     eoEveningIndex: 0,
+    matinsFragmentIndex: 0,
     amens: [],
     father: { phone: "", name: "" },
   };

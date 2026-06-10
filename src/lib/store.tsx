@@ -47,6 +47,7 @@ type Action =
   | { type: "advancePsalm"; key: string; count: number }
   | { type: "advanceEoMorning"; date: string }
   | { type: "advanceEoEvening"; date: string }
+  | { type: "advanceFragment"; date: string }
   | { type: "recordAmen"; record: AmenRecord }
   | { type: "setFather"; phone: string; name: string }
   | { type: "reset" };
@@ -152,6 +153,13 @@ function reducer(state: RuleState, action: Action): RuleState {
         ...state,
         eoEveningIndex: state.eoEveningIndex + 1,
         lastEoEveningAdvanceDate: action.date,
+      };
+    case "advanceFragment":
+      if (state.lastFragmentAdvanceDate === action.date) return state;
+      return {
+        ...state,
+        matinsFragmentIndex: state.matinsFragmentIndex + 1,
+        lastFragmentAdvanceDate: action.date,
       };
     case "recordAmen": {
       // One record per office per day; a repeat replaces it.

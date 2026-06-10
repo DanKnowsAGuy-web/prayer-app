@@ -12,11 +12,19 @@
 import { intentionsForDate, type Intention, type Tradition } from "./engine";
 import type { DayPart } from "./daypart";
 import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
+import { TRISAGION, GREAT_DOXOLOGY, DISMISSAL } from "./matins";
 
 export type MovementKind =
   | "tradition-opening"
   | "tradition-prayer"
   | "opening-line"
+  | "trisagion"
+  | "troparion"
+  | "kontakion"
+  | "theme"
+  | "fragment"
+  | "great-doxology"
+  | "dismissal"
   | "doxology"
   | "psalm"
   | "epistle"
@@ -24,7 +32,6 @@ export type MovementKind =
   | "song"
   | "cycle"
   | "intercession"
-  | "examen"
   | "night-psalm"
   | "lords"
   | "closing"
@@ -42,6 +49,11 @@ export type Movement = {
   kind?: MovementKind;
   /** Position on the value spine (1 = floor). */
   level?: number;
+  /**
+   * An opt-in that EXTENDS the session beyond the slider's budget: off at
+   * every slider level, switched on only by its own toggle in the build-out.
+   */
+  optional?: boolean;
   /** Show a sign-of-the-cross mark (traditions that cross themselves). */
   cross?: boolean;
 };
@@ -75,14 +87,6 @@ const DEFAULT_CLOSING: Movement = {
   level: 2,
   label: "Closing prayer",
   text: "O Lord, our heavenly Father, by whose providence the duties of men are appointed: grant me grace to do this day the work set before me, that I may not weary nor faint, but offer it all to thee. Amen.",
-};
-
-const EXAMEN: Movement = {
-  kind: "examen",
-  level: 1,
-  label: "the Examen",
-  text: "Look back over the day. Where did you meet grace? Where did you fall short?",
-  note: "Give thanks for the good; ask forgiveness for the rest.",
 };
 
 const NIGHT_PSALM: Movement = {
@@ -227,7 +231,6 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
     ctx.traditionPrayer && { ...ctx.traditionPrayer, kind: "tradition-prayer", level: 1 },
   );
   push(OPENING_LINE);
-  if (part === "evening") push(EXAMEN);
 
   // Psalms (and the doxology that answers them).
   const hasPsalms = ctx.psalmMovements.length > 0;
@@ -305,7 +308,6 @@ const FLOOR_KINDS = new Set<MovementKind>([
   "tradition-opening",
   "tradition-prayer",
   "opening-line",
-  "examen",
   "night-psalm",
   "lords",
   "prayer-night",
@@ -313,9 +315,9 @@ const FLOOR_KINDS = new Set<MovementKind>([
   "closing",
 ]);
 
-/** Initial include state for a chosen spine level. */
+/** Initial include state for a chosen spine level (opt-ins stay off). */
 export function defaultIncluded(movements: Movement[], level: number): boolean[] {
-  return movements.map((m) => (m.level ?? 1) <= level);
+  return movements.map((m) => !m.optional && (m.level ?? 1) <= level);
 }
 
 /**
@@ -334,3 +336,116 @@ export function applyBindings(movements: Movement[], included: boolean[]): boole
   });
 }
 
+
+// ── The EO Matins-shaped morning ─────────────────────────────────────────────
+//
+// Same arc every day, scaled in resolution by the slider: the fixed spine is
+// always present, and the slider adds resolution — psalms one at a time
+// (interleaved with the propers, so one psalm survives deep into the small
+// sessions), the day's kontakion and remembrance, the featured fragment, and
+// at the top the Great Doxology. The Gospel and the intercessory cycle are
+// opt-ins that extend the session beyond the slider's budget.
+
+/** The value rank, floor (1) → full (10). */
+export const MATINS_MAX_LEVEL = 10;
+const MATINS_PSALM_LEVELS = [2, 6, 7, 9];
+
+export type MatinsCtx = {
+  tradition: Tradition | null;
+  /** Up to four Psalter units (the walk continues here as everywhere). */
+  psalmMovements: Movement[];
+  /** "A Morning Prayer" — the rotating classic morning prayer. */
+  traditionPrayer?: Movement;
+  /** The saint of the day's troparion / kontakion (sourced), or a gap flag. */
+  troparion?: Movement;
+  kontakion?: Movement;
+  /** The fixed day-of-week remembrance. */
+  theme: Movement;
+  /** The featured window into Orthros (the familiarity rotation). */
+  fragment: Movement;
+  /** Opt-in extensions (off at every slider level). */
+  gospel?: Movement;
+  cycle?: Movement;
+  intentions: Intention[];
+  date: string;
+};
+
+export function assembleMatins(ctx: MatinsCtx): Movement[] {
+  const { tradition } = ctx;
+  const out: Movement[] = [];
+  const push = (m: Movement | undefined | false) => {
+    if (m) out.push(m);
+  };
+
+  // The fixed spine, in service order.
+  if (tradition) {
+    const meta = TRADITION_META[tradition];
+    push({
+      kind: "tradition-opening",
+      level: 1,
+      label: meta.opening.label,
+      text: meta.opening.text,
+    });
+  }
+  push({ ...TRISAGION, kind: "trisagion", level: 1 });
+  push(LORDS_PRAYER);
+  push(ctx.traditionPrayer && { ...ctx.traditionPrayer, kind: "tradition-prayer", level: 1 });
+
+  // The Psalter walk: one psalm survives deep (level 2); the rest return as
+  // the slider rises (levels 6, 7, 9), interleaved with the propers.
+  ctx.psalmMovements.forEach((p, i) => {
+    push({ ...p, kind: "psalm", level: MATINS_PSALM_LEVELS[i] ?? MATINS_PSALM_LEVELS[3] });
+  });
+
+  // The day's propers: the troparion belongs to the floor; the kontakion and
+  // the weekday remembrance arrive as the session grows.
+  push(ctx.troparion && { ...ctx.troparion, kind: "troparion", level: 1 });
+  push(ctx.kontakion && { ...ctx.kontakion, kind: "kontakion", level: 4 });
+  push({ ...ctx.theme, kind: "theme", level: 5 });
+
+  // Opt-in: the day's Gospel (extends the session; carries to evening if off).
+  push(ctx.gospel && { ...ctx.gospel, level: 1, optional: true });
+
+  // The featured fragment — one window into Orthros per session.
+  push({ ...ctx.fragment, kind: "fragment", level: 8 });
+
+  // Opt-in: prayer with the early Church.
+  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 1, optional: true });
+
+  // Your prayer list — held space, kept deep into small sessions.
+  if (intentionsForDate(ctx.intentions, ctx.date).length) {
+    const meta = tradition ? TRADITION_META[tradition] : null;
+    const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
+    const names = intentionsForDate(ctx.intentions, ctx.date)
+      .map((i) => i.text)
+      .join("\n");
+    push({
+      kind: "intercession",
+      level: 3,
+      label: "Your prayer list",
+      text: `${INTERCESSION_BEFORE}\n\n${names}\n\n${close}`,
+      ...(meta?.intercessionCloseAttribution
+        ? { source: meta.intercessionCloseAttribution }
+        : {}),
+    });
+  }
+
+  // The summit, then the close.
+  push({ ...GREAT_DOXOLOGY, kind: "great-doxology", level: 10 });
+  push({ ...DISMISSAL, kind: "dismissal", level: 1 });
+
+  // Cross marks, as everywhere.
+  if (tradition && TRADITION_META[tradition].crosses) {
+    for (const m of out) {
+      if (
+        m.kind === "tradition-opening" ||
+        m.kind === "trisagion" ||
+        m.kind === "great-doxology"
+      ) {
+        m.cross = true;
+      }
+    }
+  }
+
+  return out;
+}
