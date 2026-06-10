@@ -68,6 +68,15 @@
   font-weight: 600;
 }
 
+.welcome-callout {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 34rem;
+  border-left: 3px solid var(--clay);
+  padding-left: var(--space-3);
+}
+
 .dayinfo {
   font-size: 1.05rem;
   font-style: italic;

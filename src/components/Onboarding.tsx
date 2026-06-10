@@ -71,10 +71,30 @@ export function Onboarding() {
         <h1 className="onboard-title">
           Begin where you are.<br />Grow as you're able.
         </h1>
-        <p className="lede">
-          This is a quiet companion for daily prayer, and meets you at your own
-          pace.
-        </p>
+        {IS_EO ? (
+          <>
+            <p className="lede">
+              This app builds two things: familiarity with the Church's
+              prayers, and the discipline of praying every day. As both take
+              root, the prayer books themselves grow familiar and less
+              intimidating, and in time this app will teach you to pray from
+              them.
+            </p>
+            <p className="welcome-callout">
+              A rule of prayer is best kept under a blessing.
+            </p>
+            <p className="lede">
+              After your first week of prayer, one tap will send your spiritual
+              father a short text of how your rule has gone, so he can review
+              it and adjust it with you.
+            </p>
+          </>
+        ) : (
+          <p className="lede">
+            This is a quiet companion for daily prayer, and meets you at your
+            own pace.
+          </p>
+        )}
         <div className="onboard-actions">
           <button
             className="btn btn-primary"
