@@ -416,9 +416,9 @@ export function Onboarding() {
               people and needs you carry, named before God.
             </li>
             <li>
-              <span className="rotation-name">The evening prayers</span>: the
-              prayers before sleep, one each evening, with a night psalm to
-              close the day.
+              <span className="rotation-name">The shape of Vespers</span>: its
+              psalms and O Gladsome Light in the evening, with the prayers
+              before sleep to close the day.
             </li>
           </ul>
         ) : (

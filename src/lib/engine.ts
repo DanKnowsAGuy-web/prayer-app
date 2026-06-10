@@ -90,6 +90,9 @@ export type RuleState = {
   /** The Matins-psalm loop (Six Psalms, Polyeleos, Praises), its own pointer. */
   matinsPsalmIndex: number;
   lastMatinsPsalmAdvanceDate?: string;
+  /** The Vespers-psalm loop (Psalm 104 in two parts, then the evening psalms). */
+  vespersPsalmIndex: number;
+  lastVespersPsalmAdvanceDate?: string;
   /**
    * The prayer history: one record per completed office (kept through to the
    * Amen), universal across editions — the basis for summaries and any future
@@ -203,6 +206,7 @@ export function initialState(): RuleState {
     eoEveningIndex: 0,
     matinsFragmentIndex: 0,
     matinsPsalmIndex: 0,
+    vespersPsalmIndex: 0,
     amens: [],
     father: { phone: "", name: "" },
     milestones: [],

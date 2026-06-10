@@ -10,6 +10,7 @@ import { IS_EO } from "../lib/flavor";
 import { weekdayOf } from "../lib/engine";
 import { loadPropers, propersFor, type ProperDay } from "../lib/propers";
 import { weekdayTheme, matinsFragment, serveMatinsPsalm } from "../lib/matins";
+import { serveVespersPsalm, prokeimenon } from "../lib/vespers";
 import {
   loadLectionary,
   lectionaryFor,
@@ -19,12 +20,14 @@ import {
 import {
   assembleOffice,
   assembleMatins,
+  assembleVespers,
   applyBindings,
   defaultIncluded,
   buildGospelMovement,
   buildEpistleMovement,
   MAX_LEVEL,
   MATINS_MAX_LEVEL,
+  VESPERS_MAX_LEVEL,
   type Movement,
 } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
@@ -72,6 +75,7 @@ type OfficeData = {
   propers?: ProperDay;
   fragment?: Movement;
   matinsPsalm?: Movement;
+  vespersPsalm?: Movement;
   /** EO morning only: the rotating morning-prayer slot (needs the Psalter). */
   morningPrayer?: Movement;
 };
@@ -116,10 +120,12 @@ function OfficePrayer({
 }) {
   const { state, today, dispatch } = useStore();
 
-  // The EO edition's morning is the Matins-shaped rule; everything else keeps
-  // the value-spine office.
+  // The EO edition's offices are the Matins- and Vespers-shaped rules;
+  // everything else keeps the value-spine office.
   const isMatins =
     IS_EO && part === "morning" && state.tradition === "eastern-orthodox";
+  const isVespers =
+    IS_EO && part === "evening" && state.tradition === "eastern-orthodox";
 
   const [data, setData] = useState<OfficeData>({ psalmMovements: [] });
   const [ready, setReady] = useState(false);
@@ -158,7 +164,7 @@ function OfficePrayer({
       next.psalmMovements = unitMovements(
         psalter,
         state.psalmIndex,
-        isMatins ? 2 : MAX_PSALMS,
+        isMatins || isVespers ? 2 : MAX_PSALMS,
       );
 
       // EO morning: the rotating morning-prayer slot (eleven prayers, Psalm 50,
@@ -173,6 +179,16 @@ function OfficePrayer({
           ref: served.title,
           text: served.text,
         };
+      }
+
+      // EO Vespers evening: the propers and the Vespers psalm.
+      if (isVespers) {
+        const propers = await loadPropers();
+        next.propers = propersFor(propers, today);
+        next.vespersPsalm = serveVespersPsalm(
+          psalter as Parameters<typeof serveVespersPsalm>[0],
+          state.vespersPsalmIndex,
+        ) as Movement;
       }
 
       // EO Matins morning: the day's propers, the Matins psalm, the fragment.
@@ -202,7 +218,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex, state.matinsPsalmIndex, state.eoMorningIndex]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, isVespers, state.matinsFragmentIndex, state.matinsPsalmIndex, state.vespersPsalmIndex, state.eoMorningIndex, state.eoEveningIndex]);
 
   // The intercessory cycle is a permanent spine segment (level 3); the slider,
   // not a flag, governs whether it's prayed today. The Prologue is served once,
@@ -273,6 +289,34 @@ function OfficePrayer({
         date: today,
       });
     }
+    if (isVespers) {
+      const p = data.propers;
+      const troparion: Movement = p?.troparion
+        ? {
+            label: "Troparion of the day",
+            ref: `${p.saint} · Tone ${p.troparion.tone}`,
+            text: p.troparion.text,
+            source: "OCA",
+          }
+        : {
+            label: "Troparion of the day",
+            text: "(Today's troparion could not be sourced. OCA, Antiochian, and ROCOR were checked at build time; see oca.org/saints for the day's commemorations.)",
+            note: "Source gap: nothing is shown in its place rather than inventing a text.",
+          };
+      return assembleVespers({
+        tradition: state.tradition,
+        psalmMovements: data.psalmMovements,
+        traditionPrayer,
+        troparion,
+        vespersPsalm: data.vespersPsalm,
+        prokeimenon: prokeimenon(weekdayOf(today)) as Movement,
+        gospel: state.gospelDoneDate === today ? undefined : data.gospel,
+        epistle: state.epistleDoneDate === today ? undefined : data.epistle,
+        cycle: cycleMovement,
+        intentions: state.intentions,
+        date: today,
+      });
+    }
     return assembleOffice({
       part,
       tradition: state.tradition,
@@ -291,6 +335,7 @@ function OfficePrayer({
     });
   }, [
     isMatins,
+    isVespers,
     part,
     state.tradition,
     data,
@@ -303,14 +348,18 @@ function OfficePrayer({
   ]);
 
   // The office opens at its fullest. The slider trims down the value rank.
-  const maxLevel = isMatins ? MATINS_MAX_LEVEL : MAX_LEVEL[part];
+  const maxLevel = isMatins
+    ? MATINS_MAX_LEVEL
+    : isVespers
+      ? VESPERS_MAX_LEVEL
+      : MAX_LEVEL[part];
 
   // The slider's notches walk the value rank one segment at a time. The Matins
   // rank already interleaves the psalms (levels carry the rank directly); the
   // value-spine office expands the psalms into per-psalm notches.
   const notches = useMemo(() => {
-    if (isMatins) {
-      return Array.from({ length: MATINS_MAX_LEVEL }, (_, i) => ({
+    if (isMatins || isVespers) {
+      return Array.from({ length: maxLevel }, (_, i) => ({
         level: i + 1,
         count: MAX_PSALMS,
       }));
@@ -324,7 +373,7 @@ function OfficePrayer({
     for (let n = 1; n <= MAX_PSALMS; n++) arr.push({ level: 5, count: n });
     if (maxLevel >= 6) arr.push({ level: 6, count: MAX_PSALMS });
     return arr;
-  }, [isMatins, maxLevel]);
+  }, [isMatins, isVespers, maxLevel]);
 
   const [sliderPos, setSliderPos] = useState(notches.length);
   const [level, setLevel] = useState(maxLevel);
@@ -407,6 +456,9 @@ function OfficePrayer({
     if (keptKinds.has("matins-psalm")) {
       dispatch({ type: "advanceMatinsPsalm", date: today });
     }
+    if (keptKinds.has("vespers-psalm")) {
+      dispatch({ type: "advanceVespersPsalm", date: today });
+    }
     if (keptKinds.has("gospel")) {
       dispatch({ type: "markReadingDone", which: "gospel", date: today });
     }
@@ -468,7 +520,7 @@ function OfficePrayer({
         onSlider={onSlider}
         psalmCount={psalmCount}
         onPsalmCount={onPsalmCount}
-        hidePsalmCount={isMatins}
+        hidePsalmCount={isMatins || isVespers}
         onToggle={onToggle}
         onBegin={() => setPhase("pray")}
         onClose={onClose}

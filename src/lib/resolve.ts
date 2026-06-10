@@ -13,6 +13,7 @@ import { intentionsForDate, type Intention, type Tradition } from "./engine";
 import type { DayPart } from "./daypart";
 import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 import { TRISAGION, GREAT_DOXOLOGY, DISMISSAL } from "./matins";
+import { GLADSOME_LIGHT, VESPERS_WINDOW } from "./vespers";
 
 export type MovementKind =
   | "tradition-opening"
@@ -20,6 +21,10 @@ export type MovementKind =
   | "opening-line"
   | "trisagion"
   | "matins-psalm"
+  | "vespers-psalm"
+  | "phos"
+  | "prokeimenon"
+  | "vespers-window"
   | "troparion"
   | "kontakion"
   | "theme"
@@ -449,6 +454,110 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
         m.kind === "trisagion" ||
         m.kind === "great-doxology"
       ) {
+        m.cross = true;
+      }
+    }
+  }
+
+  return out;
+}
+
+// ── The EO Vespers-shaped evening ────────────────────────────────────────────
+//
+// The evening counterpart of assembleMatins: the same arc every evening,
+// scaled in resolution by the slider. The fixed spine is always present; the
+// rank climbs through the carried Gospel, the names, the psalms of Vespers,
+// O Gladsome Light with the prokeimenon, the early Church, the Psalter walk,
+// the close of Vespers, and the Epistle at the summit.
+
+/** The value rank, floor (1) → full (10). */
+export const VESPERS_MAX_LEVEL = 10;
+const VESPERS_WALK_LEVELS = [7, 10];
+
+export type VespersCtx = {
+  tradition: Tradition | null;
+  /** Up to two Psalter-walk units (the walk continues here as everywhere). */
+  psalmMovements: Movement[];
+  /** "An evening prayer of the Church", the rotating before-sleep prayer. */
+  traditionPrayer?: Movement;
+  /** The saint of the day's troparion (sourced), or a gap flag. */
+  troparion?: Movement;
+  /** The Vespers psalm, from the six-stop loop on its own pointer. */
+  vespersPsalm?: Movement;
+  /** The prokeimenon of the day (fixed per weekday). */
+  prokeimenon: Movement;
+  /** The day's Gospel, present only when it carried from the morning. */
+  gospel?: Movement;
+  /** The Epistle (evening-only, once daily). */
+  epistle?: Movement;
+  cycle?: Movement;
+  intentions: Intention[];
+  date: string;
+};
+
+export function assembleVespers(ctx: VespersCtx): Movement[] {
+  const { tradition } = ctx;
+  const out: Movement[] = [];
+  const push = (m: Movement | undefined | false) => {
+    if (m) out.push(m);
+  };
+
+  if (tradition) {
+    const meta = TRADITION_META[tradition];
+    push({
+      kind: "tradition-opening",
+      level: 1,
+      label: meta.opening.label,
+      text: meta.opening.text,
+    });
+  }
+  push(ctx.traditionPrayer && { ...ctx.traditionPrayer, kind: "tradition-prayer", level: 1 });
+
+  // The psalmody: the Vespers psalm, then the walk through the whole Psalter.
+  push(ctx.vespersPsalm && { ...ctx.vespersPsalm, kind: "vespers-psalm", level: 4 });
+  ctx.psalmMovements.forEach((p, i) => {
+    push({ ...p, kind: "psalm", level: VESPERS_WALK_LEVELS[i] ?? VESPERS_WALK_LEVELS[1] });
+  });
+
+  // The evening hymn and the prokeimenon arrive together, as a pair.
+  push({ ...GLADSOME_LIGHT, kind: "phos", level: 5 });
+  push({ ...ctx.prokeimenon, kind: "prokeimenon", level: 5 });
+
+  // The Epistle is the evening's summit; the Gospel appears only as a carry.
+  push(ctx.epistle && { ...ctx.epistle, level: 9 });
+  push(ctx.gospel && { ...ctx.gospel, level: 2 });
+
+  // The close of Vespers, as one window.
+  push({ ...VESPERS_WINDOW, kind: "vespers-window", level: 8 });
+
+  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 6 });
+
+  if (intentionsForDate(ctx.intentions, ctx.date).length) {
+    const meta = tradition ? TRADITION_META[tradition] : null;
+    const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
+    push({
+      ...intercessionMovement(
+        ctx.intentions,
+        ctx.date,
+        close,
+        meta?.intercessionCloseAttribution,
+      ),
+      level: 3,
+    });
+  }
+
+  // The night's close: Trisagion and Our Father come late in Vespers, before
+  // the troparion and the prayers for sleep.
+  push({ ...TRISAGION, kind: "trisagion", level: 1 });
+  push(LORDS_PRAYER);
+  push(ctx.troparion && { ...ctx.troparion, kind: "troparion", level: 1 });
+  push(NIGHT_PSALM);
+  push(PRAYER_NIGHT);
+  push({ ...DISMISSAL, kind: "dismissal", level: 1 });
+
+  if (tradition && TRADITION_META[tradition].crosses) {
+    for (const m of out) {
+      if (m.kind === "tradition-opening" || m.kind === "trisagion" || m.kind === "phos") {
         m.cross = true;
       }
     }

@@ -19,6 +19,7 @@ import {
 import type { Translation } from "./scripture";
 import { UNIT_COUNT } from "./psalter";
 import { MATINS_PSALM_COUNT } from "./matins";
+import { VESPERS_PSALM_COUNT } from "./vespers";
 import { GOSPEL_CHAPTERS, gospelRefChapters } from "./milestones";
 import { loadState, saveState } from "./storage";
 
@@ -57,6 +58,7 @@ type Action =
   | { type: "advanceEoEvening"; date: string }
   | { type: "advanceFragment"; date: string }
   | { type: "advanceMatinsPsalm"; date: string }
+  | { type: "advanceVespersPsalm"; date: string }
   | { type: "recordAmen"; record: AmenRecord }
   | { type: "setFather"; phone: string; name: string }
   | { type: "reset" };
@@ -179,6 +181,18 @@ function reducer(state: RuleState, action: Action): RuleState {
       };
       if (next.matinsPsalmIndex === MATINS_PSALM_COUNT) {
         next = withMilestone(next, "matins-psalms", action.date);
+      }
+      return next;
+    }
+    case "advanceVespersPsalm": {
+      if (state.lastVespersPsalmAdvanceDate === action.date) return state;
+      let next: RuleState = {
+        ...state,
+        vespersPsalmIndex: state.vespersPsalmIndex + 1,
+        lastVespersPsalmAdvanceDate: action.date,
+      };
+      if (next.vespersPsalmIndex === VESPERS_PSALM_COUNT) {
+        next = withMilestone(next, "vespers-psalms", action.date);
       }
       return next;
     }

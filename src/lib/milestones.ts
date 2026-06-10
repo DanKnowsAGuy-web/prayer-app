@@ -8,6 +8,8 @@ export const MILESTONE_TEXT: Record<string, string> = {
     "You have prayed the whole Psalter, all one hundred fifty psalms, in course. Begun again.",
   "matins-psalms":
     "You have prayed all the psalms of Matins: the Six Psalms, the Polyeleos, and the Praises.",
+  "vespers-psalms":
+    "You have prayed all the psalms of Vespers: the great opening psalm and the evening psalms.",
   "gospel-Matthew":
     "You have read the Gospel of Matthew entire, through the Church's daily readings.",
   "gospel-Mark":
