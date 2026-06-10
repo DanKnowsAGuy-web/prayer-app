@@ -346,9 +346,9 @@ export function applyBindings(movements: Movement[], included: boolean[]): boole
 // at the top the Great Doxology. The Gospel and the intercessory cycle are
 // opt-ins that extend the session beyond the slider's budget.
 
-/** The value rank, floor (1) → full (12). */
-export const MATINS_MAX_LEVEL = 12;
-const MATINS_PSALM_LEVELS = [2, 7, 9, 11];
+/** The value rank, floor (1) → full (11). */
+export const MATINS_MAX_LEVEL = 11;
+const MATINS_PSALM_LEVELS = [4, 7, 10, 11];
 
 export type MatinsCtx = {
   tradition: Tradition | null;
@@ -400,15 +400,16 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   // The day's propers: the troparion belongs to the floor; the kontakion and
   // the weekday remembrance arrive as the session grows.
   push(ctx.troparion && { ...ctx.troparion, kind: "troparion", level: 1 });
-  push(ctx.kontakion && { ...ctx.kontakion, kind: "kontakion", level: 4 });
+  // The kontakion and the day's remembrance arrive together, as a pair.
+  push(ctx.kontakion && { ...ctx.kontakion, kind: "kontakion", level: 5 });
   push({ ...ctx.theme, kind: "theme", level: 5 });
 
-  // The day's Gospel — high on the rank; if trimmed away (or the morning is
-  // skipped), the once-a-day carry still surfaces it in the evening.
-  push(ctx.gospel && { ...ctx.gospel, level: 8 });
+  // The day's Gospel — the last thing standing above the bare floor; if it is
+  // trimmed away (or the morning skipped), the carry surfaces it in the evening.
+  push(ctx.gospel && { ...ctx.gospel, level: 2 });
 
   // The featured fragment — one window into Orthros per session.
-  push({ ...ctx.fragment, kind: "fragment", level: 10 });
+  push({ ...ctx.fragment, kind: "fragment", level: 8 });
 
   // Prayer with the early Church, in the heart of the session.
   push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 6 });
@@ -432,7 +433,7 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   }
 
   // The summit, then the close.
-  push({ ...GREAT_DOXOLOGY, kind: "great-doxology", level: 12 });
+  push({ ...GREAT_DOXOLOGY, kind: "great-doxology", level: 9 });
   push({ ...DISMISSAL, kind: "dismissal", level: 1 });
 
   // Cross marks, as everywhere.

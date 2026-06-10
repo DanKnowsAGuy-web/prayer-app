@@ -68,3 +68,35 @@ export const EO_MORNING_COUNT = EO_MORNING_PRAYERS.length; // 11
 export function serveEoMorning(index: number): EoMorningPrayer {
   return EO_MORNING_PRAYERS[((index % EO_MORNING_COUNT) + EO_MORNING_COUNT) % EO_MORNING_COUNT];
 }
+
+// ── The full morning-prayer rotation: the eleven prayers, Psalm 50, the Creed ─
+
+/** The Nicene-Constantinopolitan Creed (Orthodox text, without the filioque). */
+const CREED =
+  "I believe in one God, the Father Almighty, Maker of heaven and earth, and of all things visible and invisible.\n\nAnd in one Lord Jesus Christ, the Son of God, the only-begotten, begotten of the Father before all ages; Light of Light, true God of true God, begotten, not made; of one essence with the Father, by whom all things were made; who for us men and for our salvation came down from heaven, and was incarnate of the Holy Spirit and the Virgin Mary, and became man. And He was crucified for us under Pontius Pilate, and suffered and was buried. And He rose again on the third day, according to the Scriptures; and ascended into heaven, and sits at the right hand of the Father; and He shall come again with glory to judge the living and the dead; whose kingdom shall have no end.\n\nAnd in the Holy Spirit, the Lord, the Giver of Life, who proceeds from the Father; who with the Father and the Son together is worshipped and glorified; who spoke by the prophets.\n\nIn one Holy, Catholic, and Apostolic Church. I acknowledge one baptism for the remission of sins. I look for the resurrection of the dead, and the life of the age to come. Amen.";
+
+type PsalterBundle = { psalms: Record<string, { v: number; text: string }[]> };
+
+/** Two extra rotation stops beyond the eleven prayers. */
+export const EO_MORNING_SLOT_COUNT = EO_MORNING_COUNT + 2; // 13
+
+/**
+ * The morning slot's full rotation: the eleven classic prayers, then Psalm 50
+ * (the psalm of repentance; Psalm 51 in the Hebrew numbering our Psalter
+ * bundle uses), then the Symbol of Faith — one per morning, in course.
+ */
+export function serveEoMorningSlot(
+  bundle: PsalterBundle,
+  index: number,
+): EoMorningPrayer {
+  const which = ((index % EO_MORNING_SLOT_COUNT) + EO_MORNING_SLOT_COUNT) % EO_MORNING_SLOT_COUNT;
+  if (which < EO_MORNING_COUNT) return EO_MORNING_PRAYERS[which];
+  if (which === EO_MORNING_COUNT) {
+    const verses = bundle.psalms["51"] || [];
+    return {
+      title: "Psalm 50 — the psalm of repentance",
+      text: verses.map((v) => v.text).join("\n"),
+    };
+  }
+  return { title: "The Symbol of Faith — the Nicene Creed", text: CREED };
+}

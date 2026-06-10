@@ -4,7 +4,7 @@ import { useStore } from "../lib/store";
 import { loadPsalter, unitMovements, MAX_PSALMS } from "../lib/psalter";
 import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
-import { serveEoMorning } from "../lib/eoMorningPrayers";
+import { serveEoMorningSlot } from "../lib/eoMorningPrayers";
 import { serveEoEvening } from "../lib/eoEveningPrayers";
 import { IS_EO } from "../lib/flavor";
 import { weekdayOf } from "../lib/engine";
@@ -69,6 +69,8 @@ type OfficeData = {
   /** EO Matins morning only: the day's propers and the featured fragment. */
   propers?: ProperDay;
   fragment?: Movement;
+  /** EO morning only: the rotating morning-prayer slot (needs the Psalter). */
+  morningPrayer?: Movement;
 };
 
 /**
@@ -150,6 +152,20 @@ function OfficePrayer({
       const psalter = await loadPsalter();
       next.psalmMovements = unitMovements(psalter, state.psalmIndex, MAX_PSALMS);
 
+      // EO morning: the rotating morning-prayer slot (eleven prayers, Psalm 50,
+      // the Creed — one per morning, in course).
+      if (part === "morning" && state.tradition === "eastern-orthodox") {
+        const served = serveEoMorningSlot(
+          psalter as Parameters<typeof serveEoMorningSlot>[0],
+          state.eoMorningIndex,
+        );
+        next.morningPrayer = {
+          label: "A morning prayer of the Church",
+          ref: served.title,
+          text: served.text,
+        };
+      }
+
       // EO Matins morning: the day's propers and the featured fragment.
       if (isMatins) {
         const propers = await loadPropers();
@@ -169,7 +185,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, state.matinsFragmentIndex, state.eoMorningIndex]);
 
   // The intercessory cycle is a permanent spine segment (level 3); the slider,
   // not a flag, governs whether it's prayed today. The Prologue is served once,
@@ -188,22 +204,18 @@ function OfficePrayer({
     };
   }, [state.cycle.prologueSeen, state.cycle.day]);
 
-  // The Eastern Orthodox prayers — one per office, rotating by usage.
+  // The Eastern Orthodox prayers — one per office, rotating by usage. The
+  // morning slot is built in the load effect (it draws on the Psalter).
   const traditionPrayer = useMemo<Movement | undefined>(() => {
     if (state.tradition !== "eastern-orthodox") return undefined;
-    const served =
-      part === "morning"
-        ? serveEoMorning(state.eoMorningIndex)
-        : serveEoEvening(state.eoEveningIndex);
+    if (part === "morning") return data.morningPrayer;
+    const served = serveEoEvening(state.eoEveningIndex);
     return {
-      label:
-        part === "morning"
-          ? "A morning prayer of the Church"
-          : "An evening prayer of the Church",
+      label: "An evening prayer of the Church",
       ref: served.title,
       text: served.text,
     };
-  }, [state.tradition, part, state.eoMorningIndex, state.eoEveningIndex]);
+  }, [state.tradition, part, data.morningPrayer, state.eoEveningIndex]);
 
   const movements = useMemo(() => {
     if (isMatins) {

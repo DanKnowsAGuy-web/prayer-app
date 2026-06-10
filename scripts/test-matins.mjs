@@ -65,7 +65,7 @@ for (const k of ["tradition-opening", "trisagion", "lords", "tradition-prayer", 
 // The interleave: one psalm early (L2), the rest later (L6, L7, L9).
 {
   const levels = ms.filter((m) => m.kind === "psalm").map((m) => m.level);
-  ok(JSON.stringify(levels) === "[2,7,9,11]", `psalm levels interleave (got ${levels})`);
+  ok(JSON.stringify(levels) === "[4,7,10,11]", `psalm levels interleave (got ${levels})`);
   const at5 = defaultIncluded(ms, 5);
   const psalmsAt5 = ms.filter((m, i) => at5[i] && m.kind === "psalm").length;
   ok(psalmsAt5 === 1, "mid-session keeps exactly one psalm");
@@ -90,6 +90,17 @@ for (const k of ["tradition-opening", "trisagion", "lords", "tradition-prayer", 
   ok(/Six Psalms/.test(f0.ref) && /Psalm 3/.test(f0.ref), "fragment 0: Six Psalms, Psalm 3");
   ok(/Psalm 38/.test(f5.ref), `next round tours on (got "${f5.ref}")`);
   ok([0,1,2,3,4].every((i) => matinsFragment(psalter, i).text.trim().length > 50), "all fragments have real text");
+}
+
+// The morning slot rotation: eleven prayers, then Psalm 50, then the Creed.
+{
+  const { serveEoMorningSlot, EO_MORNING_SLOT_COUNT } = await import("../src/lib/eoMorningPrayers.ts");
+  ok(EO_MORNING_SLOT_COUNT === 13, "thirteen morning slots");
+  const p50 = serveEoMorningSlot(psalter, 11);
+  ok(/Psalm 50/.test(p50.title) && p50.text.length > 200, "slot 12 is Psalm 50 with real text");
+  const creed = serveEoMorningSlot(psalter, 12);
+  ok(/Symbol of Faith/.test(creed.title) && /I believe in one God/.test(creed.text), "slot 13 is the Creed");
+  ok(/St\. Basil/.test(serveEoMorningSlot(psalter, 13).title), "slot 14 wraps to the first prayer");
 }
 
 // Sunday theme carries the tone label.
