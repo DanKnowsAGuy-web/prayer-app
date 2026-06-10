@@ -25,7 +25,6 @@ import {
   type Cadence,
   type Intention,
 } from "../lib/engine";
-import { keptInWindow, keptStreak, todaysCheckIn } from "../lib/engine";
 import { greeting, longDate, type DayPart } from "../lib/daypart";
 import { useState } from "react";
 
@@ -38,7 +37,7 @@ export function Home({
   onOpenSettings: () => void;
   defaultPart: DayPart;
 }) {
-  const { state, today, dispatch } = useStore();
+  const { state, today } = useStore();
   const [properDay, setProperDay] = useState<ProperDay | undefined>(undefined);
   const [life, setLife] = useState<SoloContent | null>(null);
   useEffect(() => {
@@ -69,9 +68,28 @@ export function Home({
       onComplete: () => {},
     });
   };
-  const checkIn = todaysCheckIn(state, today);
-  const streak = keptStreak(state.log);
-  const kept = keptInWindow(state.log);
+  // Faithfulness is read from the prayer record itself: a day counts when any
+  // office was prayed through to the Amen.
+  const prayedDates = [...new Set(state.amens.map((a) => a.date))].sort();
+  let streak = 0;
+  for (let i = 0; ; i++) {
+    const [ty, tm, td] = today.split("-").map(Number);
+    const dt = new Date(ty, tm - 1, td - i);
+    const date = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+    if (prayedDates.includes(date)) streak++;
+    else if (i === 0) continue; // today may simply not be prayed yet
+    else break;
+  }
+  const kept = (() => {
+    const [ty, tm, td] = today.split("-").map(Number);
+    let n = 0;
+    for (let i = 0; i < 7; i++) {
+      const dt = new Date(ty, tm - 1, td - i);
+      const date = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
+      if (prayedDates.includes(date)) n++;
+    }
+    return n;
+  })();
 
   const now = new Date();
   // Lead with whichever office the time of day suggests, but show both.
@@ -114,7 +132,7 @@ export function Home({
             {fasting && <span className="dayinfo-fast">{fasting}</span>}
           </p>
         )}
-        <Faithfulness streak={streak} kept={kept} logged={state.log.length} />
+        <Faithfulness streak={streak} kept={kept} logged={prayedDates.length} />
       </header>
 
       <section className="today" aria-labelledby="today-h">
@@ -158,12 +176,6 @@ export function Home({
       )}
 
       <PsalmRotation />
-
-      <CheckInPanel
-        kept={checkIn?.kept}
-        answered={!!checkIn}
-        onAnswer={(k) => dispatch({ type: "checkIn", date: today, kept: k })}
-      />
 
       <Intentions />
 
@@ -426,49 +438,6 @@ function MyRule() {
         {IS_EO &&
           ` The psalms of Matins are at ${(state.matinsPsalmIndex % MATINS_PSALM_COUNT) + 1} of ${MATINS_PSALM_COUNT}.`}
       </p>
-    </section>
-  );
-}
-
-function CheckInPanel({
-  kept,
-  answered,
-  onAnswer,
-}: {
-  kept?: boolean;
-  answered: boolean;
-  onAnswer: (kept: boolean) => void;
-}) {
-  return (
-    <section className="checkin" aria-labelledby="checkin-h">
-      <p className="eyebrow">This evening</p>
-      <h2 id="checkin-h" className="checkin-q">
-        Did you keep your prayer today?
-      </h2>
-      {!answered ? (
-        <div className="checkin-actions">
-          <button className="btn btn-primary" onClick={() => onAnswer(true)}>
-            Yes, I prayed
-          </button>
-          <button className="btn btn-ghost" onClick={() => onAnswer(false)}>
-            Not today
-          </button>
-        </div>
-      ) : (
-        <div className="checkin-answered">
-          <p className="checkin-result">
-            {kept
-              ? "Marked as kept. Well done, and thanks be to God."
-              : "Marked as missed. No shame in it; tomorrow is open."}
-          </p>
-          <button
-            className="btn btn-quiet"
-            onClick={() => onAnswer(!kept)}
-          >
-            Change to {kept ? "not today" : "I prayed"}
-          </button>
-        </div>
-      )}
     </section>
   );
 }

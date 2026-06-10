@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useStore } from "../lib/store";
-import {
-  weekdayOf,
-  type CheckIn,
-  type RuleState,
-  type Tradition,
-} from "../lib/engine";
+import { weekdayOf, type RuleState, type Tradition } from "../lib/engine";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import { PrayerReader, type SoloContent } from "./PrayerReader";
 
@@ -23,19 +18,6 @@ const TRADITIONS: (Tradition | "none")[] = [
   "protestant",
   "roman-catholic",
 ];
-
-/** Build a check-in log ending today: `kept` of the last `window` days. */
-function makeLog(today: string, kept: number, window: number): CheckIn[] {
-  const [y, m, d] = today.split("-").map(Number);
-  const log: CheckIn[] = [];
-  for (let i = window - 1; i >= 0; i--) {
-    const dt = new Date(y, m - 1, d - i);
-    const date = `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, "0")}-${String(dt.getDate()).padStart(2, "0")}`;
-    // Mark the most recent `kept` days as kept.
-    log.push({ date, kept: i < kept });
-  }
-  return log;
-}
 
 export function DevPanel({ onClose }: { onClose: () => void }) {
   const { state, today, dispatch } = useStore();
@@ -151,31 +133,6 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
             </button>
           ))}
         </div>
-      </section>
-
-      <section className="dev-group">
-        <h2 className="dev-h">Check-in history</h2>
-        <div className="dev-row dev-wrap">
-          <button
-            className="btn btn-ghost"
-            onClick={() => patch({ log: makeLog(today, 5, 7) })}
-          >
-            Kept 5 of 7 (→ advance offer)
-          </button>
-          <button
-            className="btn btn-ghost"
-            onClick={() => patch({ log: makeLog(today, 0, 3) })}
-          >
-            Missed 3 in a row (→ simplify)
-          </button>
-          <button className="btn btn-quiet" onClick={() => patch({ log: [] })}>
-            Clear log
-          </button>
-        </div>
-        <p className="dev-note">
-          Log has {state.log.length} day{state.log.length === 1 ? "" : "s"}.
-          Advance offers need ≥5 check-ins.
-        </p>
       </section>
 
       <section className="dev-group">
