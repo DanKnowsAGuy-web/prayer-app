@@ -6,6 +6,7 @@ import { Home } from "./components/Home";
 import { PrayerReader } from "./components/PrayerReader";
 import { Settings } from "./components/Settings";
 import { DevPanel } from "./components/DevPanel";
+import { InstallHint } from "./components/InstallHint";
 import "./styles/app.css";
 
 export function App() {
@@ -59,10 +60,13 @@ export function App() {
   }
 
   return withGlow(
-    <Home
-      onBeginPrayer={(part) => setReading(part)}
-      onOpenSettings={() => setSettingsOpen(true)}
-      defaultPart={dayPart(new Date())}
-    />,
+    <>
+      <Home
+        onBeginPrayer={(part) => setReading(part)}
+        onOpenSettings={() => setSettingsOpen(true)}
+        defaultPart={dayPart(new Date())}
+      />
+      <InstallHint />
+    </>,
   );
 }

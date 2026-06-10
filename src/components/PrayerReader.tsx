@@ -31,6 +31,7 @@ import {
   type Movement,
 } from "../lib/resolve";
 import { estimateSeconds, formatSegment, formatTotal } from "../lib/estimate";
+import { useWakeLock } from "../lib/useWakeLock";
 import { TraditionEmblem } from "./TraditionEmblem";
 
 /** A single, pre-resolved prayer to render through the reader (e.g. the cycle). */
@@ -119,6 +120,10 @@ function OfficePrayer({
   onClose: () => void;
 }) {
   const { state, today, dispatch } = useStore();
+
+  // The screen stays awake the whole time the office is open — build-out and
+  // prayer alike — so the phone never sleeps mid-psalm.
+  useWakeLock();
 
   // The EO edition's offices are the Matins- and Vespers-shaped rules;
   // everything else keeps the value-spine office.
@@ -573,6 +578,9 @@ function OfficePrayer({
  */
 function SoloPrayer({ solo, onClose }: { solo: SoloContent; onClose: () => void }) {
   const { state } = useStore();
+
+  // Hold the screen awake for the duration of the solo prayer, too.
+  useWakeLock();
 
   useEffect(() => {
     window.scrollTo(0, 0);

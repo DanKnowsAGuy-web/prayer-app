@@ -1196,3 +1196,40 @@
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ============ INSTALL HINT ============ */
+/* A quiet banner inviting the reader to add the app to their home screen,
+   where it opens full-screen with no address bar. */
+.install-hint {
+  position: fixed;
+  left: max(var(--space-3), env(safe-area-inset-left));
+  right: max(var(--space-3), env(safe-area-inset-right));
+  bottom: max(var(--space-3), env(safe-area-inset-bottom));
+  margin: 0 auto;
+  max-width: var(--measure);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 10px 40px -12px rgba(0, 0, 0, 0.6);
+  animation: settle var(--dur) var(--ease-out) both;
+}
+.install-hint-text {
+  font-size: 1.02rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+.install-hint-text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.install-hint-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
