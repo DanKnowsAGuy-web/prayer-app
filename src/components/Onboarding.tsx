@@ -39,7 +39,7 @@ export function Onboarding() {
   const [tradition, setTradition] = useState<Tradition | null>(
     IS_EO ? "eastern-orthodox" : null,
   );
-  const [translation, setTranslation] = useState<"web" | "kjv">("web");
+  const [translation, setTranslation] = useState<"web" | "kjv" | "msb">("web");
   const [names, setNames] = useState<string[]>([]);
   const [nameInput, setNameInput] = useState("");
   const [remMorning, setRemMorning] = useState<string | null>(null);
@@ -123,7 +123,7 @@ export function Onboarding() {
   }
 
   if (step === "translation") {
-    const options: { value: "web" | "kjv"; label: string; meaning: string }[] = [
+    const options: { value: "web" | "kjv" | "msb"; label: string; meaning: string }[] = [
       {
         value: "web",
         label: "World English Bible",
@@ -133,6 +133,11 @@ export function Onboarding() {
         value: "kjv",
         label: "King James Version",
         meaning: "Traditional English, familiar and stately. (Public domain.)",
+      },
+      {
+        value: "msb",
+        label: "MSB (Majority Standard Bible)",
+        meaning: "Modern English; its New Testament follows the Byzantine Majority Text. (Public domain.)",
       },
     ];
     return (

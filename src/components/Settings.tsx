@@ -11,9 +11,10 @@ const TRADITIONS: { value: Tradition; label: string }[] = [
   { value: "roman-catholic", label: "Roman Catholic" },
 ];
 
-const TRANSLATIONS: { value: "web" | "kjv"; label: string; hint: string }[] = [
+const TRANSLATIONS: { value: "web" | "kjv" | "msb"; label: string; hint: string }[] = [
   { value: "web", label: "World English Bible", hint: "Modern English (public domain)." },
   { value: "kjv", label: "King James Version", hint: "Traditional English (public domain)." },
+  { value: "msb", label: "MSB (Majority Standard Bible)", hint: "Modern English; its New Testament follows the Byzantine Majority Text (public domain)." },
 ];
 
 export function Settings({ onClose }: { onClose: () => void }) {

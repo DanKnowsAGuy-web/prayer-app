@@ -8,7 +8,7 @@
  * runtime — the NT stores ship in the bundle.
  */
 
-export type Translation = "web" | "kjv";
+export type Translation = "web" | "kjv" | "msb";
 
 /** Verse store: books → chapter number → verse number → text. */
 export type NTStore = {
@@ -118,7 +118,9 @@ export async function loadScripture(translation: Translation): Promise<NTStore> 
   const mod =
     translation === "kjv"
       ? await import("../data/nt-kjv.json")
-      : await import("../data/nt-web.json");
+      : translation === "msb"
+        ? await import("../data/nt-msb.json")
+        : await import("../data/nt-web.json");
   const store = (mod.default ?? mod) as unknown as NTStore;
   stores[translation] = store;
   return store;

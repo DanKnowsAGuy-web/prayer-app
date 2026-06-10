@@ -141,13 +141,13 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
       <section className="dev-group">
         <h2 className="dev-h">Translation</h2>
         <div className="dev-row dev-wrap">
-          {(["web", "kjv"] as const).map((t) => (
+          {(["web", "kjv", "msb"] as const).map((t) => (
             <button
               key={t}
               className={`pill ${state.translation === t ? "is-on" : ""}`}
               onClick={() => dispatch({ type: "setTranslation", translation: t })}
             >
-              {t === "web" ? "World English Bible" : "King James"}
+              {t === "web" ? "World English Bible" : t === "kjv" ? "King James" : "MSB"}
             </button>
           ))}
         </div>

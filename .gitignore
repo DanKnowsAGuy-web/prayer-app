@@ -11,3 +11,5 @@ scripts/.chapter-cache.json
 scripts/.scripture-cache.json
 
 scripts/.propers-cache.json
+
+scripts/.msb/

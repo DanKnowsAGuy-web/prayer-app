@@ -12,6 +12,7 @@ const lect = JSON.parse(readFileSync(url("lectionary.json")));
 const stores = {
   web: JSON.parse(readFileSync(url("nt-web.json"))),
   kjv: JSON.parse(readFileSync(url("nt-kjv.json"))),
+  msb: JSON.parse(readFileSync(url("nt-msb.json"))),
 };
 
 let checked = 0;
@@ -20,7 +21,7 @@ for (const [date, day] of Object.entries(lect.days)) {
   for (const which of ["gospel", "epistle"]) {
     const ref = day[which];
     if (!ref) continue;
-    for (const code of ["web", "kjv"]) {
+    for (const code of ["web", "kjv", "msb"]) {
       checked++;
       const verses = resolveVerses(stores[code], ref);
       if (!verses.length || verses.join("").trim().length === 0) {
@@ -37,5 +38,5 @@ if (gaps.length) {
   if (gaps.length > 50) console.log(`  … and ${gaps.length - 50} more`);
   process.exitCode = 1;
 } else {
-  console.log("PASS — every Gospel and Epistle reference resolves in both WEB and KJV.");
+  console.log("PASS — every Gospel and Epistle reference resolves in WEB, KJV, and MSB.");
 }
