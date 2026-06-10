@@ -65,18 +65,21 @@ for (const k of ["tradition-opening", "trisagion", "lords", "tradition-prayer", 
 // The interleave: one psalm early (L2), the rest later (L6, L7, L9).
 {
   const levels = ms.filter((m) => m.kind === "psalm").map((m) => m.level);
-  ok(JSON.stringify(levels) === "[2,6,7,9]", `psalm levels interleave (got ${levels})`);
+  ok(JSON.stringify(levels) === "[2,7,9,11]", `psalm levels interleave (got ${levels})`);
   const at5 = defaultIncluded(ms, 5);
   const psalmsAt5 = ms.filter((m, i) => at5[i] && m.kind === "psalm").length;
   ok(psalmsAt5 === 1, "mid-session keeps exactly one psalm");
 }
 
-// Opt-ins stay off at EVERY level, including full.
+// Full means full: the Gospel and the cycle are in at the top of the slider.
 {
   const full = defaultIncluded(ms, MATINS_MAX_LEVEL);
   const onFull = ms.filter((_, i) => full[i]).map((m) => m.kind);
-  ok(!onFull.includes("gospel") && !onFull.includes("cycle"), "opt-ins off even at full");
+  ok(onFull.includes("gospel") && onFull.includes("cycle"), "full includes Gospel and cycle");
   ok(onFull.includes("great-doxology") && onFull.includes("fragment"), "full: summit present");
+  const floor = defaultIncluded(ms, 1);
+  const onFloor = ms.filter((_, i) => floor[i]).map((m) => m.kind);
+  ok(!onFloor.includes("gospel") && !onFloor.includes("cycle"), "floor excludes Gospel and cycle");
 }
 
 // The fragment rotation cycles with location labels and tours the Six Psalms.

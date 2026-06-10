@@ -346,9 +346,9 @@ export function applyBindings(movements: Movement[], included: boolean[]): boole
 // at the top the Great Doxology. The Gospel and the intercessory cycle are
 // opt-ins that extend the session beyond the slider's budget.
 
-/** The value rank, floor (1) → full (10). */
-export const MATINS_MAX_LEVEL = 10;
-const MATINS_PSALM_LEVELS = [2, 6, 7, 9];
+/** The value rank, floor (1) → full (12). */
+export const MATINS_MAX_LEVEL = 12;
+const MATINS_PSALM_LEVELS = [2, 7, 9, 11];
 
 export type MatinsCtx = {
   tradition: Tradition | null;
@@ -363,7 +363,7 @@ export type MatinsCtx = {
   theme: Movement;
   /** The featured window into Orthros (the familiarity rotation). */
   fragment: Movement;
-  /** Opt-in extensions (off at every slider level). */
+  /** The day's Gospel (absent once done) and the intercessory cycle. */
   gospel?: Movement;
   cycle?: Movement;
   intentions: Intention[];
@@ -403,14 +403,15 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   push(ctx.kontakion && { ...ctx.kontakion, kind: "kontakion", level: 4 });
   push({ ...ctx.theme, kind: "theme", level: 5 });
 
-  // Opt-in: the day's Gospel (extends the session; carries to evening if off).
-  push(ctx.gospel && { ...ctx.gospel, level: 1, optional: true });
+  // The day's Gospel — high on the rank; if trimmed away (or the morning is
+  // skipped), the once-a-day carry still surfaces it in the evening.
+  push(ctx.gospel && { ...ctx.gospel, level: 8 });
 
   // The featured fragment — one window into Orthros per session.
-  push({ ...ctx.fragment, kind: "fragment", level: 8 });
+  push({ ...ctx.fragment, kind: "fragment", level: 10 });
 
-  // Opt-in: prayer with the early Church.
-  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 1, optional: true });
+  // Prayer with the early Church, in the heart of the session.
+  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 6 });
 
   // Your prayer list — held space, kept deep into small sessions.
   if (intentionsForDate(ctx.intentions, ctx.date).length) {
@@ -431,7 +432,7 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   }
 
   // The summit, then the close.
-  push({ ...GREAT_DOXOLOGY, kind: "great-doxology", level: 10 });
+  push({ ...GREAT_DOXOLOGY, kind: "great-doxology", level: 12 });
   push({ ...DISMISSAL, kind: "dismissal", level: 1 });
 
   // Cross marks, as everywhere.

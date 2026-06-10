@@ -53,7 +53,7 @@ export function Settings({ onClose }: { onClose: () => void }) {
           The readings are the same either way — only the wording changes.
         </p>
         <div className="settings-traditions">
-          {TRANSLATIONS.map((t) => (
+          {TRANSLATIONS.filter((t) => !IS_EO || t.value !== "web").map((t) => (
             <button
               key={t.value}
               className={`pill ${state.translation === t.value ? "is-on" : ""}`}

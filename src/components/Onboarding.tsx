@@ -39,8 +39,10 @@ export function Onboarding() {
   const [tradition, setTradition] = useState<Tradition | null>(
     IS_EO ? "eastern-orthodox" : null,
   );
-  const [translation, setTranslation] = useState<"web" | "kjv" | "msb">("web");
-  const [names, setNames] = useState<string[]>([]);
+  const [translation, setTranslation] = useState<"web" | "kjv" | "msb">(
+    IS_EO ? "msb" : "web",
+  );
+  const [names, setNames] = useState<{ text: string; cadence: "daily" | "weekly" }[]>([]);
   const [nameInput, setNameInput] = useState("");
   const [remMorning, setRemMorning] = useState<string | null>(null);
   const [remEvening, setRemEvening] = useState<string | null>(null);
@@ -51,10 +53,10 @@ export function Onboarding() {
     dispatch({ type: "setReminder", slot: "evening", time: remEvening });
   };
 
-  const addName = () => {
+  const addName = (cadence: "daily" | "weekly") => {
     const trimmed = nameInput.trim();
     if (!trimmed) return;
-    setNames((prev) => [...prev, trimmed]);
+    setNames((prev) => [...prev, { text: trimmed, cadence }]);
     setNameInput("");
   };
 
@@ -123,7 +125,7 @@ export function Onboarding() {
   }
 
   if (step === "translation") {
-    const options: { value: "web" | "kjv" | "msb"; label: string; meaning: string }[] = [
+    const options: { value: "web" | "kjv" | "msb"; label: string; meaning: string }[] = ([
       {
         value: "web",
         label: "World English Bible",
@@ -139,7 +141,9 @@ export function Onboarding() {
         label: "MSB (Majority Standard Bible)",
         meaning: "Modern English; its New Testament follows the Byzantine Majority Text. (Public domain.)",
       },
-    ];
+    ] as { value: "web" | "kjv" | "msb"; label: string; meaning: string }[]).filter(
+      (o) => !IS_EO || o.value !== "web",
+    );
     return (
       <main className="app onboard">
         <p className="eyebrow">How scripture reads</p>
@@ -190,7 +194,7 @@ export function Onboarding() {
           className="intention-add"
           onSubmit={(e) => {
             e.preventDefault();
-            addName();
+            addName("daily");
           }}
         >
           <input
@@ -201,18 +205,33 @@ export function Onboarding() {
             aria-label="A name to pray for"
             maxLength={120}
           />
-          <button className="btn btn-ghost" type="submit" disabled={!nameInput.trim()}>
-            Add
-          </button>
+          <div className="intention-add-btns">
+            <button className="btn btn-ghost" type="submit" disabled={!nameInput.trim()}>
+              Add daily
+            </button>
+            <button
+              className="btn btn-ghost"
+              type="button"
+              onClick={() => addName("weekly")}
+              disabled={!nameInput.trim()}
+            >
+              Add weekly
+            </button>
+          </div>
         </form>
         {names.length > 0 && (
           <ul className="name-chips">
             {names.map((n, i) => (
               <li key={i} className="name-chip">
-                <span>{n}</span>
+                <span>
+                  {n.text}
+                  {n.cadence === "weekly" && (
+                    <span className="name-chip-cadence"> · weekly</span>
+                  )}
+                </span>
                 <button
                   className="name-chip-x"
-                  aria-label={`Remove ${n}`}
+                  aria-label={`Remove ${n.text}`}
                   onClick={() => setNames((prev) => prev.filter((_, k) => k !== i))}
                 >
                   ×
@@ -402,16 +421,19 @@ export function Onboarding() {
           className="btn btn-primary"
           onClick={() => {
             dispatch({ type: "onboard", rung: LAST_RUNG, tradition, translation });
-            // The names feed the existing prayer list — same data, daily cadence.
-            names.forEach((text, i) =>
+            // The names feed the existing prayer list — same data, with the
+            // chosen cadence; weekly names spread across the week's slots.
+            let weekly = 0;
+            names.forEach((n, i) =>
               dispatch({
                 type: "addIntention",
                 intention: {
                   id: makeId(i + 1),
-                  text,
+                  text: n.text,
                   added: today,
                   answered: false,
-                  cadence: "daily",
+                  cadence: n.cadence,
+                  ...(n.cadence === "weekly" ? { bucket: weekly++ % 7 } : {}),
                 },
               }),
             );

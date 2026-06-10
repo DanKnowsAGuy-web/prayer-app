@@ -100,6 +100,10 @@
   border-radius: 999px;
   color: var(--ink);
 }
+.name-chip-cadence {
+  color: var(--ink-faint);
+  font-size: 0.85em;
+}
 .name-chip-x {
   border: none;
   background: transparent;
