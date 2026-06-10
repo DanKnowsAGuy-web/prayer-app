@@ -100,7 +100,15 @@ button {
   font-size: inherit;
   color: inherit;
   cursor: pointer;
+  /* One tap means one click on touch screens: no double-tap-zoom intent. */
+  touch-action: manipulation;
 }
+
+input,
+textarea {
+  touch-action: manipulation;
+}
+
 
 :focus-visible {
   outline: 2px solid var(--clay);
@@ -148,25 +156,31 @@ button {
   color: var(--on-clay);
   font-weight: 600;
 }
-.btn-primary:hover {
-  background: var(--clay-deep);
+@media (hover: hover) {
+  .btn-primary:hover {
+    background: var(--clay-deep);
+  }
 }
 .btn-ghost {
   background: transparent;
   border-color: var(--border-strong);
   color: var(--ink);
 }
-.btn-ghost:hover {
-  border-color: var(--ink-faint);
-  background: oklch(0.24 0.014 62);
+@media (hover: hover) {
+  .btn-ghost:hover {
+    border-color: var(--ink-faint);
+    background: oklch(0.24 0.014 62);
+  }
 }
 .btn-quiet {
   background: transparent;
   color: var(--ink-muted);
   padding-inline: 0.5rem;
 }
-.btn-quiet:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .btn-quiet:hover {
+    color: var(--ink);
+  }
 }
 .btn:active {
   transform: translateY(1px);

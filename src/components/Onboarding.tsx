@@ -46,6 +46,7 @@ export function Onboarding() {
   const [nameInput, setNameInput] = useState("");
   const [remMorning, setRemMorning] = useState<string | null>(null);
   const [remEvening, setRemEvening] = useState<string | null>(null);
+  const [started, setStarted] = useState(false);
 
   /** Persist any chosen reminder times (the existing reminders state). */
   const commitReminders = () => {
@@ -366,28 +367,69 @@ export function Onboarding() {
           As you pray, the same few streams rotate through, so the prayer stays
           alive rather than rote:
         </p>
-        <ul className="rotation-list">
-          <li>
-            <span className="rotation-name">The Psalms, in course</span> — a
-            portion each day, the whole Psalter over time, then begun again.
-          </li>
-          <li>
-            <span className="rotation-name">The day's Gospel and Epistle</span> —
-            one shared daily lectionary, read in your translation.
-          </li>
-          <li>
-            <span className="rotation-name">Prayer with the early Church</span> —
-            an ancient intercession, a different one each day.
-          </li>
-          <li>
-            <span className="rotation-name">Your prayer list</span> — the people
-            and needs you carry, named before God.
-          </li>
-          <li>
-            <span className="rotation-name">A night prayer</span> — to close the
-            evening in peace.
-          </li>
-        </ul>
+        {IS_EO ? (
+          <ul className="rotation-list">
+            <li>
+              <span className="rotation-name">The morning prayers of the Church</span> —
+              the classic prayers of the prayer book, with Psalm 50 and the
+              Creed, one each morning in course.
+            </li>
+            <li>
+              <span className="rotation-name">The saint of the day</span> — the
+              troparion and kontakion of the day's commemoration, with the
+              day's remembrance through the week.
+            </li>
+            <li>
+              <span className="rotation-name">The Psalms</span> — the psalms of
+              Matins in course, and a steady walk through the whole Psalter.
+            </li>
+            <li>
+              <span className="rotation-name">The day's Gospel and Epistle</span> —
+              the Church's daily readings, in your translation.
+            </li>
+            <li>
+              <span className="rotation-name">A window into Matins</span> — one
+              piece of the morning service each day, in its proper place, until
+              the whole shape grows familiar.
+            </li>
+            <li>
+              <span className="rotation-name">Prayer with the early Church</span> —
+              an ancient intercession, a different one each day.
+            </li>
+            <li>
+              <span className="rotation-name">Your prayer list</span> — the
+              people and needs you carry, named before God.
+            </li>
+            <li>
+              <span className="rotation-name">The evening prayers</span> — the
+              prayers before sleep, one each evening, with a night psalm to
+              close the day.
+            </li>
+          </ul>
+        ) : (
+          <ul className="rotation-list">
+            <li>
+              <span className="rotation-name">The Psalms, in course</span> — a
+              portion each day, the whole Psalter over time, then begun again.
+            </li>
+            <li>
+              <span className="rotation-name">The day's Gospel and Epistle</span> —
+              one shared daily lectionary, read in your translation.
+            </li>
+            <li>
+              <span className="rotation-name">Prayer with the early Church</span> —
+              an ancient intercession, a different one each day.
+            </li>
+            <li>
+              <span className="rotation-name">Your prayer list</span> — the people
+              and needs you carry, named before God.
+            </li>
+            <li>
+              <span className="rotation-name">A night prayer</span> — to close the
+              evening in peace.
+            </li>
+          </ul>
+        )}
         <p className="lede">
           Slide up and they are all there; slide down and they step back in turn,
           the Lord's Prayer always remaining.
@@ -420,6 +462,8 @@ export function Onboarding() {
         <button
           className="btn btn-primary"
           onClick={() => {
+            if (started) return; // a double-fired tap must not onboard twice
+            setStarted(true);
             dispatch({ type: "onboard", rung: LAST_RUNG, tradition, translation });
             // The names feed the existing prayer list — same data, with the
             // chosen cadence; weekly names spread across the week's slots.
