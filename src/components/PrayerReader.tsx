@@ -684,7 +684,19 @@ function BuildOut({
             value={sliderPos}
             onChange={(e) => onSlider(Number(e.target.value))}
             aria-label="How much to pray today"
+            style={
+              {
+                "--fill": `${((sliderPos - 1) / Math.max(1, sliderMax - 1)) * 100}%`,
+                "--glow-a":
+                  0.35 + 0.3 * ((sliderPos - 1) / Math.max(1, sliderMax - 1)),
+              } as React.CSSProperties
+            }
           />
+          <div className="slider-ticks" aria-hidden="true">
+            {Array.from({ length: sliderMax }, (_, i) => (
+              <span key={i} />
+            ))}
+          </div>
           <p className="buildout-sub">
             Slide to set how much you pray today, or fine-tune below. The Lord's
             Prayer always stays.

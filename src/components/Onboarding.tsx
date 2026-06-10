@@ -357,10 +357,11 @@ export function Onboarding() {
       <main className="app onboard">
         <p className="eyebrow">How this works</p>
         <h2 className="onboard-q">One prayer, sized to your day</h2>
+        <SliderDemo />
         <p className="lede">
-          The prayer rule adjusts to each day with a single slider. The point is
-          never to break the thread: pray fully when you can, briefly when you
-          can't, but pray every day. The daily thread is the whole of it.
+          The point is never to break the thread: pray fully when you can,
+          briefly when you can't, but pray every day. The daily thread is the
+          whole of it.
         </p>
         <div className="onboard-actions">
           <button className="btn btn-primary" onClick={() => setStep("rotation")}>
@@ -506,5 +507,82 @@ export function Onboarding() {
         </button>
       </div>
     </main>
+  );
+}
+
+/**
+ * A small living model of the daily slider: it plays by itself, dimming and
+ * relighting the parts of the prayer, until the person takes hold of it.
+ * Inherits the real slider's look, so the first build-out feels familiar.
+ */
+function SliderDemo() {
+  const SEGMENTS = [
+    { label: "The Lord's Prayer", level: 1 },
+    { label: "The Gospel", level: 2 },
+    { label: "Your prayer list", level: 3 },
+    { label: "The Psalms", level: 4 },
+    { label: "The day's hymns", level: 5 },
+    { label: "The fullness of the hour", level: 6 },
+  ];
+  const MINUTES = [4, 6, 8, 11, 14, 18];
+  const MAX = SEGMENTS.length;
+  const [value, setValue] = useState(MAX);
+  const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    if (touched) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let v = MAX;
+    let dir = -1;
+    const id = window.setInterval(() => {
+      v += dir;
+      if (v <= 1) dir = 1;
+      if (v >= MAX) dir = -1;
+      setValue(v);
+    }, 850);
+    return () => window.clearInterval(id);
+  }, [touched, MAX]);
+
+  const frac = (value - 1) / (MAX - 1);
+  return (
+    <div className="slider-demo" aria-label="How the slider sizes the prayer">
+      <p className="buildout-estimate">about {MINUTES[value - 1]} min</p>
+      <input
+        className="buildout-slider"
+        type="range"
+        min={1}
+        max={MAX}
+        step={1}
+        value={value}
+        onChange={(e) => {
+          setTouched(true);
+          setValue(Number(e.target.value));
+        }}
+        onPointerDown={() => setTouched(true)}
+        aria-label="Try the slider"
+        style={
+          {
+            "--fill": `${frac * 100}%`,
+            "--glow-a": 0.35 + 0.3 * frac,
+          } as React.CSSProperties
+        }
+      />
+      <div className="slider-ticks" aria-hidden="true">
+        {SEGMENTS.map((_, i) => (
+          <span key={i} />
+        ))}
+      </div>
+      <ul className="demo-list">
+        {SEGMENTS.map((seg) => (
+          <li
+            key={seg.label}
+            className={`demo-row ${seg.level <= value ? "" : "is-off"}`}
+          >
+            {seg.label}
+          </li>
+        ))}
+      </ul>
+      {!touched && <p className="demo-hint">Try it.</p>}
+    </div>
   );
 }

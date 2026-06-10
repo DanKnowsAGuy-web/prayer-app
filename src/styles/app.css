@@ -68,6 +68,41 @@
   font-weight: 600;
 }
 
+.slider-demo {
+  max-width: 32rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+.demo-list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.demo-row {
+  font-size: 1.05rem;
+  color: var(--ink);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: opacity var(--dur) var(--ease-out);
+}
+.demo-row.is-off {
+  opacity: 0.35;
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-faint);
+  color: var(--ink-muted);
+}
+.demo-hint {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 0.95rem;
+}
+
 .welcome-callout {
   font-size: 1.3rem;
   font-weight: 600;
@@ -966,6 +1001,98 @@
   color: var(--ink-muted);
   font-style: italic;
   max-width: 32rem;
+}
+.buildout-estimate {
+  font-size: 1.35rem;
+  color: var(--flame);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---- The slider: a taper lying on its side. More prayer, more light. ----
+   The filled track glows ember-to-flame (--fill is set from the value); the
+   thumb is the flame itself, with a quiet static halo (--glow-a brightens
+   slightly toward full). */
+.buildout-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  max-width: 32rem;
+  height: 32px; /* generous touch target */
+  background: transparent;
+  margin: var(--space-2) 0;
+  --fill: 100%;
+  --glow-a: 0.5;
+}
+.buildout-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background:
+    linear-gradient(90deg, var(--flame-soft), var(--flame)) 0 0 / var(--fill) 100% no-repeat,
+    var(--surface-2);
+}
+.buildout-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--clay-deep);
+  background: radial-gradient(circle at 38% 35%, var(--flame), var(--clay) 75%);
+  box-shadow:
+    0 0 8px oklch(0.79 0.16 50 / var(--glow-a)),
+    0 0 22px oklch(0.79 0.16 50 / calc(var(--glow-a) * 0.45));
+  transition: transform var(--dur) var(--ease-out);
+}
+.buildout-slider:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+.buildout-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: var(--surface-2);
+}
+.buildout-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--flame-soft), var(--flame));
+}
+.buildout-slider::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--clay-deep);
+  background: radial-gradient(circle at 38% 35%, var(--flame), var(--clay) 75%);
+  box-shadow:
+    0 0 8px oklch(0.79 0.16 50 / var(--glow-a)),
+    0 0 22px oklch(0.79 0.16 50 / calc(var(--glow-a) * 0.45));
+}
+.buildout-slider:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+/* Faint notch ticks beneath the track. */
+.slider-ticks {
+  display: flex;
+  justify-content: space-between;
+  max-width: 32rem;
+  padding: 0 14px; /* align under the thumb's travel */
+  margin-top: -6px;
+}
+.slider-ticks span {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--ink-faint);
+  opacity: 0.55;
+}
+@media (prefers-reduced-motion: reduce) {
+  .buildout-slider::-webkit-slider-thumb {
+    transition: none;
+  }
 }
 .buildout-list {
   list-style: none;
