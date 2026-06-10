@@ -45,6 +45,7 @@ type Action =
   | { type: "advanceCycle"; key: string }
   | { type: "advancePsalm"; key: string; count: number }
   | { type: "advanceEoMorning"; date: string }
+  | { type: "advanceEoEvening"; date: string }
   | { type: "reset" };
 
 function reducer(state: RuleState, action: Action): RuleState {
@@ -141,6 +142,13 @@ function reducer(state: RuleState, action: Action): RuleState {
         ...state,
         eoMorningIndex: state.eoMorningIndex + 1,
         lastEoMorningAdvanceDate: action.date,
+      };
+    case "advanceEoEvening":
+      if (state.lastEoEveningAdvanceDate === action.date) return state;
+      return {
+        ...state,
+        eoEveningIndex: state.eoEveningIndex + 1,
+        lastEoEveningAdvanceDate: action.date,
       };
     case "advancePsalm":
       // Per-office latch; advance by however many psalm units were prayed.

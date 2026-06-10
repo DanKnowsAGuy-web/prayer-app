@@ -5,6 +5,7 @@ import { loadPsalter, unitMovements, MAX_PSALMS } from "../lib/psalter";
 import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import { serveEoMorning } from "../lib/eoMorningPrayers";
+import { serveEoEvening } from "../lib/eoEveningPrayers";
 import {
   loadLectionary,
   lectionaryFor,
@@ -163,16 +164,22 @@ function OfficePrayer({
     };
   }, [state.cycle.prologueSeen, state.cycle.day]);
 
-  // The Eastern Orthodox morning prayers — one per morning, rotating by usage.
+  // The Eastern Orthodox prayers — one per office, rotating by usage.
   const traditionPrayer = useMemo<Movement | undefined>(() => {
-    if (state.tradition !== "eastern-orthodox" || part !== "morning") return undefined;
-    const served = serveEoMorning(state.eoMorningIndex);
+    if (state.tradition !== "eastern-orthodox") return undefined;
+    const served =
+      part === "morning"
+        ? serveEoMorning(state.eoMorningIndex)
+        : serveEoEvening(state.eoEveningIndex);
     return {
-      label: "A morning prayer of the Church",
+      label:
+        part === "morning"
+          ? "A morning prayer of the Church"
+          : "An evening prayer of the Church",
       ref: served.title,
       text: served.text,
     };
-  }, [state.tradition, part, state.eoMorningIndex]);
+  }, [state.tradition, part, state.eoMorningIndex, state.eoEveningIndex]);
 
   const movements = useMemo(
     () =>
@@ -280,7 +287,10 @@ function OfficePrayer({
       dispatch({ type: "advanceCycle", key: officeKey });
     }
     if (keptKinds.has("tradition-prayer")) {
-      dispatch({ type: "advanceEoMorning", date: today });
+      dispatch({
+        type: part === "morning" ? "advanceEoMorning" : "advanceEoEvening",
+        date: today,
+      });
     }
     if (keptKinds.has("gospel")) {
       dispatch({ type: "markReadingDone", which: "gospel", date: today });

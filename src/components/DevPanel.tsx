@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useStore } from "../lib/store";
-import { LADDER } from "../lib/ladder";
 import {
   weekdayOf,
   type CheckIn,
@@ -91,7 +90,7 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
       </section>
 
       <section className="dev-group">
-        <h2 className="dev-h">Onboarding & rung</h2>
+        <h2 className="dev-h">Onboarding</h2>
         <div className="dev-row">
           <button
             className={`pill ${state.onboarded ? "is-on" : ""}`}
@@ -99,17 +98,6 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
           >
             {state.onboarded ? "Onboarded" : "Not onboarded"}
           </button>
-        </div>
-        <div className="dev-row dev-wrap">
-          {LADDER.map((r) => (
-            <button
-              key={r.id}
-              className={`pill ${state.rung === r.id ? "is-on" : ""}`}
-              onClick={() => patch({ rung: r.id })}
-            >
-              {r.id}. {r.name}
-            </button>
-          ))}
         </div>
       </section>
 

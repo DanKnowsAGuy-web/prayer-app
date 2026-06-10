@@ -1,7 +1,7 @@
 /**
  * Rough time estimates for a prayer's segments, used by the build-out preview.
  * Prayer is read unhurried, often aloud, so the rate is deliberately slow;
- * contemplative segments (silence, reflection) get a floor beyond reading time.
+ * contemplative segments (the Examen) get a floor beyond reading time.
  * These are approximate by design — they help the person budget, not stopwatch.
  */
 import type { Movement } from "./resolve";
@@ -9,7 +9,7 @@ import type { Movement } from "./resolve";
 const WORDS_PER_MINUTE = 100;
 const CONTEMPLATIVE_FLOOR_S = 90;
 /** Segments held in stillness get a floor beyond their reading time. */
-const CONTEMPLATIVE = new Set(["examen", "reflection"]);
+const CONTEMPLATIVE = new Set(["examen"]);
 
 export function estimateSeconds(m: Movement): number {
   const trimmed = m.text.trim();
