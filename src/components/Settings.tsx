@@ -1,5 +1,5 @@
 import { useStore } from "../lib/store";
-import type { Prefs, Tradition } from "../lib/engine";
+import type { Tradition } from "../lib/engine";
 import { buildReminderIcs, downloadIcs } from "../lib/ics";
 
 const TRADITIONS: { value: Tradition; label: string }[] = [
@@ -8,11 +8,6 @@ const TRADITIONS: { value: Tradition; label: string }[] = [
   { value: "evangelical", label: "Evangelical" },
   { value: "protestant", label: "Protestant" },
   { value: "roman-catholic", label: "Roman Catholic" },
-];
-
-const ELEMENT_TOGGLES: { key: keyof Prefs; label: string; hint: string }[] = [
-  { key: "song", label: "The Gospel song", hint: "The Benedictus in the morning, the Magnificat at night." },
-  { key: "reflection", label: "A time of reflection", hint: "A pause to sit with the word after the readings." },
 ];
 
 const TRANSLATIONS: { value: "web" | "kjv"; label: string; hint: string }[] = [
@@ -101,37 +96,6 @@ export function Settings({ onClose }: { onClose: () => void }) {
         >
           Add prayer reminders to my calendar
         </button>
-      </section>
-
-      <section className="settings-group">
-        <h2 className="settings-h">What your prayer includes</h2>
-        <p className="settings-note">
-          These are added on top of your current rule.
-        </p>
-        <ul className="toggle-list">
-          {ELEMENT_TOGGLES.map((e) => {
-            const on = state.prefs[e.key];
-            return (
-              <li key={e.key} className="toggle-row">
-                <span className="toggle-text">
-                  <span className="toggle-label">{e.label}</span>
-                  <span className="toggle-hint">{e.hint}</span>
-                </span>
-                <button
-                  className={`switch ${on ? "is-on" : ""}`}
-                  role="switch"
-                  aria-checked={on}
-                  aria-label={`${e.label}: ${on ? "on" : "off"}`}
-                  onClick={() =>
-                    dispatch({ type: "setPref", key: e.key, value: !on })
-                  }
-                >
-                  <span className="switch-knob" />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
       <div className="onboard-actions">

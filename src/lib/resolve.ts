@@ -9,12 +9,7 @@
  * renaming a segment can never move it.
  */
 
-import {
-  intentionsForDate,
-  type Intention,
-  type Prefs,
-  type Tradition,
-} from "./engine";
+import { intentionsForDate, type Intention, type Tradition } from "./engine";
 import type { DayPart } from "./daypart";
 import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 
@@ -26,8 +21,6 @@ export type MovementKind =
   | "epistle"
   | "gospel"
   | "song"
-  | "reading"
-  | "reflection"
   | "cycle"
   | "intercession"
   | "examen"
@@ -46,14 +39,11 @@ export type Movement = {
   note?: string;
   /** What this movement IS — drives placement, bindings, and estimates. */
   kind?: MovementKind;
-  /** Position on the value spine (1 = floor). Optional segments use OPT. */
+  /** Position on the value spine (1 = floor). */
   level?: number;
   /** Show a sign-of-the-cross mark (traditions that cross themselves). */
   cross?: boolean;
 };
-
-/** Optional-depth level: above the whole spine, off unless opted in. */
-export const OPT = 99;
 
 /**
  * The top of the spine for each part. The morning tops out at the Psalms; the
@@ -107,14 +97,6 @@ const PRAYER_NIGHT: Movement = {
   level: 1,
   label: "Prayer for the night",
   text: "Lighten my darkness, I beseech thee, O Lord; and by thy great mercy defend me from all perils and dangers of this night. Amen.",
-};
-
-const REFLECTION: Movement = {
-  kind: "reflection",
-  level: OPT,
-  label: "Reflection",
-  text: "Sit with the word you were given. What is God saying through it?",
-  note: "Hold it in silence rather than analysing it.",
 };
 
 /** The standard prayers said around the names of those being interceded for. */
@@ -263,9 +245,8 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
   if (showEpistle) push({ ...ctx.epistle!, level: 6 });
   if (showGospel) push(ctx.gospel);
 
-  // Optional depth (off unless opted in): song, reflection.
-  push(ctx.song && { ...ctx.song, kind: "song", level: OPT });
-  push(REFLECTION);
+  // The Gospel song belongs to the full office: the top of each part's spine.
+  push(ctx.song && { ...ctx.song, kind: "song", level: MAX_LEVEL[part] });
 
   // Prayer with the early Church (the intercessory cycle).
   push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 3 });
@@ -324,20 +305,9 @@ const FLOOR_KINDS = new Set<MovementKind>([
   "closing",
 ]);
 
-/** Initial include state for a chosen spine level (optional depth from prefs). */
-export function defaultIncluded(
-  movements: Movement[],
-  level: number,
-  prefs: Prefs,
-): boolean[] {
-  return movements.map((m) => {
-    if (m.level === OPT) {
-      if (m.kind === "song") return prefs.song;
-      if (m.kind === "reflection") return prefs.reflection;
-      return false;
-    }
-    return (m.level ?? 1) <= level;
-  });
+/** Initial include state for a chosen spine level. */
+export function defaultIncluded(movements: Movement[], level: number): boolean[] {
+  return movements.map((m) => (m.level ?? 1) <= level);
 }
 
 /**
@@ -356,21 +326,3 @@ export function applyBindings(movements: Movement[], included: boolean[]): boole
   });
 }
 
-/**
- * The spine level the current include set corresponds to, or null if it no
- * longer matches a clean bracket (a "Custom" set the slider can't represent).
- */
-export function derivedLevel(movements: Movement[], included: boolean[]): number | null {
-  for (let lvl = 1; lvl <= 6; lvl++) {
-    const matches = movements.every((m, i) => {
-      if (m.level === OPT) return true; // opt-ins don't define the bracket
-      if (m.kind === "doxology" || m.kind === "closing") return true; // frame-bound
-      return included[i] === ((m.level ?? 1) <= lvl);
-    });
-    if (matches) {
-      const anyOpt = movements.some((m, i) => m.level === OPT && included[i]);
-      return anyOpt ? null : lvl;
-    }
-  }
-  return null;
-}

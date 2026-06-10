@@ -12,7 +12,6 @@ import {
   localDate,
   nextWeeklyBucket,
   type Intention,
-  type Prefs,
   type RuleState,
   type Tradition,
 } from "./engine";
@@ -26,7 +25,6 @@ type Action =
       rung: number;
       tradition: Tradition | null;
       translation?: Translation;
-      prefs?: Prefs;
       psalmTime?: "morning" | "evening";
       petitionTime?: "morning" | "evening";
     }
@@ -42,7 +40,6 @@ type Action =
   | { type: "setTradition"; tradition: Tradition }
   | { type: "setTranslation"; translation: Translation }
   | { type: "markReadingDone"; which: "gospel" | "epistle"; date: string }
-  | { type: "setPref"; key: keyof Prefs; value: boolean }
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "advanceCycle"; key: string }
@@ -58,7 +55,6 @@ function reducer(state: RuleState, action: Action): RuleState {
         rung: action.rung,
         tradition: action.tradition,
         ...(action.translation ? { translation: action.translation } : {}),
-        ...(action.prefs ? { prefs: action.prefs } : {}),
         ...(action.psalmTime ? { psalmTime: action.psalmTime } : {}),
         ...(action.petitionTime ? { petitionTime: action.petitionTime } : {}),
       };
@@ -110,8 +106,6 @@ function reducer(state: RuleState, action: Action): RuleState {
       if (state[key] === action.date) return state;
       return { ...state, [key]: action.date };
     }
-    case "setPref":
-      return { ...state, prefs: { ...state.prefs, [action.key]: action.value } };
     case "devPatch":
       return { ...state, ...action.patch };
     case "setReminder":

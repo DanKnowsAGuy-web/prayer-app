@@ -4,7 +4,6 @@ import { LADDER } from "../lib/ladder";
 import {
   weekdayOf,
   type CheckIn,
-  type Prefs,
   type RuleState,
   type Tradition,
 } from "../lib/engine";
@@ -25,8 +24,6 @@ const TRADITIONS: (Tradition | "none")[] = [
   "protestant",
   "roman-catholic",
 ];
-
-const PREF_KEYS: (keyof Prefs)[] = ["song", "reflection"];
 
 /** Build a check-in log ending today: `kept` of the last `window` days. */
 function makeLog(today: string, kept: number, window: number): CheckIn[] {
@@ -163,23 +160,6 @@ export function DevPanel({ onClose }: { onClose: () => void }) {
               onClick={() => dispatch({ type: "setTranslation", translation: t })}
             >
               {t === "web" ? "World English Bible" : "King James"}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="dev-group">
-        <h2 className="dev-h">Depth toggles</h2>
-        <div className="dev-row dev-wrap">
-          {PREF_KEYS.map((k) => (
-            <button
-              key={k}
-              className={`pill ${state.prefs[k] ? "is-on" : ""}`}
-              onClick={() =>
-                patch({ prefs: { ...state.prefs, [k]: !state.prefs[k] } })
-              }
-            >
-              {k}
             </button>
           ))}
         </div>

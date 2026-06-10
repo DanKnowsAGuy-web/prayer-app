@@ -38,24 +38,6 @@ export type Tradition =
   | "protestant"
   | "roman-catholic";
 
-/**
- * Optional depth a person can switch on for the office. These are NOT spine
- * levels (the slider handles the value rank); they are extra segments that ride
- * along when enabled, pre-checked in the build-out. Standing preferences so the
- * person needn't re-check them each day.
- *   - song: the Gospel song (Benedictus in the morning, Magnificat at night)
- *   - reflection: a contemplative pause after the readings
- */
-export type Prefs = {
-  song: boolean;
-  reflection: boolean;
-};
-
-export const NO_PREFS: Prefs = {
-  song: false,
-  reflection: false,
-};
-
 export type RuleState = {
   /** Whether onboarding is complete. */
   onboarded: boolean;
@@ -63,8 +45,6 @@ export type RuleState = {
   tradition: Tradition | null;
   /** Which translation the scripture text is shown in (the plan is identical). */
   translation: Translation;
-  /** Optional depth toggles (song / reading / reflection). */
-  prefs: Prefs;
   /** Current rung index into the LADDER. */
   rung: number;
   /** Chronological check-in log (oldest first). */
@@ -164,7 +144,6 @@ export function initialState(): RuleState {
     onboarded: false,
     tradition: null,
     translation: "web",
-    prefs: { ...NO_PREFS },
     rung: FIRST_RUNG,
     log: [],
     intentions: [],

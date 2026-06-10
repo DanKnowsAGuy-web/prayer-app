@@ -69,9 +69,8 @@ function computeIncluded(
   movements: Movement[],
   level: number,
   psalmCount: number,
-  prefs: { song: boolean; reflection: boolean },
 ): boolean[] {
-  const base = defaultIncluded(movements, level, prefs);
+  const base = defaultIncluded(movements, level);
   let psalmPos = 0;
   return base.map((on, i) => {
     if (movements[i].kind === "psalm") {
@@ -217,7 +216,7 @@ function OfficePrayer({
     setSliderPos(notches.length);
     setLevel(maxLevel);
     setPsalmCount(MAX_PSALMS);
-    setIncluded(computeIncluded(movements, maxLevel, MAX_PSALMS, state.prefs));
+    setIncluded(computeIncluded(movements, maxLevel, MAX_PSALMS));
     // Re-seed only when the candidate set changes shape, not on every render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, movements.length]);
@@ -227,14 +226,14 @@ function OfficePrayer({
     setSliderPos(pos);
     setLevel(notch.level);
     setPsalmCount(notch.count);
-    setIncluded(computeIncluded(movements, notch.level, notch.count, state.prefs));
+    setIncluded(computeIncluded(movements, notch.level, notch.count));
   };
   const onPsalmCount = (n: number) => {
     setPsalmCount(n);
     // Keep the slider on the matching notch when one exists (psalms are in view
     // and at least one is kept); otherwise it's a custom set and the thumb stays.
     if (level === 5 && n > 0) setSliderPos(4 + n);
-    setIncluded(computeIncluded(movements, level, n, state.prefs));
+    setIncluded(computeIncluded(movements, level, n));
   };
   const onToggle = (i: number) =>
     setIncluded((prev) => prev.map((v, n) => (n === i ? !v : v)));

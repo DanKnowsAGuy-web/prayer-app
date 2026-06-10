@@ -51,7 +51,6 @@ const psalms = [
   { label: "Psalm 2", text: "p2" },
 ];
 const song = { label: "Benedictus", text: "s" };
-const reading = { label: "A reading", text: "r" };
 const cycle = { label: "Church", text: "c", source: "Hippolytus" };
 const intentions = [
   { id: "1", text: "For a friend", added: "2026-06-09", answered: false, cadence: "daily" },
@@ -137,7 +136,7 @@ for (const part of ["morning", "evening"]) {
 // 5. …and drops the closing when nothing but the floor remains.
 {
   const ms = assembleOffice(ctx("morning"));
-  const floorOnly = defaultIncluded(ms, 1, { song: false, reading: false, reflection: false });
+  const floorOnly = defaultIncluded(ms, 1);
   const eff = applyBindings(ms, floorOnly);
   const closingIdx = ms.findIndex((m) => m.kind === "closing");
   if (closingIdx >= 0 && eff[closingIdx]) fail("closing stayed on at the bare floor");
