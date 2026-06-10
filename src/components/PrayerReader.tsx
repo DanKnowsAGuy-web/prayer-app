@@ -154,7 +154,10 @@ function OfficePrayer({
       ? serveCycleDay(state.cycle.day)
       : { theme: "Prologue", entry: prologueEntry() };
     return {
-      label: served.theme,
+      // The segment is always recognizable by its track name; the day's theme
+      // shows as the small line above the text.
+      label: "Prayer with the early Church",
+      ref: served.theme,
       text: served.entry.prayer,
       source: served.entry.attribution,
     };
@@ -191,10 +194,27 @@ function OfficePrayer({
 
   // The office opens at its fullest. The slider trims down the value rank.
   const maxLevel = MAX_LEVEL[part];
+
+  // The slider's notches walk the value rank one segment at a time: levels 1–4,
+  // then the Psalms one psalm per notch, then (evening) the Epistle on top.
+  const notches = useMemo(() => {
+    const arr: { level: number; count: number }[] = [
+      { level: 1, count: MAX_PSALMS },
+      { level: 2, count: MAX_PSALMS },
+      { level: 3, count: MAX_PSALMS },
+      { level: 4, count: MAX_PSALMS },
+    ];
+    for (let n = 1; n <= MAX_PSALMS; n++) arr.push({ level: 5, count: n });
+    if (maxLevel >= 6) arr.push({ level: 6, count: MAX_PSALMS });
+    return arr;
+  }, [maxLevel]);
+
+  const [sliderPos, setSliderPos] = useState(notches.length);
   const [level, setLevel] = useState(maxLevel);
   const [psalmCount, setPsalmCount] = useState(MAX_PSALMS);
   const [included, setIncluded] = useState<boolean[]>([]);
   useEffect(() => {
+    setSliderPos(notches.length);
     setLevel(maxLevel);
     setPsalmCount(MAX_PSALMS);
     setIncluded(computeIncluded(movements, maxLevel, MAX_PSALMS, state.prefs));
@@ -202,12 +222,18 @@ function OfficePrayer({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, movements.length]);
 
-  const onLevel = (lvl: number) => {
-    setLevel(lvl);
-    setIncluded(computeIncluded(movements, lvl, psalmCount, state.prefs));
+  const onSlider = (pos: number) => {
+    const notch = notches[Math.max(1, Math.min(notches.length, pos)) - 1];
+    setSliderPos(pos);
+    setLevel(notch.level);
+    setPsalmCount(notch.count);
+    setIncluded(computeIncluded(movements, notch.level, notch.count, state.prefs));
   };
   const onPsalmCount = (n: number) => {
     setPsalmCount(n);
+    // Keep the slider on the matching notch when one exists (psalms are in view
+    // and at least one is kept); otherwise it's a custom set and the thumb stays.
+    if (level === 5 && n > 0) setSliderPos(4 + n);
     setIncluded(computeIncluded(movements, level, n, state.prefs));
   };
   const onToggle = (i: number) =>
@@ -225,9 +251,10 @@ function OfficePrayer({
     [movements, effective],
   );
 
-  // Finishing the office advances the usage tracks and marks the once-daily
-  // readings — but only for what was actually kept through to the Amen.
-  const handleClose = useCallback(() => {
+  // The Amen finishes the office: usage tracks advance and the once-daily
+  // readings are marked done — only for what was kept through to the end.
+  // Closing without Amen (the back button, Escape) advances nothing.
+  const handleAmen = useCallback(() => {
     const keptKinds = new Set(kept.map((m) => m.kind));
     // Usage tracks advance once per office prayed (the reducer latches the key).
     const officeKey = `${today}:${part}`;
@@ -250,17 +277,17 @@ function OfficePrayer({
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") handleClose();
+      if (e.key === "Escape") onClose();
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [handleClose]);
+  }, [onClose]);
 
   if (!ready) {
     return (
       <main className="reader" data-part={part}>
         <div className="reader-bar">
-          <button className="btn btn-quiet reader-close" onClick={handleClose}>
+          <button className="btn btn-quiet reader-close" onClick={onClose}>
             ← Close
           </button>
           <span className="reader-bar-title">
@@ -281,14 +308,14 @@ function OfficePrayer({
         title={title}
         movements={movements}
         included={effective}
-        level={level}
-        maxLevel={maxLevel}
-        onLevel={onLevel}
+        sliderPos={sliderPos}
+        sliderMax={notches.length}
+        onSlider={onSlider}
         psalmCount={psalmCount}
         onPsalmCount={onPsalmCount}
         onToggle={onToggle}
         onBegin={() => setPhase("pray")}
-        onClose={handleClose}
+        onClose={onClose}
       />
     );
   }
@@ -296,7 +323,7 @@ function OfficePrayer({
   return (
     <main className="reader" data-part={part}>
       <div className="reader-bar">
-        <button className="btn btn-quiet reader-close" onClick={handleClose}>
+        <button className="btn btn-quiet reader-close" onClick={onClose}>
           ← Close
         </button>
         <span className="reader-bar-title">
@@ -322,7 +349,7 @@ function OfficePrayer({
         ))}
 
         <div className="reader-end">
-          <button className="btn btn-primary" onClick={handleClose}>
+          <button className="btn btn-primary" onClick={handleAmen}>
             Amen
           </button>
         </div>
@@ -388,9 +415,9 @@ function BuildOut({
   title,
   movements,
   included,
-  level,
-  maxLevel,
-  onLevel,
+  sliderPos,
+  sliderMax,
+  onSlider,
   psalmCount,
   onPsalmCount,
   onToggle,
@@ -400,9 +427,9 @@ function BuildOut({
   title: string;
   movements: Movement[];
   included: boolean[];
-  level: number;
-  maxLevel: number;
-  onLevel: (lvl: number) => void;
+  sliderPos: number;
+  sliderMax: number;
+  onSlider: (pos: number) => void;
   psalmCount: number;
   onPsalmCount: (n: number) => void;
   onToggle: (i: number) => void;
@@ -438,10 +465,10 @@ function BuildOut({
             className="buildout-slider"
             type="range"
             min={1}
-            max={maxLevel}
+            max={sliderMax}
             step={1}
-            value={level}
-            onChange={(e) => onLevel(Number(e.target.value))}
+            value={sliderPos}
+            onChange={(e) => onSlider(Number(e.target.value))}
             aria-label="How much to pray today"
           />
           <p className="buildout-sub">
