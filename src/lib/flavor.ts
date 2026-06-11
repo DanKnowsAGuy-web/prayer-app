@@ -7,3 +7,6 @@ export const IS_EO = __FLAVOR__ === "eo";
 
 /** The priest's send-a-rule tool: a single screen, no prayer office. */
 export const IS_PRIEST = __FLAVOR__ === "priest";
+
+/** The SJOTL edition: a single fixed Orthodox rule, scaled by notches. */
+export const IS_SJOTL = __FLAVOR__ === "sjotl";

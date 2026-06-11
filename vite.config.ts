@@ -23,7 +23,13 @@ export default defineConfig(({ mode }) => ({
   define: {
     __BUILD__: JSON.stringify(build),
     __FLAVOR__: JSON.stringify(
-      mode === "eo" ? "eo" : mode === "priest" ? "priest" : "general",
+      mode === "eo"
+        ? "eo"
+        : mode === "priest"
+          ? "priest"
+          : mode === "sjotl"
+            ? "sjotl"
+            : "general",
     ),
   },
   server: { port: 5173 },

@@ -9,11 +9,19 @@ import { PrayerList } from "./components/PrayerList";
 import { PriestShare } from "./components/PriestShare";
 import { DevPanel } from "./components/DevPanel";
 import { InstallHint } from "./components/InstallHint";
-import { IS_PRIEST } from "./lib/flavor";
+import { IS_PRIEST, IS_SJOTL } from "./lib/flavor";
 import "./styles/app.css";
 
 export function App() {
-  const { state } = useStore();
+  const { state, dispatch } = useStore();
+
+  // The SJOTL edition has no denomination selection: it onboards itself to the
+  // single Orthodox rule the first time it opens.
+  useEffect(() => {
+    if (IS_SJOTL && !state.onboarded) {
+      dispatch({ type: "onboard", rung: 0, tradition: "eastern-orthodox" });
+    }
+  }, [state.onboarded, dispatch]);
   // When reading, we hold which practice is open.
   const [reading, setReading] = useState<DayPart | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -56,7 +64,8 @@ export function App() {
   }
 
   if (!state.onboarded) {
-    return withGlow(<Onboarding />);
+    // SJOTL onboards itself (the effect above); show only the glow meanwhile.
+    return withGlow(IS_SJOTL ? <div className="app" /> : <Onboarding />);
   }
 
   if (settingsOpen) {

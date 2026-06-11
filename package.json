@@ -7,13 +7,16 @@
     "dev": "vite",
     "dev:eo": "vite --mode eo",
     "dev:priest": "vite --mode priest",
+    "dev:sjotl": "vite --mode sjotl",
     "build": "tsc -b && vite build",
     "build:eo": "tsc -b && vite build --mode eo",
     "build:priest": "tsc -b && vite build --mode priest",
+    "build:sjotl": "tsc -b && vite build --mode sjotl",
     "preview": "vite preview",
     "deploy": "npm run build && node scripts/deploy.mjs",
     "deploy:eo": "npm run build:eo && node scripts/deploy-eo.mjs",
-    "deploy:priest": "npm run build:priest && node scripts/deploy-priest.mjs"
+    "deploy:priest": "npm run build:priest && node scripts/deploy-priest.mjs",
+    "deploy:sjotl": "npm run build:sjotl && node scripts/deploy-sjotl.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

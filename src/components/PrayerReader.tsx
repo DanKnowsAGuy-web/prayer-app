@@ -10,7 +10,8 @@ import { isProtEvang } from "../lib/earlyChurch";
 import { serveCanticle } from "../lib/songsOfScripture";
 import { serveReflection } from "../lib/earlyChurchWords";
 import { serveConfession } from "../lib/confession";
-import { IS_EO } from "../lib/flavor";
+import { IS_EO, IS_SJOTL } from "../lib/flavor";
+import { assembleSjotl, SJOTL_MAX_LEVEL } from "../lib/sjotl";
 import { weekdayOf } from "../lib/engine";
 import { loadPropers, propersFor, type ProperDay } from "../lib/propers";
 import { weekdayTheme, matinsFragment, serveMatinsPsalm } from "../lib/matins";
@@ -83,6 +84,8 @@ type OfficeData = {
   vespersPsalm?: Movement;
   /** EO morning only: the rotating morning-prayer slot (needs the Psalter). */
   morningPrayer?: Movement;
+  /** SJOTL morning only: Psalm 50, the great psalm of repentance. */
+  psalm50?: Movement;
 };
 
 /**
@@ -135,6 +138,8 @@ function OfficePrayer({
     IS_EO && part === "morning" && state.tradition === "eastern-orthodox";
   const isVespers =
     IS_EO && part === "evening" && state.tradition === "eastern-orthodox";
+  // The SJOTL edition's fixed Orthodox rule (its own shape, both parts).
+  const isSjotl = IS_SJOTL;
 
   const [data, setData] = useState<OfficeData>({ psalmMovements: [] });
   const [ready, setReady] = useState(false);
@@ -159,8 +164,9 @@ function OfficePrayer({
         );
         next.gospelRef = refs.gospel;
       }
-      // The Epistle is evening-only; skip it in the morning.
-      if (part === "evening" && refs?.epistle) {
+      // The Epistle is evening-only in the value-spine office; the SJOTL rule
+      // reads both the Epistle and the Gospel in both offices.
+      if ((part === "evening" || isSjotl) && refs?.epistle) {
         next.epistle = buildEpistleMovement(
           refs.epistle,
           passageFor(store, refs.epistle),
@@ -175,6 +181,17 @@ function OfficePrayer({
         state.psalmIndex,
         isMatins || isVespers ? 2 : MAX_PSALMS,
       );
+
+      // SJOTL morning: Psalm 50 (Septuagint), the great psalm of repentance —
+      // its text is the Hebrew 51 in the bundle.
+      if (isSjotl && part === "morning") {
+        const verses = (psalter.psalms as Record<string, { text: string }[]>)["51"] || [];
+        next.psalm50 = {
+          label: "Psalm 50",
+          ref: "The psalm of repentance",
+          text: verses.map((v) => v.text).join("\n"),
+        };
+      }
 
       // EO morning: the rotating morning-prayer slot (eleven prayers, Psalm 50,
       // the Creed — one per morning, in course).
@@ -227,7 +244,7 @@ function OfficePrayer({
     return () => {
       active = false;
     };
-  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, isVespers, state.matinsFragmentIndex, state.matinsPsalmIndex, state.vespersPsalmIndex, state.eoMorningIndex, state.eoEveningIndex]);
+  }, [today, part, state.translation, state.psalmIndex, state.tradition, isMatins, isVespers, isSjotl, state.matinsFragmentIndex, state.matinsPsalmIndex, state.vespersPsalmIndex, state.eoMorningIndex, state.eoEveningIndex]);
 
   // The intercessory cycle is a permanent spine segment (level 3); the slider,
   // not a flag, governs whether it's prayed today. The Prologue is served once,
@@ -341,6 +358,14 @@ function OfficePrayer({
         date: today,
       });
     }
+    if (isSjotl) {
+      return assembleSjotl({
+        part,
+        psalm50: data.psalm50,
+        gospel: state.gospelDoneDate === today ? undefined : data.gospel,
+        epistle: state.epistleDoneDate === today ? undefined : data.epistle,
+      });
+    }
     return assembleOffice({
       part,
       tradition: state.tradition,
@@ -363,6 +388,7 @@ function OfficePrayer({
   }, [
     isMatins,
     isVespers,
+    isSjotl,
     part,
     state.tradition,
     data,
@@ -382,13 +408,15 @@ function OfficePrayer({
     ? MATINS_MAX_LEVEL
     : isVespers
       ? VESPERS_MAX_LEVEL
-      : MAX_LEVEL[part];
+      : isSjotl
+        ? SJOTL_MAX_LEVEL[part]
+        : MAX_LEVEL[part];
 
   // The slider's notches walk the value rank one segment at a time. The Matins
   // rank already interleaves the psalms (levels carry the rank directly); the
   // value-spine office expands the psalms into per-psalm notches.
   const notches = useMemo(() => {
-    if (isMatins || isVespers) {
+    if (isMatins || isVespers || isSjotl) {
       return Array.from({ length: maxLevel }, (_, i) => ({
         level: i + 1,
         count: MAX_PSALMS,
@@ -403,7 +431,7 @@ function OfficePrayer({
     for (let n = 1; n <= MAX_PSALMS; n++) arr.push({ level: 5, count: n });
     if (maxLevel >= 6) arr.push({ level: 6, count: MAX_PSALMS });
     return arr;
-  }, [isMatins, isVespers, maxLevel]);
+  }, [isMatins, isVespers, isSjotl, maxLevel]);
 
   const [sliderPos, setSliderPos] = useState(notches.length);
   const [level, setLevel] = useState(maxLevel);
@@ -566,7 +594,7 @@ function OfficePrayer({
         onSlider={onSlider}
         psalmCount={psalmCount}
         onPsalmCount={onPsalmCount}
-        hidePsalmCount={isMatins || isVespers}
+        hidePsalmCount={isMatins || isVespers || isSjotl}
         onToggle={onToggle}
         onBegin={() => setPhase("pray")}
         onClose={onClose}

@@ -53,7 +53,13 @@ export type MovementKind =
   | "night-psalm"
   | "lords"
   | "closing"
-  | "prayer-night";
+  | "prayer-night"
+  | "rubric"
+  | "troparia"
+  | "fixed-psalm"
+  | "axion"
+  | "jesus-prayer"
+  | "prayer";
 
 export type Movement = {
   label: string;

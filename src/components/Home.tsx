@@ -1,6 +1,6 @@
 import { useStore } from "../lib/store";
 import { unitLabel, UNIT_COUNT } from "../lib/psalter";
-import { IS_EO } from "../lib/flavor";
+import { IS_EO, IS_SJOTL } from "../lib/flavor";
 import { isProtEvang } from "../lib/earlyChurch";
 import { useEffect } from "react";
 import {
@@ -187,7 +187,7 @@ export function Home({
         </aside>
       )}
 
-      <PsalmRotation />
+      {!IS_SJOTL && <PsalmRotation />}
 
       <Intentions onOpen={onOpenPrayerList} />
 
