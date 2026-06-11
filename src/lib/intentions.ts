@@ -1,12 +1,18 @@
 /**
- * The prayer list's categories: each supplies the line woven into the office
- * for a held name, and a label for the manager. The text the user typed is the
- * NAME; the category surrounds it with the Church's words for the reason.
+ * The prayer list's petitions. Each category opens with a short litany bid —
+ * a line or two in the Church's voice — after which the names held under it are
+ * simply read. So the office prays the petition first, then the names, rather
+ * than folding each name into its own sentence.
  *
  * Wording follows the app's quiet, traditional voice. "general" is the plain
- * fallback — a name with no reason attached, prayed simply "for N."
+ * petition — names carried without a stated reason — and comes first.
  */
-import { categoryOf, type Intention, type IntentionCategory } from "./engine";
+import {
+  effectiveCategory,
+  intentionsForDate,
+  type Intention,
+  type IntentionCategory,
+} from "./engine";
 
 export type CategoryDef = {
   key: IntentionCategory;
@@ -14,68 +20,62 @@ export type CategoryDef = {
   label: string;
   /** A short hint of when it fits, shown beneath the label. */
   hint: string;
-  /** The line prayed in the office, given the name and any context word. */
-  line: (name: string, context?: string) => string;
+  /** The litany bid prayed before the names of this petition. */
+  bid: string;
+  /** A note on when the petition is prayed, when it isn't simply daily/weekly. */
+  schedule?: string;
 };
 
-/** `, my grandmother` etc., or "" when no context word was given. */
-function ctx(context?: string): string {
-  const c = context?.trim();
-  return c ? `, ${c}` : "";
-}
-
 /**
- * Categories in the order they are offered and grouped — the living first,
- * the departed last, as the commemorations are ordered in the services.
+ * The petitions, in the order they are offered and prayed — the general
+ * remembrance first, the departed last, as a litany moves toward the close.
+ * "afflicted" is intentionally absent: it is merged into "sick" (see
+ * categoryOf), and legacy names resolve there.
  */
 export const CATEGORIES: CategoryDef[] = [
   {
-    key: "sick",
-    label: "The sick",
-    hint: "illness, surgery, recovery",
-    line: (n, c) => `for the health and salvation of ${n}${ctx(c)}`,
+    key: "general",
+    label: "General",
+    hint: "a name carried simply before God",
+    bid: "For all those we carry in our hearts and name before You, O Lord:",
   },
   {
-    key: "afflicted",
-    label: "The afflicted",
-    hint: "sorrow, hardship, those in despair",
-    line: (n, c) => `for ${n}${ctx(c)}, in their affliction`,
+    key: "sick",
+    label: "The sick & afflicted",
+    hint: "illness, suffering, sorrow, those in despair",
+    bid: "For the sick and the suffering, that the Lord may visit them with His healing and peace, and lighten every affliction:",
   },
   {
     key: "strayed",
     label: "Those who have strayed",
     hint: "those fallen away from the faith",
-    line: (n, c) => `for ${n}${ctx(c)}, that they may find their way home`,
+    bid: "For those who have wandered from the way, that the Good Shepherd may seek them and bring them home:",
   },
   {
     key: "peace",
     label: "Peace with those at odds",
     hint: "the estranged, those who wrong us",
-    line: (n, c) => `for ${n}${ctx(c)}, and for peace between us`,
+    bid: "For those from whom we are estranged, and for peace and reconciliation between us:",
   },
   {
     key: "new-life",
     label: "New life",
     hint: "the expectant, the newly baptized or married",
-    line: (n, c) => `for ${n}${ctx(c)}, in this new beginning`,
+    bid: "For those at the threshold of new life, that You bless and keep them in their beginning:",
+    schedule: "Prayed each day for forty days, then kept in the general remembrance.",
   },
   {
     key: "asked",
     label: "Those who asked our prayers",
     hint: "those who entrusted themselves to you",
-    line: (n, c) => `for ${n}${ctx(c)}, who asked our prayers`,
-  },
-  {
-    key: "general",
-    label: "General",
-    hint: "a name held simply before God",
-    line: (n, c) => `for ${n}${ctx(c)}`,
+    bid: "For all who have asked our prayers, and those we have promised to remember:",
   },
   {
     key: "departed",
     label: "The departed",
     hint: "those who have fallen asleep",
-    line: (n, c) => `for the repose of ${n}${ctx(c)}; may their memory be eternal`,
+    bid: "For Your servants who have fallen asleep before us, that You give them rest where Your light shines, and make their memory eternal:",
+    schedule: "Prayed on Fridays, the day of the Cross.",
   },
 ];
 
@@ -83,6 +83,7 @@ const BY_KEY: Record<IntentionCategory, CategoryDef> = Object.fromEntries(
   CATEGORIES.map((c) => [c.key, c]),
 ) as Record<IntentionCategory, CategoryDef>;
 
+/** The petition for a category, resolving merged/legacy keys to a real one. */
 export function categoryDef(key: IntentionCategory): CategoryDef {
   return BY_KEY[key] ?? BY_KEY.general;
 }
@@ -91,19 +92,40 @@ export function categoryLabel(key: IntentionCategory): string {
   return categoryDef(key).label;
 }
 
-/** The line prayed in the office for one held name. */
-export function intentionLine(i: Intention): string {
-  return categoryDef(categoryOf(i)).line(i.text, i.context);
+export type IntercessionBlock = {
+  key: IntentionCategory;
+  label: string;
+  bid: string;
+  /** The names held under this petition, in the order they were added. */
+  names: string[];
+};
+
+/**
+ * The day's names grouped into petitions, in canonical order — each block its
+ * litany bid and the names read under it. Empty petitions are omitted.
+ */
+export function intercessionBlocks(
+  intentions: Intention[],
+  date: string,
+): IntercessionBlock[] {
+  const today = intentionsForDate(intentions, date);
+  return CATEGORIES.map((def) => ({
+    key: def.key,
+    label: def.label,
+    bid: def.bid,
+    names: today
+      .filter((i) => effectiveCategory(i, date) === def.key)
+      .map((i) => i.text),
+  })).filter((b) => b.names.length > 0);
 }
 
 /**
- * The day's names as woven lines, ordered by category (living first, departed
- * last) so the commemorations read as the services order them. Order within a
- * category follows the list as given.
+ * The prayer-list body for the office: each petition's bid, then its names on
+ * the following line. Blocks are separated by a blank line. "" when no names
+ * come up today (the caller supplies its own empty-state line).
  */
-export function intentionLines(intentions: Intention[]): string[] {
-  const order = CATEGORIES.map((c) => c.key);
-  return [...intentions]
-    .sort((a, b) => order.indexOf(categoryOf(a)) - order.indexOf(categoryOf(b)))
-    .map(intentionLine);
+export function intercessionBody(intentions: Intention[], date: string): string {
+  return intercessionBlocks(intentions, date)
+    .map((b) => `${b.bid}\n${b.names.join(", ")}.`)
+    .join("\n\n");
 }

@@ -169,15 +169,24 @@ export type Intention = {
   cadence: Cadence;
   /** For weekly names: the weekday (0=Sun…6=Sat) they come up on. */
   bucket?: number;
-  /** Why they are held in prayer; shapes the woven line. Defaults to general. */
+  /** The petition a name is prayed under. Defaults to general. */
   category?: IntentionCategory;
-  /** An optional word of context, e.g. "my grandmother" or "Kyiv". */
-  context?: string;
 };
 
-/** Treat a saved intention with no category (older data) as general. */
+/** Friday — the day the Church keeps the memory of the departed (and the Cross). */
+const FRIDAY = 5;
+
+/** New-life names are prayed each day for this many days, then become general. */
+export const NEW_LIFE_DAYS = 40;
+
+/**
+ * Treat a saved intention's category, normalizing legacy values: names with no
+ * category are general, and the old "afflicted" category is folded into "sick"
+ * (the merged "sick & afflicted" petition).
+ */
 export function categoryOf(i: Intention): IntentionCategory {
-  return i.category ?? "general";
+  const c = i.category ?? "general";
+  return c === "afflicted" ? "sick" : c;
 }
 
 /** Treat a saved intention with no cadence (older data) as daily. */
@@ -191,9 +200,33 @@ export function weekdayOf(date: string): number {
   return new Date(y, m - 1, d).getDay();
 }
 
+/** Whole days from local "YYYY-MM-DD" `from` to `to` (negative if `to` is earlier). */
+function daysBetween(from: string, to: string): number {
+  const ms = (s: string) => {
+    const [y, m, d] = s.split("-").map(Number);
+    return new Date(y, m - 1, d).getTime();
+  };
+  return Math.round((ms(to) - ms(from)) / 86400000);
+}
+
 /**
- * The intentions to pray on a given day: every daily name, plus the weekly
- * names whose rotation slot lands on today's weekday. Answered names drop out.
+ * The petition a name is actually prayed under today. Mostly its chosen
+ * category, with one time-bound rule: a "new life" name returns to "general"
+ * once its forty days have passed.
+ */
+export function effectiveCategory(i: Intention, date: string): IntentionCategory {
+  const c = categoryOf(i);
+  if (c === "new-life" && daysBetween(i.added, date) >= NEW_LIFE_DAYS) {
+    return "general";
+  }
+  return c;
+}
+
+/**
+ * The intentions to pray on a given day. Most names follow their cadence (daily
+ * every day; weekly on their rotation weekday). Two petitions keep their own
+ * rhythm regardless: the departed are prayed on Fridays, and a new-life name is
+ * prayed every day through its forty days. Answered names drop out.
  */
 export function intentionsForDate(
   intentions: Intention[],
@@ -202,6 +235,9 @@ export function intentionsForDate(
   const wd = weekdayOf(date);
   return intentions.filter((i) => {
     if (i.answered) return false;
+    const cat = effectiveCategory(i, date);
+    if (cat === "departed") return wd === FRIDAY;
+    if (cat === "new-life") return true;
     if (cadenceOf(i) === "daily") return true;
     return (i.bucket ?? 0) % 7 === wd;
   });

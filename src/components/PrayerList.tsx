@@ -3,31 +3,36 @@ import { useStore } from "../lib/store";
 import {
   cadenceOf,
   categoryOf,
+  effectiveCategory,
   nextWeeklyBucket,
   weekdayOf,
   type Cadence,
   type Intention,
   type IntentionCategory,
 } from "../lib/engine";
-import { CATEGORIES, intentionLine } from "../lib/intentions";
+import { CATEGORIES, categoryDef } from "../lib/intentions";
 
 const makeId = (seed: number) => `i${seed.toString(36)}${Math.floor(seed % 1000)}`;
 
+/** Departed and new-life keep their own rhythm, so the daily/weekly choice is moot. */
+const FIXED_RHYTHM: IntentionCategory[] = ["departed", "new-life"];
+
 /**
- * The prayer list manager, reached from the home screen. Add a name with a
- * rhythm (daily/weekly) and a category that supplies the words it is prayed
- * with; tap any name to move it to another category, change its rhythm, or
- * remove it.
+ * The prayer list manager, reached from the home screen. Add a name and a
+ * petition to pray it under; most names follow a daily or weekly rhythm, while
+ * the departed are kept on Fridays and new-life names for forty days. Tap any
+ * name to move it to another petition, change its rhythm, or remove it.
  */
 export function PrayerList({ onClose }: { onClose: () => void }) {
   const { state, today, dispatch } = useStore();
   const [name, setName] = useState("");
-  const [context, setContext] = useState("");
   const [cadence, setCadence] = useState<Cadence>("daily");
   const [category, setCategory] = useState<IntentionCategory>("general");
   const [editingId, setEditingId] = useState<string | null>(null);
 
   const wd = weekdayOf(today);
+  const def = categoryDef(category);
+  const fixedRhythm = FIXED_RHYTHM.includes(category);
 
   function add() {
     const trimmed = name.trim();
@@ -43,18 +48,16 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
         cadence,
         bucket: cadence === "weekly" ? nextWeeklyBucket(state.intentions) : undefined,
         category,
-        ...(context.trim() ? { context: context.trim() } : {}),
       },
     });
     setName("");
-    setContext("");
-    // Keep the chosen cadence and category — adding several at once is common.
+    // Keep the chosen rhythm and petition — adding several at once is common.
   }
 
-  // Names grouped under their category, in the canonical order.
+  // Names grouped under the petition they are prayed under today, in order.
   const groups = CATEGORIES.map((c) => ({
     def: c,
-    items: state.intentions.filter((i) => categoryOf(i) === c.key),
+    items: state.intentions.filter((i) => effectiveCategory(i, today) === c.key),
   })).filter((g) => g.items.length > 0);
 
   return (
@@ -69,8 +72,8 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
       <section className="settings-group">
         <h2 className="settings-h">Add someone</h2>
         <p className="settings-note">
-          Daily names are prayed every day; weekly names come up once a week, in
-          turn. The category gives the words they are prayed with.
+          Choose a name and the petition to pray it under. The petition is read
+          first, then the names held within it.
         </p>
 
         <form
@@ -88,35 +91,10 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
             aria-label="The name to hold in prayer"
             maxLength={80}
           />
-          <input
-            className="intention-input"
-            value={context}
-            onChange={(e) => setContext(e.target.value)}
-            placeholder="A word of context — optional (e.g. my grandmother)"
-            aria-label="An optional word of context"
-            maxLength={60}
-          />
 
           <div className="pl-field">
-            <span className="pl-field-label">Rhythm</span>
-            <div className="pl-pills" role="group" aria-label="How often to pray">
-              {(["daily", "weekly"] as Cadence[]).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  className={`pill ${cadence === c ? "is-on" : ""}`}
-                  aria-pressed={cadence === c}
-                  onClick={() => setCadence(c)}
-                >
-                  {c === "daily" ? "Daily" : "Weekly"}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="pl-field">
-            <span className="pl-field-label">Category</span>
-            <div className="pl-pills" role="group" aria-label="Why they are held in prayer">
+            <span className="pl-field-label">Petition</span>
+            <div className="pl-pills" role="group" aria-label="The petition to pray them under">
               {CATEGORIES.map((c) => (
                 <button
                   key={c.key}
@@ -132,11 +110,29 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
             </div>
           </div>
 
-          {name.trim() && (
-            <p className="pl-preview">
-              Prayed: “{CATEGORIES.find((c) => c.key === category)!.line(name.trim(), context.trim() || undefined)}.”
-            </p>
+          {!fixedRhythm && (
+            <div className="pl-field">
+              <span className="pl-field-label">Rhythm</span>
+              <div className="pl-pills" role="group" aria-label="How often to pray">
+                {(["daily", "weekly"] as Cadence[]).map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    className={`pill ${cadence === c ? "is-on" : ""}`}
+                    aria-pressed={cadence === c}
+                    onClick={() => setCadence(c)}
+                  >
+                    {c === "daily" ? "Daily" : "Weekly"}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
+
+          <p className="pl-preview">
+            Prayed: “{def.bid}”
+            {def.schedule ? ` ${def.schedule}` : ""}
+          </p>
 
           <button className="btn btn-primary" type="submit" disabled={!name.trim()}>
             Add to the list
@@ -152,12 +148,14 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
         groups.map((g) => (
           <section className="settings-group pl-group" key={g.def.key}>
             <h2 className="settings-h">{g.def.label}</h2>
+            <p className="pl-bid">{g.def.bid}</p>
             <ul className="pl-list">
               {g.items.map((i) => (
                 <Row
                   key={i.id}
                   intention={i}
                   wd={wd}
+                  today={today}
                   expanded={editingId === i.id}
                   onToggle={() => setEditingId(editingId === i.id ? null : i.id)}
                   onClose={() => setEditingId(null)}
@@ -177,38 +175,47 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
   );
 }
 
+/** The rhythm/schedule chip for a name, reflecting its petition's rules. */
+function scheduleTag(i: Intention, today: string, wd: number): string {
+  const cat = effectiveCategory(i, today);
+  if (cat === "departed") return "Fridays";
+  if (cat === "new-life") return "New life";
+  const cadence = cadenceOf(i);
+  if (cadence === "daily") return "Daily";
+  const inToday = (i.bucket ?? 0) % 7 === wd;
+  return inToday ? "Weekly · today" : "Weekly";
+}
+
 function Row({
   intention: i,
   wd,
+  today,
   expanded,
   onToggle,
   onClose,
 }: {
   intention: Intention;
   wd: number;
+  today: string;
   expanded: boolean;
   onToggle: () => void;
   onClose: () => void;
 }) {
   const { dispatch } = useStore();
   const cadence = cadenceOf(i);
-  const inToday = cadence === "weekly" && (i.bucket ?? 0) % 7 === wd;
+  const fixedRhythm = FIXED_RHYTHM.includes(effectiveCategory(i, today));
 
   return (
     <li className={`pl-item ${expanded ? "is-open" : ""}`}>
       <button className="pl-item-head" onClick={onToggle} aria-expanded={expanded}>
         <span className="pl-item-name">{i.text}</span>
-        <span className={`cadence-tag cadence-${cadence} ${inToday ? "is-today" : ""}`}>
-          {cadence === "daily" ? "Daily" : inToday ? "Weekly · today" : "Weekly"}
-        </span>
+        <span className="cadence-tag">{scheduleTag(i, today, wd)}</span>
       </button>
-
-      <p className="pl-item-line">{intentionLine(i)}.</p>
 
       {expanded && (
         <div className="pl-edit">
           <span className="pl-field-label">Move to</span>
-          <div className="pl-pills" role="group" aria-label="Move to another category">
+          <div className="pl-pills" role="group" aria-label="Move to another petition">
             {CATEGORIES.map((c) => (
               <button
                 key={c.key}
@@ -223,12 +230,14 @@ function Row({
           </div>
 
           <div className="pl-edit-actions">
-            <button
-              className="cadence-tag cadence-toggle"
-              onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
-            >
-              Make {cadence === "daily" ? "weekly" : "daily"}
-            </button>
+            {!fixedRhythm && (
+              <button
+                className="cadence-tag cadence-toggle"
+                onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
+              >
+                Make {cadence === "daily" ? "weekly" : "daily"}
+              </button>
+            )}
             <button
               className="btn btn-quiet pl-remove"
               onClick={() => {

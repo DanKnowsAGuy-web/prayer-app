@@ -18,8 +18,7 @@ import {
   type SummaryWindow,
 } from "../lib/ruleSummary";
 import { TraditionEmblem } from "./TraditionEmblem";
-import { intentionsForDate } from "../lib/engine";
-import { intentionLines } from "../lib/intentions";
+import { intercessionBlocks } from "../lib/intentions";
 import { greeting, longDate, type DayPart } from "../lib/daypart";
 import { useState } from "react";
 
@@ -441,7 +440,7 @@ function MyRule() {
 
 function Intentions({ onOpen }: { onOpen: () => void }) {
   const { state, today } = useStore();
-  const todays = intentionLines(intentionsForDate(state.intentions, today));
+  const blocks = intercessionBlocks(state.intentions, today);
   const count = state.intentions.length;
 
   return (
@@ -456,10 +455,13 @@ function Intentions({ onOpen }: { onOpen: () => void }) {
           The people and needs you carry can rest here. Daily names are prayed
           every day; weekly names come up once a week, in turn.
         </p>
-      ) : todays.length > 0 ? (
+      ) : blocks.length > 0 ? (
         <ul className="intention-preview">
-          {todays.map((line, n) => (
-            <li key={n}>{line}.</li>
+          {blocks.map((b) => (
+            <li key={b.key}>
+              <span className="preview-cat">{b.label}</span>
+              {b.names.join(", ")}
+            </li>
           ))}
         </ul>
       ) : (

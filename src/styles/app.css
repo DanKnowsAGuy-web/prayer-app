@@ -1250,6 +1250,21 @@
   margin-top: var(--space-3);
   align-self: flex-start;
 }
+.intention-preview .preview-cat {
+  display: block;
+  font-style: normal;
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 0.1rem;
+}
+.pl-bid {
+  color: var(--ink-muted);
+  font-style: italic;
+  font-size: 0.95rem;
+  margin: 0;
+}
 
 .prayerlist .pl-add {
   display: flex;
