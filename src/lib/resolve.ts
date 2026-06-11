@@ -44,7 +44,10 @@ export type MovementKind =
   | "gospel"
   | "song"
   | "canticle"
+  | "hymn"
   | "creed"
+  | "reflection"
+  | "confession"
   | "cycle"
   | "intercession"
   | "night-psalm"
@@ -71,6 +74,10 @@ export type Movement = {
   optional?: boolean;
   /** Show a sign-of-the-cross mark (traditions that cross themselves). */
   cross?: boolean;
+  /** A one-line italic note on an ancient prayer's origin, shown the first time only. */
+  provenance?: string;
+  /** Stable id for the provenance note, so it shows once ever (see seenProvenance). */
+  provId?: string;
 };
 
 /**
@@ -213,6 +220,10 @@ export type OfficeCtx = {
   traditionPrayer?: Movement;
   /** The day's intercessory-cycle prayer, present only when the cycle is on. */
   cycle?: Movement;
+  /** Protestant/Evangelical rotations (in course), present only for those traditions. */
+  canticle?: Movement;
+  reflection?: Movement;
+  confession?: { confession: Movement; assurance: Movement };
   /** The person's prayer list, prayed in both offices when there are names. */
   intentions: Intention[];
   date: string;
@@ -245,6 +256,14 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
   );
   push(OPENING_LINE);
 
+  // The Protestant/Evangelical rule draws its depth from the undivided Church.
+  // Confession and assurance come early, near the opening, before the Word.
+  const protEvang = isProtEvang(tradition);
+  if (protEvang && ctx.confession) {
+    push({ ...ctx.confession.confession, kind: "confession", level: 2 });
+    push({ ...ctx.confession.assurance, kind: "confession", level: 2 });
+  }
+
   // Psalms (and the doxology that answers them).
   const hasPsalms = ctx.psalmMovements.length > 0;
   for (const p of ctx.psalmMovements) {
@@ -260,6 +279,9 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
     });
   }
 
+  // The Church sings Scripture back: a canticle in course (Protestant/Evangelical).
+  push(protEvang && ctx.canticle && { ...ctx.canticle, kind: "canticle", level: 3 });
+
   // Scripture. The Gospel belongs to the morning (carried to the evening only if
   // not done). The Epistle is evening-only, the deepest evening segment, and
   // once-daily. Epistle before Gospel, by custom.
@@ -271,15 +293,15 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
   // The Gospel song belongs to the full office: the top of each part's spine.
   push(ctx.song && { ...ctx.song, kind: "song", level: MAX_LEVEL[part] });
 
-  // The Protestant/Evangelical rule draws its depth from the undivided Church:
-  // the Apostles' Creed in the fuller office, and the early canticles and the
-  // original Nicene Creed as opt-ins that extend the session.
-  const protEvang = isProtEvang(tradition);
+  // After the Word: the confession of faith and a word from the early Church.
+  // The Apostles' Creed sits in the fuller office; the original Nicene Creed and
+  // the early canticles are opt-ins that extend the session.
   if (protEvang) {
     push({ ...APOSTLES_CREED, kind: "creed", level: 4 });
+    push(ctx.reflection && { ...ctx.reflection, kind: "reflection", level: 4 });
     push({ ...NICENE_CREED, kind: "creed", level: MAX_LEVEL[part], optional: true });
     for (const c of earlyChurchCanticles(part)) {
-      push({ ...c, kind: "canticle", level: MAX_LEVEL[part], optional: true });
+      push({ ...c, kind: "hymn", level: MAX_LEVEL[part], optional: true });
     }
   }
 

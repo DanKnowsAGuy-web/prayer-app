@@ -1,6 +1,7 @@
 import { useStore } from "../lib/store";
 import { unitLabel, UNIT_COUNT } from "../lib/psalter";
 import { IS_EO } from "../lib/flavor";
+import { isProtEvang } from "../lib/earlyChurch";
 import { useEffect } from "react";
 import {
   loadPropers,
@@ -33,7 +34,7 @@ export function Home({
   onOpenPrayerList: () => void;
   defaultPart: DayPart;
 }) {
-  const { state, today } = useStore();
+  const { state, today, dispatch } = useStore();
   const [properDay, setProperDay] = useState<ProperDay | undefined>(undefined);
   const [life, setLife] = useState<SoloContent | null>(null);
   useEffect(() => {
@@ -168,6 +169,21 @@ export function Home({
         <aside className="offer offer-advance" role="status">
           <p className="offer-eyebrow">A quiet first</p>
           <p className="offer-body">{MILESTONE_TEXT[recentMilestone.id]}</p>
+        </aside>
+      )}
+
+      {isProtEvang(state.tradition) && !state.provenanceIntroSeen && (
+        <aside className="offer provenance-intro" role="note">
+          <p className="offer-body">
+            Many of these prayers are very old. The first time one appears, you
+            will see a short note on where it came from, then it steps aside.
+          </p>
+          <button
+            className="btn btn-quiet"
+            onClick={() => dispatch({ type: "dismissProvenanceIntro" })}
+          >
+            Got it
+          </button>
         </aside>
       )}
 

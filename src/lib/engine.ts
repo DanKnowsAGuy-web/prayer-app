@@ -125,6 +125,21 @@ export type RuleState = {
     prologueSeen: boolean;
     lastAdvanceKey?: string;
   };
+  /**
+   * Protestant/Evangelical rotations, each advancing by usage (its own pointer)
+   * with a per-office latch against double-taps. The Song of Scripture, the
+   * early-Church reflection, and the confession-and-assurance pairings.
+   */
+  canticleIndex: number;
+  lastCanticleAdvanceKey?: string;
+  reflectionIndex: number;
+  lastReflectionAdvanceKey?: string;
+  confessionIndex: number;
+  lastConfessionAdvanceKey?: string;
+  /** Ancient-prayer provenance notes already shown (by id); each is shown once. */
+  seenProvenance: string[];
+  /** Whether the one-time note explaining the provenance lines has been seen. */
+  provenanceIntroSeen?: boolean;
 };
 
 /** One completed office: what was prayed, and roughly how long it ran. */
@@ -262,6 +277,10 @@ export function initialState(): RuleState {
     petitionTime: "morning",
     reminders: { morning: null, evening: null },
     cycle: { day: 1, prologueSeen: false },
+    canticleIndex: 0,
+    reflectionIndex: 0,
+    confessionIndex: 0,
+    seenProvenance: [],
     eoMorningIndex: 0,
     eoEveningIndex: 0,
     matinsFragmentIndex: 0,

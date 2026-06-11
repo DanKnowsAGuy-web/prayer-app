@@ -6,6 +6,10 @@ import { canticleMovement } from "../lib/devotions";
 import { serveCycleDay, prologueEntry } from "../lib/intercessoryCycle";
 import { serveEoMorningSlot } from "../lib/eoMorningPrayers";
 import { serveEoEvening } from "../lib/eoEveningPrayers";
+import { isProtEvang } from "../lib/earlyChurch";
+import { serveCanticle } from "../lib/songsOfScripture";
+import { serveReflection } from "../lib/earlyChurchWords";
+import { serveConfession } from "../lib/confession";
 import { IS_EO } from "../lib/flavor";
 import { weekdayOf } from "../lib/engine";
 import { loadPropers, propersFor, type ProperDay } from "../lib/propers";
@@ -255,6 +259,21 @@ function OfficePrayer({
     };
   }, [state.tradition, part, data.morningPrayer, state.eoEveningIndex]);
 
+  // The Protestant/Evangelical rotations, in course (one per office prayed).
+  const protEvang = isProtEvang(state.tradition);
+  const songOfScripture = useMemo<Movement | undefined>(
+    () => (protEvang ? (serveCanticle(state.canticleIndex) as Movement) : undefined),
+    [protEvang, state.canticleIndex],
+  );
+  const reflection = useMemo<Movement | undefined>(
+    () => (protEvang ? (serveReflection(state.reflectionIndex) as Movement) : undefined),
+    [protEvang, state.reflectionIndex],
+  );
+  const confessionPair = useMemo(
+    () => (protEvang ? serveConfession(state.confessionIndex) : undefined),
+    [protEvang, state.confessionIndex],
+  );
+
   const movements = useMemo(() => {
     if (isMatins) {
       const p = data.propers;
@@ -331,6 +350,9 @@ function OfficePrayer({
       song: canticleMovement(part),
       traditionPrayer,
       cycle: cycleMovement,
+      canticle: songOfScripture,
+      reflection,
+      confession: confessionPair,
       intentions: state.intentions,
       date: today,
       carry: {
@@ -346,6 +368,9 @@ function OfficePrayer({
     data,
     traditionPrayer,
     cycleMovement,
+    songOfScripture,
+    reflection,
+    confessionPair,
     state.intentions,
     today,
     state.gospelDoneDate,
@@ -448,6 +473,22 @@ function OfficePrayer({
     }
     if (keptKinds.has("cycle")) {
       dispatch({ type: "advanceCycle", key: officeKey });
+    }
+    if (keptKinds.has("canticle")) {
+      dispatch({ type: "advanceCanticle", key: officeKey });
+    }
+    if (keptKinds.has("reflection")) {
+      dispatch({ type: "advanceReflection", key: officeKey });
+    }
+    if (keptKinds.has("confession")) {
+      dispatch({ type: "advanceConfession", key: officeKey });
+    }
+    // The first time an ancient prayer is prayed, its provenance note is retired.
+    const provIds = kept
+      .map((m) => m.provId)
+      .filter((id): id is string => Boolean(id));
+    if (provIds.length) {
+      dispatch({ type: "markProvenanceSeen", ids: provIds });
     }
     if (keptKinds.has("tradition-prayer")) {
       dispatch({
@@ -557,6 +598,10 @@ function OfficePrayer({
             )}
             <p className="reader-text">{m.text}</p>
             {m.source && <p className="reader-source">{m.source}</p>}
+            {m.provenance &&
+              !(m.provId && state.seenProvenance.includes(m.provId)) && (
+                <p className="reader-provenance">{m.provenance}</p>
+              )}
             {m.note && <p className="reader-note">{m.note}</p>}
           </section>
         ))}
@@ -617,6 +662,10 @@ function SoloPrayer({ solo, onClose }: { solo: SoloContent; onClose: () => void 
             {m.ref && <p className="reader-ref">{m.ref}</p>}
             <p className="reader-text">{m.text}</p>
             {m.source && <p className="reader-source">{m.source}</p>}
+            {m.provenance &&
+              !(m.provId && state.seenProvenance.includes(m.provId)) && (
+                <p className="reader-provenance">{m.provenance}</p>
+              )}
             {m.note && <p className="reader-note">{m.note}</p>}
           </section>
         ))}

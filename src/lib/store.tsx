@@ -54,6 +54,11 @@ type Action =
   | { type: "devPatch"; patch: Partial<RuleState> }
   | { type: "setReminder"; slot: "morning" | "evening"; time: string | null }
   | { type: "advanceCycle"; key: string }
+  | { type: "advanceCanticle"; key: string }
+  | { type: "advanceReflection"; key: string }
+  | { type: "advanceConfession"; key: string }
+  | { type: "markProvenanceSeen"; ids: string[] }
+  | { type: "dismissProvenanceIntro" }
   | { type: "advancePsalm"; key: string; count: number }
   | { type: "advanceEoMorning"; date: string }
   | { type: "advanceEoEvening"; date: string }
@@ -158,6 +163,34 @@ function reducer(state: RuleState, action: Action): RuleState {
         },
       };
     }
+    case "advanceCanticle":
+      if (state.lastCanticleAdvanceKey === action.key) return state;
+      return {
+        ...state,
+        canticleIndex: state.canticleIndex + 1,
+        lastCanticleAdvanceKey: action.key,
+      };
+    case "advanceReflection":
+      if (state.lastReflectionAdvanceKey === action.key) return state;
+      return {
+        ...state,
+        reflectionIndex: state.reflectionIndex + 1,
+        lastReflectionAdvanceKey: action.key,
+      };
+    case "advanceConfession":
+      if (state.lastConfessionAdvanceKey === action.key) return state;
+      return {
+        ...state,
+        confessionIndex: state.confessionIndex + 1,
+        lastConfessionAdvanceKey: action.key,
+      };
+    case "markProvenanceSeen": {
+      const add = action.ids.filter((id) => !state.seenProvenance.includes(id));
+      if (add.length === 0) return state;
+      return { ...state, seenProvenance: [...state.seenProvenance, ...add] };
+    }
+    case "dismissProvenanceIntro":
+      return { ...state, provenanceIntroSeen: true };
     case "advanceEoMorning":
       // One morning prayer per day; a re-open/double-Amen can't advance twice.
       if (state.lastEoMorningAdvanceDate === action.date) return state;
