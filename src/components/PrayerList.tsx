@@ -71,10 +71,6 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
 
       <section className="settings-group">
         <h2 className="settings-h">Add someone</h2>
-        <p className="settings-note">
-          Choose a name and the petition to pray it under. The petition is read
-          first, then the names held within it.
-        </p>
 
         <form
           className="pl-add"
@@ -129,10 +125,7 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
             </div>
           )}
 
-          <p className="pl-preview">
-            Prayed: “{def.bid}”
-            {def.schedule ? ` ${def.schedule}` : ""}
-          </p>
+          {def.schedule && <p className="pl-preview">{def.schedule}</p>}
 
           <button className="btn btn-primary" type="submit" disabled={!name.trim()}>
             Add to the list
@@ -140,12 +133,9 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
         </form>
       </section>
 
-      {groups.length === 0 ? (
-        <p className="intentions-empty">
-          The people and needs you carry can rest here.
-        </p>
-      ) : (
-        groups.map((g) => (
+      {groups.length === 0
+        ? null
+        : groups.map((g) => (
           <section className="settings-group pl-group" key={g.def.key}>
             <h2 className="settings-h">{g.def.label}</h2>
             <p className="pl-bid">{g.def.bid}</p>
@@ -163,8 +153,7 @@ export function PrayerList({ onClose }: { onClose: () => void }) {
               ))}
             </ul>
           </section>
-        ))
-      )}
+        ))}
 
       <div className="onboard-actions">
         <button className="btn btn-primary" onClick={onClose}>
