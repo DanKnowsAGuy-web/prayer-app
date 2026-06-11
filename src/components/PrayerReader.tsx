@@ -669,7 +669,7 @@ function BuildOut({
   const psalmIdxs = movements.flatMap((m, i) => (m.kind === "psalm" ? [i] : []));
   const firstPsalm = psalmIdxs[0] ?? -1;
   const numPsalms = psalmIdxs.length;
-  const psalmOptions = [...Array(numPsalms)].map((_, k) => numPsalms - k); // n..1
+  const psalmOptions = [...Array(numPsalms)].map((_, k) => k + 1); // 1..n, in sequence
 
   return (
     <main className="reader buildout-screen">

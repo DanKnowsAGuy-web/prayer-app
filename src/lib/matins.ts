@@ -8,6 +8,7 @@
  * come from src/data/propers.json instead (see scripts/build-propers.mjs).
  */
 import type { Movement } from "./resolve";
+import { hebrewOf, lxxPsalmLabel } from "./lxx";
 
 // ── The fixed spine ──────────────────────────────────────────────────────────
 
@@ -86,15 +87,18 @@ function psalmText(bundle: PsalterBundle, n: number): string {
   return (bundle.psalms[String(n)] || []).map((v) => v.text).join("\n");
 }
 
+// `n` is the Septuagint number (what the services use and what we display);
+// the text is looked up by its Hebrew counterpart, since the bundled Psalter
+// (WEB) follows the Hebrew numbering. See ./lxx.
 const MATINS_PSALM_LOOP: { n: number; place: string }[] = [
   { n: 3, place: "from the Six Psalms, the quiet opening of Matins" },
-  { n: 38, place: "from the Six Psalms, the quiet opening of Matins" },
-  { n: 63, place: "from the Six Psalms, the quiet opening of Matins" },
-  { n: 88, place: "from the Six Psalms, the quiet opening of Matins" },
-  { n: 103, place: "from the Six Psalms, the quiet opening of Matins" },
-  { n: 143, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 37, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 62, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 87, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 102, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 142, place: "from the Six Psalms, the quiet opening of Matins" },
+  { n: 134, place: "from the Polyeleos, the festal psalms of praise" },
   { n: 135, place: "from the Polyeleos, the festal psalms of praise" },
-  { n: 136, place: "from the Polyeleos, the festal psalms of praise" },
   { n: 148, place: "from the Praises (Lauds), near the end of Matins" },
   { n: 149, place: "from the Praises (Lauds), near the end of Matins" },
   { n: 150, place: "from the Praises (Lauds), near the end of Matins" },
@@ -110,9 +114,9 @@ export function serveMatinsPsalm(
   const i = ((index % MATINS_PSALM_COUNT) + MATINS_PSALM_COUNT) % MATINS_PSALM_COUNT;
   const { n, place } = MATINS_PSALM_LOOP[i];
   return {
-    label: `Psalm ${n}`,
+    label: lxxPsalmLabel(n),
     ref: `A psalm of Matins · ${place}`,
-    text: psalmText(bundle, n),
+    text: psalmText(bundle, hebrewOf(n)),
   };
 }
 

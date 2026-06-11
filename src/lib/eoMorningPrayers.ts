@@ -9,6 +9,8 @@
  * English forms in the OCA-leaning voice the app uses throughout.
  */
 
+import { hebrewOf, lxxPsalmLabel } from "./lxx";
+
 export type EoMorningPrayer = {
   /** The traditional attribution, shown as the small line above the text. */
   title: string;
@@ -92,9 +94,9 @@ export function serveEoMorningSlot(
   const which = ((index % EO_MORNING_SLOT_COUNT) + EO_MORNING_SLOT_COUNT) % EO_MORNING_SLOT_COUNT;
   if (which < EO_MORNING_COUNT) return EO_MORNING_PRAYERS[which];
   if (which === EO_MORNING_COUNT) {
-    const verses = bundle.psalms["51"] || [];
+    const verses = bundle.psalms[String(hebrewOf(50))] || [];
     return {
-      title: "Psalm 50 · the psalm of repentance",
+      title: `${lxxPsalmLabel(50)} · the psalm of repentance`,
       text: verses.map((v) => v.text).join("\n"),
     };
   }

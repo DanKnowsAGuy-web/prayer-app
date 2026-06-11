@@ -9,6 +9,7 @@
  * are intentionally absent, as everywhere in the app.
  */
 import type { Movement } from "./resolve";
+import { hebrewOf, lxxPsalmLabel } from "./lxx";
 
 type PsalterBundle = { psalms: Record<string, { v: number; text: string }[]> };
 
@@ -24,13 +25,16 @@ function psalmText(bundle: PsalterBundle, n: number, from?: number, to?: number)
 // The great opening psalm in two parts (so no single visit runs long), then
 // the "Lord, I have cried" psalms. One per session, advancing by usage.
 
+// `n` is the Septuagint number (displayed, as the services use it); the text is
+// looked up by its Hebrew counterpart, since the bundled Psalter (WEB) follows
+// the Hebrew numbering. See ./lxx.
 const VESPERS_PSALM_LOOP: { n: number; from?: number; to?: number; place: string }[] = [
-  { n: 104, from: 1, to: 18, place: "the opening psalm of Vespers" },
-  { n: 104, from: 19, to: 35, place: "the opening psalm of Vespers" },
+  { n: 103, from: 1, to: 18, place: "the opening psalm of Vespers" },
+  { n: 103, from: 19, to: 35, place: "the opening psalm of Vespers" },
+  { n: 140, place: "from 'Lord, I have cried', the evening psalms" },
   { n: 141, place: "from 'Lord, I have cried', the evening psalms" },
-  { n: 142, place: "from 'Lord, I have cried', the evening psalms" },
-  { n: 130, place: "from 'Lord, I have cried', the evening psalms" },
-  { n: 117, place: "from 'Lord, I have cried', the evening psalms" },
+  { n: 129, place: "from 'Lord, I have cried', the evening psalms" },
+  { n: 116, place: "from 'Lord, I have cried', the evening psalms" },
 ];
 
 export const VESPERS_PSALM_COUNT = VESPERS_PSALM_LOOP.length; // 6
@@ -44,11 +48,11 @@ export function serveVespersPsalm(
     ((index % VESPERS_PSALM_COUNT) + VESPERS_PSALM_COUNT) % VESPERS_PSALM_COUNT;
   const s = VESPERS_PSALM_LOOP[i];
   const label =
-    s.from != null ? `Psalm ${s.n}:${s.from}–${s.to}` : `Psalm ${s.n}`;
+    s.from != null ? lxxPsalmLabel(s.n, { from: s.from, to: s.to! }) : lxxPsalmLabel(s.n);
   return {
     label,
     ref: `A psalm of Vespers · ${s.place}`,
-    text: psalmText(bundle, s.n, s.from, s.to),
+    text: psalmText(bundle, hebrewOf(s.n), s.from, s.to),
   };
 }
 
@@ -60,15 +64,17 @@ export const GLADSOME_LIGHT: Omit<Movement, "kind" | "level"> = {
   text: "O Gladsome Light of the holy glory of the immortal Father, heavenly, holy, blessed Jesus Christ. Now that we have come to the setting of the sun and behold the light of evening, we praise God: Father, Son, and Holy Spirit. For meet it is at all times to worship Thee with voices of praise, O Son of God and Giver of Life; therefore all the world glorifies Thee.",
 };
 
-/** The fixed Vespers prokeimena, by the weekday of the evening (0=Sun…6=Sat). */
-const PROKEIMENA: { text: string; source: string }[] = [
-  { text: "Behold now, bless the Lord, all you servants of the Lord.", source: "Psalm 134" },
-  { text: "The Lord hears me when I call upon Him.", source: "Psalm 4" },
-  { text: "Your mercy, O Lord, shall pursue me all the days of my life.", source: "Psalm 23" },
-  { text: "O God, save me by Your name, and judge me by Your strength.", source: "Psalm 54" },
-  { text: "My help comes from the Lord, who made heaven and earth.", source: "Psalm 121" },
-  { text: "O God, You are my helper, and Your mercy shall go before me.", source: "Psalm 59" },
-  { text: "The Lord is King; He is clothed with majesty.", source: "Psalm 93" },
+// The fixed Vespers prokeimena, by the weekday of the evening (0=Sun…6=Sat).
+// `lxx` is the Septuagint number the source is cited as; the displayed citation
+// carries the Hebrew number in parentheses (see ./lxx).
+const PROKEIMENA: { text: string; lxx: number }[] = [
+  { text: "Behold now, bless the Lord, all you servants of the Lord.", lxx: 133 },
+  { text: "The Lord hears me when I call upon Him.", lxx: 4 },
+  { text: "Your mercy, O Lord, shall pursue me all the days of my life.", lxx: 22 },
+  { text: "O God, save me by Your name, and judge me by Your strength.", lxx: 53 },
+  { text: "My help comes from the Lord, who made heaven and earth.", lxx: 120 },
+  { text: "O God, You are my helper, and Your mercy shall go before me.", lxx: 58 },
+  { text: "The Lord is King; He is clothed with majesty.", lxx: 92 },
 ];
 
 export function prokeimenon(weekday: number): Omit<Movement, "kind" | "level"> {
@@ -76,7 +82,7 @@ export function prokeimenon(weekday: number): Omit<Movement, "kind" | "level"> {
   return {
     label: "The prokeimenon of the day",
     text: `${p.text} (twice)\n\n${p.text}`,
-    source: p.source,
+    source: lxxPsalmLabel(p.lxx),
   };
 }
 
