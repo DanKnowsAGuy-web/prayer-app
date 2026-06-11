@@ -80,7 +80,7 @@ export const TRADITION_META: Record<Tradition, TraditionMeta> = {
     opening: {
       label: "O Heavenly King",
       // OCA-typical English.
-      text: "O Heavenly King, the Comforter, the Spirit of Truth, who art everywhere present and fillest all things, Treasury of good things and Giver of life: come and abide in us, and cleanse us from every impurity, and save our souls, O Good One.",
+      text: "O Heavenly King, the Comforter, the Spirit of Truth, who art everywhere present and fillest all things, Treasury of Blessings and Giver of life: come and abide in us, and cleanse us from every impurity, and save our souls, O Good One.",
     },
     intercessionClose: CLOSE_SAINTS,
   },
