@@ -1275,6 +1275,54 @@
   margin: 0;
 }
 
+/* ── The priest's send-a-rule tool (the `priest` flavor) ──────────────────── */
+.priest {
+  max-width: 34rem;
+}
+.priest-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: var(--space-4);
+}
+.priest-title {
+  font-size: 1.8rem;
+  font-weight: 500;
+}
+.priest-sub {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+.priest-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.priest-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.priest-label {
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.priest-preview {
+  font-style: italic;
+  color: var(--ink-muted);
+  resize: none;
+}
+.priest-send {
+  margin-top: var(--space-2);
+  align-self: flex-start;
+}
+.priest-copied {
+  color: var(--ink-muted);
+  font-style: italic;
+}
+
 .prayerlist .pl-add {
   display: flex;
   flex-direction: column;

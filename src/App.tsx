@@ -6,8 +6,10 @@ import { Home } from "./components/Home";
 import { PrayerReader } from "./components/PrayerReader";
 import { Settings } from "./components/Settings";
 import { PrayerList } from "./components/PrayerList";
+import { PriestShare } from "./components/PriestShare";
 import { DevPanel } from "./components/DevPanel";
 import { InstallHint } from "./components/InstallHint";
+import { IS_PRIEST } from "./lib/flavor";
 import "./styles/app.css";
 
 export function App() {
@@ -36,6 +38,11 @@ export function App() {
       {node}
     </>
   );
+
+  // The priest edition is a single screen: the send-a-rule tool, nothing else.
+  if (IS_PRIEST) {
+    return withGlow(<PriestShare />);
+  }
 
   if (hash === "#dev") {
     return withGlow(

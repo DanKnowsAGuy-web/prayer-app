@@ -22,7 +22,9 @@ export default defineConfig(({ mode }) => ({
   plugins: [react()],
   define: {
     __BUILD__: JSON.stringify(build),
-    __FLAVOR__: JSON.stringify(mode === "eo" ? "eo" : "general"),
+    __FLAVOR__: JSON.stringify(
+      mode === "eo" ? "eo" : mode === "priest" ? "priest" : "general",
+    ),
   },
   server: { port: 5173 },
 }));
