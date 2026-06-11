@@ -15,8 +15,8 @@ const PRAYER_APP_URL = "https://danknowsaguy-web.github.io/sjotl-prayer-app/";
 
 function buildMessage(firstName: string, priestName: string): string {
   const first = firstName.trim() || "Friend";
-  const signoff = priestName.trim() ? ` — ${priestName.trim()}` : "";
-  return `${first}, the following link may assist you in your prayer rule: ${PRAYER_APP_URL}${signoff}`;
+  const signoff = priestName.trim() ? `\n\n— ${priestName.trim()}` : "";
+  return `${first}, the following link may assist you in your prayer rule:\n\n${PRAYER_APP_URL}${signoff}`;
 }
 
 export function PriestShare() {
@@ -102,7 +102,7 @@ export function PriestShare() {
             className="intention-input priest-preview"
             value={message}
             readOnly
-            rows={4}
+            rows={6}
             aria-label="The message that will be sent"
           />
         </div>
