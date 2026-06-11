@@ -15,6 +15,12 @@ import type { DayPart } from "./daypart";
 import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 import { TRISAGION, GREAT_DOXOLOGY, DISMISSAL } from "./matins";
 import { GLADSOME_LIGHT, VESPERS_WINDOW } from "./vespers";
+import {
+  APOSTLES_CREED,
+  NICENE_CREED,
+  earlyChurchCanticles,
+  isProtEvang,
+} from "./earlyChurch";
 
 export type MovementKind =
   | "tradition-opening"
@@ -37,6 +43,8 @@ export type MovementKind =
   | "epistle"
   | "gospel"
   | "song"
+  | "canticle"
+  | "creed"
   | "cycle"
   | "intercession"
   | "night-psalm"
@@ -263,8 +271,21 @@ export function assembleOffice(ctx: OfficeCtx): Movement[] {
   // The Gospel song belongs to the full office: the top of each part's spine.
   push(ctx.song && { ...ctx.song, kind: "song", level: MAX_LEVEL[part] });
 
-  // Prayer with the early Church (the intercessory cycle).
-  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: 3 });
+  // The Protestant/Evangelical rule draws its depth from the undivided Church:
+  // the Apostles' Creed in the fuller office, and the early canticles and the
+  // original Nicene Creed as opt-ins that extend the session.
+  const protEvang = isProtEvang(tradition);
+  if (protEvang) {
+    push({ ...APOSTLES_CREED, kind: "creed", level: 4 });
+    push({ ...NICENE_CREED, kind: "creed", level: MAX_LEVEL[part], optional: true });
+    for (const c of earlyChurchCanticles(part)) {
+      push({ ...c, kind: "canticle", level: MAX_LEVEL[part], optional: true });
+    }
+  }
+
+  // Prayer with the early Church (the intercessory cycle). For Protestant and
+  // Evangelical it is the formative core, kept all but the smallest session.
+  push(ctx.cycle && { ...ctx.cycle, kind: "cycle", level: protEvang ? 2 : 3 });
 
   // Your prayer list — held space, in both offices, when there are names today.
   if (intentionsForDate(ctx.intentions, ctx.date).length) {
