@@ -1233,3 +1233,112 @@
   gap: var(--space-3);
   flex-wrap: wrap;
 }
+
+/* ── The prayer list: Home preview and the manager screen ─────────────────── */
+.intention-preview {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  color: var(--ink-muted);
+  font-style: italic;
+  max-width: 32rem;
+}
+.intentions-open {
+  margin-top: var(--space-3);
+  align-self: flex-start;
+}
+
+.prayerlist .pl-add {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.pl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: var(--space-2);
+}
+.pl-field-label {
+  color: var(--ink-faint);
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.pl-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.pl-pills .pill {
+  font-size: 0.95rem;
+  padding: 0.4rem 0.85rem;
+}
+.pl-preview {
+  color: var(--ink-muted);
+  font-style: italic;
+  margin-top: var(--space-2);
+}
+
+.pl-group .settings-h {
+  font-size: 1.15rem;
+  color: var(--ink-muted);
+}
+.pl-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.pl-item {
+  border-bottom: 1px solid var(--border);
+  padding: 0.55rem 0;
+}
+.pl-item-head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.2rem 0;
+}
+.pl-item-name {
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+.pl-item-line {
+  color: var(--ink-faint);
+  font-style: italic;
+  font-size: 0.9rem;
+  margin: 0.15rem 0 0;
+}
+.pl-edit {
+  margin-top: var(--space-2);
+  padding: var(--space-2);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.pl-edit-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.cadence-tag.cadence-toggle {
+  cursor: pointer;
+}
+.pl-remove {
+  color: var(--ink-muted);
+}

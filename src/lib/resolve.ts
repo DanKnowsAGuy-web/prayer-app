@@ -10,6 +10,7 @@
  */
 
 import { intentionsForDate, type Intention, type Tradition } from "./engine";
+import { intentionLines } from "./intentions";
 import type { DayPart } from "./daypart";
 import { TRADITION_META, DEFAULT_DOXOLOGY } from "./traditions";
 import { TRISAGION, GREAT_DOXOLOGY, DISMISSAL } from "./matins";
@@ -176,7 +177,7 @@ function intercessionMovement(
   close: string,
   attribution?: string,
 ): Movement {
-  const today = intentionsForDate(intentions, date).map((i) => i.text);
+  const today = intentionLines(intentionsForDate(intentions, date));
   const names = today.length
     ? today.join("\n")
     : "(bring to mind those you carry, and name them before God)";
@@ -428,9 +429,7 @@ export function assembleMatins(ctx: MatinsCtx): Movement[] {
   if (intentionsForDate(ctx.intentions, ctx.date).length) {
     const meta = tradition ? TRADITION_META[tradition] : null;
     const close = meta ? meta.intercessionClose : INTERCESSION_AFTER;
-    const names = intentionsForDate(ctx.intentions, ctx.date)
-      .map((i) => i.text)
-      .join("\n");
+    const names = intentionLines(intentionsForDate(ctx.intentions, ctx.date)).join("\n");
     push({
       kind: "intercession",
       level: 3,

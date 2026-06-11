@@ -1,4 +1,4 @@
-import { useStore, makeId } from "../lib/store";
+import { useStore } from "../lib/store";
 import { unitLabel, UNIT_COUNT } from "../lib/psalter";
 import { IS_EO } from "../lib/flavor";
 import { useEffect } from "react";
@@ -18,23 +18,20 @@ import {
   type SummaryWindow,
 } from "../lib/ruleSummary";
 import { TraditionEmblem } from "./TraditionEmblem";
-import {
-  cadenceOf,
-  nextWeeklyBucket,
-  weekdayOf,
-  type Cadence,
-  type Intention,
-} from "../lib/engine";
+import { intentionsForDate } from "../lib/engine";
+import { intentionLines } from "../lib/intentions";
 import { greeting, longDate, type DayPart } from "../lib/daypart";
 import { useState } from "react";
 
 export function Home({
   onBeginPrayer,
   onOpenSettings,
+  onOpenPrayerList,
   defaultPart,
 }: {
   onBeginPrayer: (part: DayPart) => void;
   onOpenSettings: () => void;
+  onOpenPrayerList: () => void;
   defaultPart: DayPart;
 }) {
   const { state, today } = useStore();
@@ -177,7 +174,7 @@ export function Home({
 
       <PsalmRotation />
 
-      <Intentions />
+      <Intentions onOpen={onOpenPrayerList} />
 
       <MyRule />
 
@@ -442,72 +439,10 @@ function MyRule() {
   );
 }
 
-function Intentions() {
-  const { state, today, dispatch } = useStore();
-  const [text, setText] = useState("");
-  // "Just added" is per-visit only; it does not persist across logins.
-  const [sessionAdded, setSessionAdded] = useState<string[]>([]);
-  const [showAll, setShowAll] = useState(false);
-
-  const wd = weekdayOf(today);
-
-  function add(cadence: Cadence) {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const id = makeId(Date.now() + state.intentions.length);
-    dispatch({
-      type: "addIntention",
-      intention: {
-        id,
-        text: trimmed,
-        added: today,
-        answered: false,
-        cadence,
-        bucket:
-          cadence === "weekly" ? nextWeeklyBucket(state.intentions) : undefined,
-      },
-    });
-    setSessionAdded((prev) => [id, ...prev]);
-    setText("");
-  }
-
-  function row(i: Intention) {
-    const cadence = cadenceOf(i);
-    const inToday = cadence === "weekly" && (i.bucket ?? 0) % 7 === wd;
-    return (
-      <li key={i.id} className={`intention ${i.answered ? "is-answered" : ""}`}>
-        <button
-          className="intention-toggle"
-          onClick={() => dispatch({ type: "toggleIntention", id: i.id })}
-          aria-pressed={i.answered}
-          aria-label={i.answered ? "Mark as still praying" : "Mark as answered"}
-        >
-          <span className="intention-mark" aria-hidden="true" />
-          <span className="intention-text">{i.text}</span>
-        </button>
-        <button
-          className={`cadence-tag cadence-${cadence} ${inToday ? "is-today" : ""}`}
-          onClick={() => dispatch({ type: "toggleCadence", id: i.id })}
-          aria-label={`Praying ${cadence}. Tap to make ${
-            cadence === "daily" ? "weekly" : "daily"
-          }.`}
-        >
-          {cadence === "daily" ? "Daily" : inToday ? "Weekly · today" : "Weekly"}
-        </button>
-        <button
-          className="intention-remove"
-          onClick={() => dispatch({ type: "removeIntention", id: i.id })}
-          aria-label={`Remove "${i.text}"`}
-        >
-          ×
-        </button>
-      </li>
-    );
-  }
-
-  const recent = sessionAdded
-    .map((id) => state.intentions.find((i) => i.id === id))
-    .filter((i): i is Intention => Boolean(i));
+function Intentions({ onOpen }: { onOpen: () => void }) {
+  const { state, today } = useStore();
+  const todays = intentionLines(intentionsForDate(state.intentions, today));
+  const count = state.intentions.length;
 
   return (
     <section className="intentions" aria-labelledby="int-h">
@@ -516,65 +451,28 @@ function Intentions() {
         Your prayer list
       </h2>
 
-      <form
-        className="intention-add"
-        onSubmit={(e) => {
-          e.preventDefault();
-          add("daily");
-        }}
-      >
-        <input
-          className="intention-input"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="A name, a need, a thanksgiving…"
-          aria-label="Add a prayer intention"
-          maxLength={120}
-        />
-        <div className="intention-add-btns">
-          <button className="btn btn-primary" type="submit" disabled={!text.trim()}>
-            Add daily
-          </button>
-          <button
-            className="btn btn-ghost"
-            type="button"
-            onClick={() => add("weekly")}
-            disabled={!text.trim()}
-          >
-            Add weekly
-          </button>
-        </div>
-      </form>
-
-      {recent.length > 0 && !showAll && (
-        <div className="recent-added">
-          <p className="recent-label">Just added</p>
-          <ul className="intention-list">{recent.map(row)}</ul>
-        </div>
-      )}
-
-      {state.intentions.length === 0 && recent.length === 0 ? (
+      {count === 0 ? (
         <p className="intentions-empty">
           The people and needs you carry can rest here. Daily names are prayed
           every day; weekly names come up once a week, in turn.
         </p>
-      ) : showAll ? (
-        <div className="full-list">
-          <ul className="intention-list">{state.intentions.map(row)}</ul>
-          <button className="btn btn-quiet" onClick={() => setShowAll(false)}>
-            Hide list
-          </button>
-        </div>
+      ) : todays.length > 0 ? (
+        <ul className="intention-preview">
+          {todays.map((line, n) => (
+            <li key={n}>{line}.</li>
+          ))}
+        </ul>
       ) : (
-        state.intentions.length > 0 && (
-          <button
-            className="btn btn-ghost see-list"
-            onClick={() => setShowAll(true)}
-          >
-            See your prayer list ({state.intentions.length})
-          </button>
-        )
+        <p className="intentions-empty">
+          No names come up today; your list rests until their turn.
+        </p>
       )}
+
+      <button className="btn btn-primary intentions-open" onClick={onOpen}>
+        {count === 0
+          ? "Add people to your prayer list"
+          : `Open your prayer list (${count})`}
+      </button>
     </section>
   );
 }

@@ -45,6 +45,7 @@ type Action =
   | { type: "toggleIntention"; id: string }
   | { type: "toggleCadence"; id: string }
   | { type: "removeIntention"; id: string }
+  | { type: "updateIntention"; id: string; patch: Partial<Intention> }
   | { type: "setPsalmTime"; time: "morning" | "evening" }
   | { type: "setPetitionTime"; time: "morning" | "evening" }
   | { type: "setTradition"; tradition: Tradition }
@@ -109,6 +110,13 @@ function reducer(state: RuleState, action: Action): RuleState {
       return {
         ...state,
         intentions: state.intentions.filter((i) => i.id !== action.id),
+      };
+    case "updateIntention":
+      return {
+        ...state,
+        intentions: state.intentions.map((i) =>
+          i.id === action.id ? { ...i, ...action.patch, id: i.id } : i,
+        ),
       };
     case "setPsalmTime":
       return { ...state, psalmTime: action.time };

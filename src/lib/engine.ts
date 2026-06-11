@@ -144,6 +144,21 @@ export type AmenRecord = {
 
 export type Cadence = "daily" | "weekly";
 
+/**
+ * The reason a name is held in prayer. It governs the line woven into the
+ * office (see lib/intentions). "general" is the plain fallback; older saved
+ * names with no category are treated as "general".
+ */
+export type IntentionCategory =
+  | "general"
+  | "sick"
+  | "departed"
+  | "afflicted"
+  | "asked"
+  | "new-life"
+  | "peace"
+  | "strayed";
+
 export type Intention = {
   id: string;
   text: string;
@@ -154,7 +169,16 @@ export type Intention = {
   cadence: Cadence;
   /** For weekly names: the weekday (0=Sun…6=Sat) they come up on. */
   bucket?: number;
+  /** Why they are held in prayer; shapes the woven line. Defaults to general. */
+  category?: IntentionCategory;
+  /** An optional word of context, e.g. "my grandmother" or "Kyiv". */
+  context?: string;
 };
+
+/** Treat a saved intention with no category (older data) as general. */
+export function categoryOf(i: Intention): IntentionCategory {
+  return i.category ?? "general";
+}
 
 /** Treat a saved intention with no cadence (older data) as daily. */
 export function cadenceOf(i: Intention): Cadence {
